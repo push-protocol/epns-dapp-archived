@@ -1,23 +1,22 @@
 {
   "files": {
-    "main.css": "/static/css/main.ef5167fb.chunk.css",
-    "main.js": "/static/js/main.dc6f3d90.chunk.js",
-    "main.js.map": "/static/js/main.dc6f3d90.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.e86b45e8.js",
-    "runtime-main.js.map": "/static/js/runtime-main.e86b45e8.js.map",
-    "static/js/2.c0de3a00.chunk.js": "/static/js/2.c0de3a00.chunk.js",
-    "static/js/2.c0de3a00.chunk.js.map": "/static/js/2.c0de3a00.chunk.js.map",
-    "index.html": "/index.html",
-    "precache-manifest.4aa043957b0da423c4c9924f75c6703c.js": "/precache-manifest.4aa043957b0da423c4c9924f75c6703c.js",
-    "service-worker.js": "/service-worker.js",
-    "static/css/main.ef5167fb.chunk.css.map": "/static/css/main.ef5167fb.chunk.css.map",
-    "static/js/2.c0de3a00.chunk.js.LICENSE.txt": "/static/js/2.c0de3a00.chunk.js.LICENSE.txt",
-    "static/media/ethereumLogo.png": "/static/media/ethereumLogo.0020ce37.png"
+    "main.js": "https://app.epns.io/static/js/main.25189d46.chunk.js",
+    "main.js.map": "https://app.epns.io/static/js/main.25189d46.chunk.js.map",
+    "runtime-main.js": "https://app.epns.io/static/js/runtime-main.b3745675.js",
+    "runtime-main.js.map": "https://app.epns.io/static/js/runtime-main.b3745675.js.map",
+    "static/js/2.346a49e6.chunk.js": "https://app.epns.io/static/js/2.346a49e6.chunk.js",
+    "static/js/2.346a49e6.chunk.js.map": "https://app.epns.io/static/js/2.346a49e6.chunk.js.map",
+    "static/js/3.75412f6c.chunk.js": "https://app.epns.io/static/js/3.75412f6c.chunk.js",
+    "static/js/3.75412f6c.chunk.js.map": "https://app.epns.io/static/js/3.75412f6c.chunk.js.map",
+    "index.html": "https://app.epns.io/index.html",
+    "precache-manifest.aae8297ee6bcde0c9162cbfdce3941db.js": "https://app.epns.io/precache-manifest.aae8297ee6bcde0c9162cbfdce3941db.js",
+    "service-worker.js": "https://app.epns.io/service-worker.js",
+    "static/js/2.346a49e6.chunk.js.LICENSE.txt": "https://app.epns.io/static/js/2.346a49e6.chunk.js.LICENSE.txt",
+    "static/js/3.75412f6c.chunk.js.LICENSE.txt": "https://app.epns.io/static/js/3.75412f6c.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.e86b45e8.js",
-    "static/js/2.c0de3a00.chunk.js",
-    "static/css/main.ef5167fb.chunk.css",
-    "static/js/main.dc6f3d90.chunk.js"
+    "static/js/runtime-main.b3745675.js",
+    "static/js/2.346a49e6.chunk.js",
+    "static/js/main.25189d46.chunk.js"
   ]
 }
