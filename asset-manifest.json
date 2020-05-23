@@ -1,22 +1,25 @@
 {
   "files": {
-    "main.js": "https://app.epns.io/static/js/main.25189d46.chunk.js",
-    "main.js.map": "https://app.epns.io/static/js/main.25189d46.chunk.js.map",
-    "runtime-main.js": "https://app.epns.io/static/js/runtime-main.b3745675.js",
-    "runtime-main.js.map": "https://app.epns.io/static/js/runtime-main.b3745675.js.map",
-    "static/js/2.346a49e6.chunk.js": "https://app.epns.io/static/js/2.346a49e6.chunk.js",
-    "static/js/2.346a49e6.chunk.js.map": "https://app.epns.io/static/js/2.346a49e6.chunk.js.map",
-    "static/js/3.75412f6c.chunk.js": "https://app.epns.io/static/js/3.75412f6c.chunk.js",
-    "static/js/3.75412f6c.chunk.js.map": "https://app.epns.io/static/js/3.75412f6c.chunk.js.map",
+    "main.css": "https://app.epns.io/static/css/main.3c2f3820.chunk.css",
+    "main.js": "https://app.epns.io/static/js/main.70de714b.chunk.js",
+    "main.js.map": "https://app.epns.io/static/js/main.70de714b.chunk.js.map",
+    "runtime-main.js": "https://app.epns.io/static/js/runtime-main.c2d7cef9.js",
+    "runtime-main.js.map": "https://app.epns.io/static/js/runtime-main.c2d7cef9.js.map",
+    "static/js/2.be14bf01.chunk.js": "https://app.epns.io/static/js/2.be14bf01.chunk.js",
+    "static/js/2.be14bf01.chunk.js.map": "https://app.epns.io/static/js/2.be14bf01.chunk.js.map",
+    "static/js/3.36ae541c.chunk.js": "https://app.epns.io/static/js/3.36ae541c.chunk.js",
+    "static/js/3.36ae541c.chunk.js.map": "https://app.epns.io/static/js/3.36ae541c.chunk.js.map",
     "index.html": "https://app.epns.io/index.html",
-    "precache-manifest.aae8297ee6bcde0c9162cbfdce3941db.js": "https://app.epns.io/precache-manifest.aae8297ee6bcde0c9162cbfdce3941db.js",
+    "precache-manifest.541eb611a03f05e98f13b6b082f06c66.js": "https://app.epns.io/precache-manifest.541eb611a03f05e98f13b6b082f06c66.js",
     "service-worker.js": "https://app.epns.io/service-worker.js",
-    "static/js/2.346a49e6.chunk.js.LICENSE.txt": "https://app.epns.io/static/js/2.346a49e6.chunk.js.LICENSE.txt",
-    "static/js/3.75412f6c.chunk.js.LICENSE.txt": "https://app.epns.io/static/js/3.75412f6c.chunk.js.LICENSE.txt"
+    "static/css/main.3c2f3820.chunk.css.map": "https://app.epns.io/static/css/main.3c2f3820.chunk.css.map",
+    "static/js/2.be14bf01.chunk.js.LICENSE.txt": "https://app.epns.io/static/js/2.be14bf01.chunk.js.LICENSE.txt",
+    "static/js/3.36ae541c.chunk.js.LICENSE.txt": "https://app.epns.io/static/js/3.36ae541c.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.b3745675.js",
-    "static/js/2.346a49e6.chunk.js",
-    "static/js/main.25189d46.chunk.js"
+    "static/js/runtime-main.c2d7cef9.js",
+    "static/js/2.be14bf01.chunk.js",
+    "static/css/main.3c2f3820.chunk.css",
+    "static/js/main.70de714b.chunk.js"
   ]
 }
