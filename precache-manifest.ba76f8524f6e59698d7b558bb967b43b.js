@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "e42a07b95ea91a2335431a3428e5e90d",
+    "revision": "7aa4d10389b9d95910515a345c489005",
     "url": "https://app.epns.io/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "https://app.epns.io/static/css/2.f9890651.chunk.css"
   },
   {
-    "revision": "ed2268dbe77c0e9f57c2",
+    "revision": "869609643cfb2c3e0a89",
     "url": "https://app.epns.io/static/css/main.fca38781.chunk.css"
   },
   {
@@ -28,8 +28,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "https://app.epns.io/static/js/3.59a973d4.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "ed2268dbe77c0e9f57c2",
-    "url": "https://app.epns.io/static/js/main.ffca12c6.chunk.js"
+    "revision": "869609643cfb2c3e0a89",
+    "url": "https://app.epns.io/static/js/main.f38aeb91.chunk.js"
   },
   {
     "revision": "6efead29ee628e9e165e",
