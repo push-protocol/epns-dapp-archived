@@ -1,28 +1,28 @@
 {
   "files": {
     "main.css": "https://app.epns.io/static/css/main.fca38781.chunk.css",
-    "main.js": "https://app.epns.io/static/js/main.94e28023.chunk.js",
-    "main.js.map": "https://app.epns.io/static/js/main.94e28023.chunk.js.map",
+    "main.js": "https://app.epns.io/static/js/main.abe52c3e.chunk.js",
+    "main.js.map": "https://app.epns.io/static/js/main.abe52c3e.chunk.js.map",
     "runtime-main.js": "https://app.epns.io/static/js/runtime-main.68846977.js",
     "runtime-main.js.map": "https://app.epns.io/static/js/runtime-main.68846977.js.map",
     "static/css/2.f9890651.chunk.css": "https://app.epns.io/static/css/2.f9890651.chunk.css",
-    "static/js/2.ef438f1e.chunk.js": "https://app.epns.io/static/js/2.ef438f1e.chunk.js",
-    "static/js/2.ef438f1e.chunk.js.map": "https://app.epns.io/static/js/2.ef438f1e.chunk.js.map",
+    "static/js/2.b5345230.chunk.js": "https://app.epns.io/static/js/2.b5345230.chunk.js",
+    "static/js/2.b5345230.chunk.js.map": "https://app.epns.io/static/js/2.b5345230.chunk.js.map",
     "static/js/3.59a973d4.chunk.js": "https://app.epns.io/static/js/3.59a973d4.chunk.js",
     "static/js/3.59a973d4.chunk.js.map": "https://app.epns.io/static/js/3.59a973d4.chunk.js.map",
     "index.html": "https://app.epns.io/index.html",
-    "precache-manifest.11c57e7a2e93b7c434d9857024443db5.js": "https://app.epns.io/precache-manifest.11c57e7a2e93b7c434d9857024443db5.js",
+    "precache-manifest.6373d7dfa615722c5744f1954f14670f.js": "https://app.epns.io/precache-manifest.6373d7dfa615722c5744f1954f14670f.js",
     "service-worker.js": "https://app.epns.io/service-worker.js",
     "static/css/2.f9890651.chunk.css.map": "https://app.epns.io/static/css/2.f9890651.chunk.css.map",
     "static/css/main.fca38781.chunk.css.map": "https://app.epns.io/static/css/main.fca38781.chunk.css.map",
-    "static/js/2.ef438f1e.chunk.js.LICENSE.txt": "https://app.epns.io/static/js/2.ef438f1e.chunk.js.LICENSE.txt",
+    "static/js/2.b5345230.chunk.js.LICENSE.txt": "https://app.epns.io/static/js/2.b5345230.chunk.js.LICENSE.txt",
     "static/js/3.59a973d4.chunk.js.LICENSE.txt": "https://app.epns.io/static/js/3.59a973d4.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.68846977.js",
     "static/css/2.f9890651.chunk.css",
-    "static/js/2.ef438f1e.chunk.js",
+    "static/js/2.b5345230.chunk.js",
     "static/css/main.fca38781.chunk.css",
-    "static/js/main.94e28023.chunk.js"
+    "static/js/main.abe52c3e.chunk.js"
   ]
 }
