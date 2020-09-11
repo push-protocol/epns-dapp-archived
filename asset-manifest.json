@@ -1,28 +1,28 @@
 {
   "files": {
-    "main.css": "https://staging.epns.io/static/css/main.fca38781.chunk.css",
-    "main.js": "https://staging.epns.io/static/js/main.1a605239.chunk.js",
-    "main.js.map": "https://staging.epns.io/static/js/main.1a605239.chunk.js.map",
-    "runtime-main.js": "https://staging.epns.io/static/js/runtime-main.b360958d.js",
-    "runtime-main.js.map": "https://staging.epns.io/static/js/runtime-main.b360958d.js.map",
-    "static/css/2.f9890651.chunk.css": "https://staging.epns.io/static/css/2.f9890651.chunk.css",
-    "static/js/2.c3bb39dd.chunk.js": "https://staging.epns.io/static/js/2.c3bb39dd.chunk.js",
-    "static/js/2.c3bb39dd.chunk.js.map": "https://staging.epns.io/static/js/2.c3bb39dd.chunk.js.map",
-    "static/js/3.2bd2a143.chunk.js": "https://staging.epns.io/static/js/3.2bd2a143.chunk.js",
-    "static/js/3.2bd2a143.chunk.js.map": "https://staging.epns.io/static/js/3.2bd2a143.chunk.js.map",
-    "index.html": "https://staging.epns.io/index.html",
-    "precache-manifest.bf86810fc2d291a04cd1b46b515bd9e8.js": "https://staging.epns.io/precache-manifest.bf86810fc2d291a04cd1b46b515bd9e8.js",
-    "service-worker.js": "https://staging.epns.io/service-worker.js",
-    "static/css/2.f9890651.chunk.css.map": "https://staging.epns.io/static/css/2.f9890651.chunk.css.map",
-    "static/css/main.fca38781.chunk.css.map": "https://staging.epns.io/static/css/main.fca38781.chunk.css.map",
-    "static/js/2.c3bb39dd.chunk.js.LICENSE.txt": "https://staging.epns.io/static/js/2.c3bb39dd.chunk.js.LICENSE.txt",
-    "static/js/3.2bd2a143.chunk.js.LICENSE.txt": "https://staging.epns.io/static/js/3.2bd2a143.chunk.js.LICENSE.txt"
+    "main.css": "https://app.epns.io/static/css/main.fca38781.chunk.css",
+    "main.js": "https://app.epns.io/static/js/main.48ef4a3e.chunk.js",
+    "main.js.map": "https://app.epns.io/static/js/main.48ef4a3e.chunk.js.map",
+    "runtime-main.js": "https://app.epns.io/static/js/runtime-main.68846977.js",
+    "runtime-main.js.map": "https://app.epns.io/static/js/runtime-main.68846977.js.map",
+    "static/css/2.f9890651.chunk.css": "https://app.epns.io/static/css/2.f9890651.chunk.css",
+    "static/js/2.b5345230.chunk.js": "https://app.epns.io/static/js/2.b5345230.chunk.js",
+    "static/js/2.b5345230.chunk.js.map": "https://app.epns.io/static/js/2.b5345230.chunk.js.map",
+    "static/js/3.59a973d4.chunk.js": "https://app.epns.io/static/js/3.59a973d4.chunk.js",
+    "static/js/3.59a973d4.chunk.js.map": "https://app.epns.io/static/js/3.59a973d4.chunk.js.map",
+    "index.html": "https://app.epns.io/index.html",
+    "precache-manifest.270461d3c34aec6e9f87410d05b96920.js": "https://app.epns.io/precache-manifest.270461d3c34aec6e9f87410d05b96920.js",
+    "service-worker.js": "https://app.epns.io/service-worker.js",
+    "static/css/2.f9890651.chunk.css.map": "https://app.epns.io/static/css/2.f9890651.chunk.css.map",
+    "static/css/main.fca38781.chunk.css.map": "https://app.epns.io/static/css/main.fca38781.chunk.css.map",
+    "static/js/2.b5345230.chunk.js.LICENSE.txt": "https://app.epns.io/static/js/2.b5345230.chunk.js.LICENSE.txt",
+    "static/js/3.59a973d4.chunk.js.LICENSE.txt": "https://app.epns.io/static/js/3.59a973d4.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.b360958d.js",
+    "static/js/runtime-main.68846977.js",
     "static/css/2.f9890651.chunk.css",
-    "static/js/2.c3bb39dd.chunk.js",
+    "static/js/2.b5345230.chunk.js",
     "static/css/main.fca38781.chunk.css",
-    "static/js/main.1a605239.chunk.js"
+    "static/js/main.48ef4a3e.chunk.js"
   ]
 }
