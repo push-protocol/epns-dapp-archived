@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "https://app.epns.io/static/css/main.35086101.chunk.css",
-    "main.js": "https://app.epns.io/static/js/main.587d69f2.chunk.js",
-    "main.js.map": "https://app.epns.io/static/js/main.587d69f2.chunk.js.map",
+    "main.js": "https://app.epns.io/static/js/main.99f6f0b3.chunk.js",
+    "main.js.map": "https://app.epns.io/static/js/main.99f6f0b3.chunk.js.map",
     "runtime-main.js": "https://app.epns.io/static/js/runtime-main.be5ff641.js",
     "runtime-main.js.map": "https://app.epns.io/static/js/runtime-main.be5ff641.js.map",
     "static/css/2.350db883.chunk.css": "https://app.epns.io/static/css/2.350db883.chunk.css",
@@ -11,7 +11,7 @@
     "static/js/3.80579bb8.chunk.js": "https://app.epns.io/static/js/3.80579bb8.chunk.js",
     "static/js/3.80579bb8.chunk.js.map": "https://app.epns.io/static/js/3.80579bb8.chunk.js.map",
     "index.html": "https://app.epns.io/index.html",
-    "precache-manifest.2126faeb1661dfd534a5c930ec6fc4e8.js": "https://app.epns.io/precache-manifest.2126faeb1661dfd534a5c930ec6fc4e8.js",
+    "precache-manifest.2b1a4fb24bdbdb50f4c4e452585d6ee1.js": "https://app.epns.io/precache-manifest.2b1a4fb24bdbdb50f4c4e452585d6ee1.js",
     "service-worker.js": "https://app.epns.io/service-worker.js",
     "static/css/2.350db883.chunk.css.map": "https://app.epns.io/static/css/2.350db883.chunk.css.map",
     "static/css/main.35086101.chunk.css.map": "https://app.epns.io/static/css/main.35086101.chunk.css.map",
@@ -23,6 +23,6 @@
     "static/css/2.350db883.chunk.css",
     "static/js/2.b61df4c8.chunk.js",
     "static/css/main.35086101.chunk.css",
-    "static/js/main.587d69f2.chunk.js"
+    "static/js/main.99f6f0b3.chunk.js"
   ]
 }
