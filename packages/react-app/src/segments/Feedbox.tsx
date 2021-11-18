@@ -1,70 +1,67 @@
 import React from "react";
-import styled, { css } from 'styled-components';
+import { api, utils, NotificationItem } from "@epnsproject/frontend-sdk-staging";
+import styled from 'styled-components';
 import Loader from 'react-loader-spinner'
+import { Waypoint } from "react-waypoint";
 
+import {ALLOWED_CORE_NETWORK} from 'pages/Home'
 import { useWeb3React } from '@web3-react/core'
 import { addresses, abis } from "@project/contracts";
-import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
 import { ethers } from "ethers";
-import { BigNumber, bigNumberify, formatEther } from 'ethers/utils'
-import { useQuery, gql } from '@apollo/client';
+import ChannelsDataStore from "singletons/ChannelsDataStore";
 
-import ViewNotificationItem from "components/ViewNotificationItem";
 import NotificationToast from "components/NotificationToast";
-import hex2ascii from 'hex2ascii'
 
 // Create Header
-function Feedbox({ epnsReadProvider }) {
-
-  const { account, library } = useWeb3React();
+function Feedbox() {
+  const [epnsReadProvider, setEpnsReadProvider] = React.useState(null);
+  const { account, library, chainId } = useWeb3React();
 
   const [notifications, setNotifications] = React.useState([]);
-
+  // since we dont have how many notifications there are in total
+  // we use this field to note when there are no more notifications to load
+  const [finishedFetching, setFinishedFetching] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
   const [toast, showToast] = React.useState(null);
 
-  const [page, setPage] = React.useState(0);
-  const [paginatedNotifications, setPaginatedNotifications] = React.useState([]);
-
-  const notificationsPerPage = 20;
-  const notificationsVisited = page * notificationsPerPage;
-
+  const [currentPage, setCurrentPage] = React.useState(1);
   //define query
-  const GET_NOTIFICATIONS = gql`
-  {
-    notifications(where:{userAddress:"${account}"}, orderBy: indexBlock, orderDirection: desc)
-    {
-        id
-        userAddress
-        channelAddress
-        notificationTitle
-        notificationBody
-        dataType
-        dataSecret
-        dataASub
-        dataAMsg
-        dataACta
-        dataAImg
-        dataATime
-        indexTimestamp
-        indexBlock
+  const notificationsPerPage = 6;
+
+  React.useEffect(() => {
+    const signer = library.getSigner(account);
+    // define the epns comms contracts
+    const ethCommsContract = new ethers.Contract(addresses.epnsEthComm, abis.epnsComm, signer);
+    const polygonCommsContract = new ethers.Contract(addresses.epnsPolyComm, abis.epnsComm, signer);
+    const communicatorContract = chainId === ALLOWED_CORE_NETWORK ? ethCommsContract : polygonCommsContract;
+    // define the epns comms contracts
+    setEpnsReadProvider(communicatorContract);
+  }, [chainId]);
+  
+  const loadNotifications = async (currentPage:any) => {
+    setLoading(true);
+    try{
+      const {count, results} = await api.fetchNotifications(account, notificationsPerPage, currentPage);
+      const parsedResponse = utils.parseApiResponse(results);
+      setNotifications((oldNotifications) => ([
+        ...oldNotifications,
+        ...parsedResponse,
+      ]));
+      if(count === 0){
+        setFinishedFetching(true);
+      }
+    }catch(err){
+      console.log(err)
+    } finally{
+      setLoading(false);
     }
   }
-`;
-
-  //useQuery react hook exposed by Apollo fetches query results and stores in data
-  const { loading, error, data } = useQuery(GET_NOTIFICATIONS);
 
   const clearToast = () => showToast(null);
 
-  //set notitifications
-  React.useEffect(() => {
-    if (!loading && !error && data && data.notifications) {
-      setNotifications(data.notifications);
-    }
-  }, [loading, error, data, epnsReadProvider]);
-
   React.useEffect(() => {
     if (epnsReadProvider) {
+      loadNotifications(currentPage);
       return subscribe()
     }
   }, [epnsReadProvider]);
@@ -76,20 +73,13 @@ function Feedbox({ epnsReadProvider }) {
     }
   }, [toast]);
 
-  //update paginatedNotifications array when scrolled till the end
-  React.useEffect(() => {
-    if(notifications){
-      setPaginatedNotifications(prev => [...prev, ...notifications.slice(notificationsVisited, notificationsVisited + notificationsPerPage)])
-      console.log("🚀 ~ file: Feedbox.tsx ~ line 31 ~ Feedbox ~ paginatedNotifications", paginatedNotifications)
-    }
-  }, [notifications, page]);
-
-  //function to handle infinity scroll
-  const handleScroll = (event) => {
-    const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
-    if (scrollHeight - scrollTop === clientHeight) {
-      setPage(prev => prev + 1);
-    }
+  //function to query more notifications
+  const handlePagination = async() => {
+    setCurrentPage((prevPage) => {
+      const newPage = prevPage + 1;
+      loadNotifications(newPage);
+      return newPage;
+    });
   };
   
   const subscribe = () => {
@@ -101,7 +91,8 @@ function Feedbox({ epnsReadProvider }) {
   //handle new notification
   const onReceive = async notification => {
     showToast(notification);
-    setNotifications(notifications => [notification].concat(notifications));
+    setNotifications(existingNotifications => [notification, ...existingNotifications]);
+    // setNotifications(notifications => [notification].concat(notifications));
   };
 
   //subscribe to SendNotification
@@ -122,22 +113,24 @@ function Feedbox({ epnsReadProvider }) {
         .concat('+')
         .concat(eventUserAddress)
         .toLocaleLowerCase()
-      const ipfsId = identity.split('+')[1]
+      const ipfsId = identity.split('+')[1];
+
+      const channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(eventChannelAddress);
 
       // Form Gateway URL
       const url = "https://ipfs.io/ipfs/" + ipfsId;
       fetch(url)
         .then(result => result.json())
         .then(result => {
-      const ipfsNotification = result
+      const ipfsNotification = {...result}
       const notification = {
         id: notificationId,
         userAddress: eventUserAddress,
         channelAddress: eventChannelAddress,
-        indexTimestamp: Date.now() / 1000, // todo
-        notificationTitle: ipfsNotification.notification.title,
+        indexTimeStamp: Date.now() / 1000, // todo
+        notificationTitle: ipfsNotification.notification.title || channelJson.name,
         notificationBody: ipfsNotification.notification.body,
-        ...ipfsNotification.data,
+        // ...ipfsNotification.data,
       }
       if (ipfsNotification.data.type === '1') {
         const isSubscribed = 
@@ -161,41 +154,85 @@ function Feedbox({ epnsReadProvider }) {
     epnsReadProvider.on(event, cb)
     return epnsReadProvider.off.bind(epnsReadProvider, event, cb)
   }
+  // transform the data gotten from the API into a workable format
+  const parseAPINotifications = (oneAPINotification) => {
+    // extract required data
+    let {
+      payload_id: payloadId,
+      payload: {
+        data: {
+          amsg
+        },
+        notification: {
+          body,
+          title
+        }
+      }
+    } = oneAPINotification;
+
+    let timeStamp = "";
+    // parse the text for the timestamp
+    const matches = amsg.match(/\[timestamp:(.*?)\]/);
+    if (matches) {
+      timeStamp = matches[1];
+      amsg = amsg.replace(/ *\[timestamp:[^)]*\] */g, "");
+    }
+    // save payload into object
+    const parsedNotification = {
+      id: payloadId,
+      notificationBody: body,
+      notificationTitle: title,
+      indexTimeStamp: parseInt(timeStamp)
+    };
+    return parsedNotification
+  };
+  const showWayPoint = (index) => {
+    return (Number(index) === notifications.length - 1) && !finishedFetching;
+  }
 
   // Render
   return (
     <>
-    <Container>
-    {loading &&
-        <ContainerInfo>
+      <Container>
+        {notifications &&
+          <Items id="scrollstyle-secondary">
+            {notifications.map((oneNotification, index) => {
+              const { cta, title, message, app, icon, image} = oneNotification;
+
+              // render the notification item
+              return (
+                <>
+                  {showWayPoint(index) && (<Waypoint onEnter = { () => handlePagination()}/>)}
+                  <NotificationItem
+                    notificationTitle={title}
+                    notificationBody={message}
+                    cta={cta}
+                    app={app}
+                    icon={icon}
+                    image={image}
+                  />
+                </>
+              );
+            })}
+          </Items>
+        }
+        {(loading) && 
           <Loader
-           type="Oval"
-           color="#35c5f3"
-           height={40}
-           width={40}
+          type="Oval"
+          color="#35c5f3"
+          height={40}
+          width={40}
+        />
+        }
+      
+        {
+        toast && 
+        <NotificationToast
+          notification={toast}
+          clearToast = {clearToast}
           />
-        </ContainerInfo>
-      }
-      {!loading &&
-      <Items id="scrollstyle-secondary" onScroll = {handleScroll}>
-          {Object.keys(paginatedNotifications).map(index => {  
-            return (
-            <ViewNotificationItem
-              key={paginatedNotifications[index].id}
-              notificationObject={paginatedNotifications[index]}
-            />)
-            })
-          }
-        </Items>
-      }
-    {
-     toast && 
-     <NotificationToast
-       notification={toast}
-       clearToast = {clearToast}
-      />
-    }
-    </Container>
+        }
+      </Container>
     </>
   );
 }

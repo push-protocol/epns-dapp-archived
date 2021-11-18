@@ -15,7 +15,7 @@ dotenv.config();
 
 // You should replace this uri with your own and put it into a .env file
 const client = new ApolloClient({
-  uri: "https://api.thegraph.com/subgraphs/name/epnsproject/epnsprod",
+  uri: "https://api.thegraph.com/subgraphs/name/epnsproject/epnsstaging",
   cache: new InMemoryCache()
 });
 

@@ -9,8 +9,10 @@ import { ethers } from "ethers";
 
 import Loader from 'react-loader-spinner'
 
+import AliasVerificationodal from 'components/AliasVerificationModal';
 import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
-
+import config from 'config';
+import NotificationToast from "components/NotificationToast";
 import Feedbox from 'segments/Feedbox';
 import ViewChannels from 'segments/ViewChannels';
 import Info from "segments/Info";
@@ -19,53 +21,122 @@ import ChannelCreationDashboard from 'segments/ChannelCreationDashboard';
 
 import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
+import { postReq } from "api"
 
-
+export const ALLOWED_CORE_NETWORK = 42 //chainId of networks which we have deployed the core contract on
+const CHANNEL_TAB = 1 //Default to 1 which is the channel tab
+const NOTIF_TAB = 0;
 // Create Header
 function Home({ setBadgeCount, bellPressed }) {
   ReactGA.pageview('/home');
 
   const { active, error, account, library, chainId } = useWeb3React();
+  const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
+  const INITIAL_OPEN_TAB =  CHANNEL_TAB ;//if they are not on a core network.redirect then to the notifications page
 
-  const [epnsReadProvider, setEpnsReadProvider] = React.useState(null);
+  const [epnsReadProvider, setEpnsReadProvider] = React.useState(null); // read provider for epns core functions
+  const [epnsCommReadProvider, setEpnsCommReadProvider] = React.useState(null); // read provider for epns communicator functions
   const [epnsWriteProvider, setEpnsWriteProvider] = React.useState(null);
-
+  const [epnsCommWriteProvider, setEpnsCommWriteProvider] = React.useState(null);
+ 
   const [controlAt, setControlAt] = React.useState(0);
+  const [modalOpen, setModalOpen] = React.useState(false);
   const [adminStatusLoaded, setAdminStatusLoaded] = React.useState(false);
+  const [aliasEthAccount, setAliasEthAccount] = React.useState(null);
+  const [aliasVerified, setAliasVerified] = React.useState(true);
   const [channelAdmin, setChannelAdmin] = React.useState(false);
   const [channelJson, setChannelJson] = React.useState([]);
 
-
-
+  // toast related section
+  const [toast, showToast] = React.useState(null);
+  const clearToast = () => showToast(null);
+  const showNetworkToast = () => {
+    showToast({
+      notificationTitle: <span style={{color: "#e20880"}}> Invalid Network </span>,
+      notificationBody: "Please connect to the Ropsten network to access channels"
+    });
+  }
+  //clear toast variable after it is shown
   React.useEffect(() => {
-    const contractInstance = new ethers.Contract(addresses.epnscore, abis.epnscore, library);
-    setEpnsReadProvider(contractInstance);
-
-    if (!!(library && account)) {
-      let signer = library.getSigner(account);
-      const signerInstance = new ethers.Contract(addresses.epnscore, abis.epnscore, signer);
-      setEpnsWriteProvider(signerInstance);
+    if (toast) {
+      clearToast()
     }
-
-  }, [account]);
+  }, [toast]);
+  // toast related section
 
   React.useEffect(() => {
+    (async function(){
+      const coreProvider = onCoreNetwork ?
+        library : ethers.getDefaultProvider(ALLOWED_CORE_NETWORK, {etherscan: config.etherscanToken})
+      // if we are not on the core network then check for if this account is an alias for another channel
+      if(!onCoreNetwork){
+        // for now resolve a fake promise to return the current user address as the eth account of the channel's current alias
+        const aliasEth = await postReq('/channels/get_alias' , {
+            "aliasAddress": account,
+            "aliasBlockchain":"POLYGON_TEST_MUMBAI", //use this for now, since we are only on polygon network
+            "op":"read"
+        })
+        .then(({data}) => {
+          console.log({data})
+          const ethAccount =  data || account;
+          setAliasEthAccount(ethAccount);
+          return data;
+        }); 
+        if(aliasEth){
+          // for now resolve a fake promise to return the current user address as the eth account of the channel's current alias
+          const aliasVerified = await postReq('/channels/get_alias_verification_status', {
+            "aliasAddress":account,
+            "op":"read"
+          })
+          .then(({data}) => {
+            const {status} = data;
+            console.log({secd: data})
+            const aliasIsVerified =  data;
+            setAliasVerified(status);
+            return aliasIsVerified
+          }); 
+        } 
+      }
+      // if we are not on the core network then fetch if there is an alias address from the api
+      // inititalise the read contract for the core network
+      const coreContractInstance = new ethers.Contract(addresses.epnscore, abis.epnscore, coreProvider);
+      setEpnsReadProvider(coreContractInstance);
+      // inititalise the read contract for the core network
+  
+      // initialise the read contract for the communicator function
+      const commAddress = onCoreNetwork ? addresses.epnsEthComm : addresses.epnsPolyComm;
+      const commContractInstance = new ethers.Contract(commAddress, abis.epnsComm, library);
+      setEpnsCommReadProvider(commContractInstance);
+      // initialise the read contract for the communicator function
+  
+      if (!!(library && account)) {
+        let signer = library.getSigner(account);
+        const coreSignerInstance = new ethers.Contract(addresses.epnscore, abis.epnscore, signer);
+        setEpnsWriteProvider(coreSignerInstance);
+        const communicatorSignerInstance = new ethers.Contract(commAddress, abis.epnsComm, signer);
+        setEpnsCommWriteProvider(communicatorSignerInstance)
+      }
+    })();
+
+  }, [account, chainId]);
+
+  React.useEffect(() => {
+    if(!epnsReadProvider || !epnsCommReadProvider) return;
     // Reset when account refreshes
     setChannelAdmin(false);
     setAdminStatusLoaded(false);
-    userClickedAt(1);
+    userClickedAt(INITIAL_OPEN_TAB);
     setChannelJson([]);
 
     // EPNS Read Provider Set
-    if (epnsReadProvider != null) {
+    if (epnsReadProvider != null && epnsCommReadProvider != null) {
       // Instantiate Data Stores
-      UsersDataStore.instance.init(account, epnsReadProvider);
-      ChannelsDataStore.instance.init(account, epnsReadProvider);
-
+      UsersDataStore.instance.init(account, epnsReadProvider, epnsCommReadProvider);
+      ChannelsDataStore.instance.init(account, epnsReadProvider, epnsCommReadProvider);
       checkUserForChannelRights();
     }
 
-  }, [epnsReadProvider]);
+  }, [epnsReadProvider, epnsCommReadProvider]);
 
 
   // Revert to Feedbox on bell pressed
@@ -92,15 +163,18 @@ function Home({ setBadgeCount, bellPressed }) {
   // Check if a user is a channel or not
   const checkUserForChannelRights = async () => {
     // Check if account is admin or not and handle accordingly
-    EPNSCoreHelper.getChannelJsonFromUserAddress(account, epnsReadProvider)
+    const ownerAccount = !onCoreNetwork ? aliasEthAccount : account;
+    EPNSCoreHelper.getChannelJsonFromUserAddress(ownerAccount, epnsReadProvider)
       .then(response => {
-        console.log(response);
         setChannelJson(response);
         setChannelAdmin(true);
         setAdminStatusLoaded(true);
       })
       .catch(e => {
         setChannelAdmin(false);
+        setAdminStatusLoaded(true);
+      })
+      .finally(() =>{
         setAdminStatusLoaded(true);
       });
 
@@ -123,6 +197,10 @@ function Home({ setBadgeCount, bellPressed }) {
 
         <ControlButton index={1} active={controlAt == 1 ? 1 : 0} border="#35c5f3"
           onClick={() => {
+            // if they arent connected to the right channels then we have to restrict access to here
+            // if(!onCoreNetwork){
+            //   return showNetworkToast();
+            // }
             userClickedAt(1)
           }}
         >
@@ -134,6 +212,13 @@ function Home({ setBadgeCount, bellPressed }) {
           disabled={!adminStatusLoaded}
           onClick={() => {
             if (adminStatusLoaded) {
+              // if youre not on kovan and you dont have a channel, you cannot create except on kovan, so throw error
+              if(!channelAdmin && !onCoreNetwork){
+                return showNetworkToast();
+              }
+              if(channelAdmin && !aliasVerified && !onCoreNetwork){
+                return setModalOpen(true);
+              }
               userClickedAt(2)
             }
           }}
@@ -146,10 +231,16 @@ function Home({ setBadgeCount, bellPressed }) {
                width={32}
             />
           }
-          {channelAdmin && adminStatusLoaded &&
+          {channelAdmin && adminStatusLoaded && (onCoreNetwork ? true : aliasVerified) &&
             <ControlChannelContainer>
               <ControlChannelImage src={`${channelJson.icon}`} active={controlAt == 2 ? 1 : 0}/>
               <ControlChannelText active={controlAt == 2 ? 1 : 0}>{channelJson.name}</ControlChannelText>
+            </ControlChannelContainer>
+          }
+          {channelAdmin && adminStatusLoaded && (!aliasVerified && !onCoreNetwork) &&
+            <ControlChannelContainer>
+              <ControlChannelImage src={`${channelJson.icon}`} active={controlAt == 2 ? 1 : 0}/>
+              <ControlChannelText active={controlAt == 2 ? 1 : 0}>Verify channel alias</ControlChannelText>
             </ControlChannelContainer>
           }
           {!channelAdmin && adminStatusLoaded &&
@@ -178,17 +269,37 @@ function Home({ setBadgeCount, bellPressed }) {
         {controlAt == 1 &&
           <ViewChannels
             epnsReadProvider={epnsReadProvider}
+            epnsCommReadProvider={epnsCommReadProvider}
             epnsWriteProvide={epnsWriteProvider}
+            epnsCommWriteProvider={epnsCommWriteProvider}
           />
         }
         {controlAt == 2 && !channelAdmin && adminStatusLoaded &&
           <ChannelCreationDashboard />
         }
         {controlAt == 2 && channelAdmin && adminStatusLoaded &&
-          <ChannelOwnerDashboard />
+          <ChannelOwnerDashboard 
+            epnsReadProvider={epnsReadProvider}
+            epnsCommReadProvider={epnsCommReadProvider}
+            epnsWriteProvider={epnsWriteProvider}
+            epnsCommWriteProvider={epnsCommWriteProvider}
+          />
         }
         {controlAt == 3 &&
           <Info/>
+        }
+        { toast && 
+          <NotificationToast
+            notification={toast}
+            clearToast = {clearToast}
+          />
+        }
+        {
+          modalOpen &&
+          <AliasVerificationodal
+            onClose={() => setModalOpen(false)}
+            onSuccess={() => setAliasVerified(true)}
+          />
         }
       </Interface>
     </Container>

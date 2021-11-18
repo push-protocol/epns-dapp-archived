@@ -1,6 +1,7 @@
 import React from "react";
 import styled, { css } from 'styled-components';
 import Loader from 'react-loader-spinner'
+import { Waypoint } from "react-waypoint";
 
 import { useWeb3React } from '@web3-react/core'
 import { addresses, abis } from "@project/contracts";
@@ -15,69 +16,83 @@ import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
 
 // Create Header
-function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
-  const { account, library } = useWeb3React();
+function ViewChannels({ epnsReadProvider, epnsWriteProvide, epnsCommReadProvider, epnsCommWriteProvider }) {
+  const { account, library, chainId } = useWeb3React();
 
   const [controlAt, setControlAt] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
+  const [moreLoading, setMoreLoading] = React.useState(false);
   const [channels, setChannels] = React.useState([]);
+  const [totalChannelLength, setChannelLength] = React.useState(0);
+  const [paginatedChannels, setPaginatedChannels] = React.useState([]);
   const [user, setUser] = React.useState(null);
   const [owner, setOwner] = React.useState(null);
 
-  React.useEffect(() => {
-    fetchChannels();
-  }, [account]);
+  const [page, setPage] = React.useState(0);
+  const channelsPerPage = 10;
+  const channelsVisited = page * channelsPerPage;
 
-  // handle user action at control center
-  const userClickedAt = (controlIndex) => {
-    setControlAt(controlIndex);
+  React.useEffect(() => {
+    setChannels([]);
+    fetchInitialsChannelMeta();
+  }, [account, chainId]);
+
+
+  //update paginatedChannels array when scrolled till the end
+  React.useEffect(() => {
+    if(channels){
+      setPaginatedChannels(prev => [...prev, ...channels.slice(channelsVisited, channelsVisited + channelsPerPage)])
+      // setPaginatedChannels(channels)
+    }
+  }, [channels, page]);
+
+
+  // to update a page
+  const updateCurrentPage = () => {
+    if(loading || moreLoading) return;
+    // fetch more channel information
+    setMoreLoading(true);
+    setPage((prev) => {
+      const newPage = prev + 1;
+      loadMoreChannelMeta(newPage);
+      return newPage;
+    });
   }
 
-  //ROPSTEN ETHER FAUCET API IMPLEMENTATION
-  //not feasible at the moment
-
-  // const requestEther = () => {
-
-  //   fetch('https://faucet.ropsten.be/donate/0x276B820E8382f17ECB9FA77B0952ca4E67287601')
-  //   .then(async response => {
-  //     const data = await response.json();
-  //     console.log("🚀 ~ file: ViewChannels.tsx ~ line 40 ~ requestEther ~ data", data)
-
-  //     // check for error response
-  //     if (!response.ok) {
-  //         // get error message from body or default to response statusText
-  //         const error = (data && data.message) || response.statusText;
-  //         console.log(error);
-  //     }
-  // })
-  // .catch(error => {
-  //     console.error('There was an error!', error);
-  // });
-  // }
-
   // to fetch channels
-  const fetchChannels = async () => {
+  const fetchInitialsChannelMeta = async () => {
     // get and set user and owner first
     const userMeta = await UsersDataStore.instance.getUserMetaAsync();
     setUser(userMeta);
-
+    
     const ownerAddr = await UsersDataStore.instance.getOwnerMetaAsync();
     setOwner(ownerAddr);
 
     // const channelsMeta = await EPNSCoreHelper.getChannelsMetaLatestToOldest(-1, -1, epnsReadProvider);
-    const channelsMeta = await ChannelsDataStore.instance.getChannelsMetaAsync(-1, -1);
-
-    // sort this again, this time with subscriber count
-    // channelsMeta.sort((a, b) => {
-    //   if (a.memberCount.toNumber() < b.memberCount.toNumber()) return -1;
-    //   if (a.memberCount.toNumber() > b.memberCount.toNumber()) return 1;
-    //   return 0;
-    // });
-
+    const channelsMeta = await ChannelsDataStore.instance.getChannelsMetaAsync(channelsVisited, channelsPerPage);
+    const totalChannelsLength = await ChannelsDataStore.instance.getChannelsCountAsync();
+    setChannelLength(totalChannelsLength)
     // Filter out channel
 
     setChannels(channelsMeta);
     setLoading(false);
+  }
+
+  // load more channels when we get to the bottom of the page
+  const loadMoreChannelMeta = async (newPageNumber) => {
+    const startingPoint = newPageNumber * channelsPerPage;
+    // console.log({startingPoint, channelsPerPage})
+    const moreChannels = await ChannelsDataStore.instance.getChannelsMetaAsync(startingPoint, channelsPerPage);
+    setChannels(oldChannels => ([
+      ...oldChannels,
+      ...moreChannels
+    ]));
+    setMoreLoading(false)
+  }
+
+  // conditionally display the waymore bar which loads more information
+  const showWayPoint = (index) => {
+    return ( Number(index) === paginatedChannels.length -1 )
   }
 
   return (
@@ -102,43 +117,72 @@ function ViewChannels({ epnsReadProvider, epnsWriteProvide }) {
           />
         </ContainerInfo>
       }
-
       {!loading && controlAt == 0 && channels.length != 0 &&
         <Items id="scrollstyle-secondary">
           <Faucets/>
 
-          {Object.keys(channels).map(index => {
+          {Object.keys(paginatedChannels.filter(Boolean)).map(index => {
             const isOwner = (
-              channels[index].addr === account ||
-              (account === owner && channels[index].addr === "0x0000000000000000000000000000000000000000")
+              paginatedChannels[index].addr === account ||
+              (account === owner && paginatedChannels[index].addr === "0x0000000000000000000000000000000000000000")
             );
 
-            if (channels[index].addr !== "0x0000000000000000000000000000000000000000") {
+            if (paginatedChannels[index].addr !== "0x0000000000000000000000000000000000000000") {
               return (
-                <ViewChannelItem
-                  key={channels[index].addr}
-                  channelObject={channels[index]}
-                  isOwner={isOwner}
-                  epnsReadProvider={epnsReadProvider}
-                  epnsWriteProvide={epnsWriteProvide}
-                />
+                <>
+                {showWayPoint(index) && (<Waypoint onEnter = {updateCurrentPage}/>)}
+                <div
+                  key={paginatedChannels[index].addr}
+                >
+                  <ViewChannelItem
+                    channelObject={paginatedChannels[index]}
+                    isOwner={isOwner}
+                    epnsReadProvider={epnsReadProvider}
+                    epnsWriteProvide={epnsWriteProvide}
+                    epnsCommReadProvider={epnsCommReadProvider}
+                    epnsCommWriteProvider={epnsCommWriteProvider}
+                  />
+                </div>
+                </>
               );
             }
-            else if (channels[index].addr === "0x0000000000000000000000000000000000000000" && user.channellized) {
+            else if (paginatedChannels[index].addr === "0x0000000000000000000000000000000000000000" && user.channellized) {
               return (
-                <ViewChannelItem
-                  key={channels[index].addr}
-                  channelObject={channels[index]}
-                  isOwner={isOwner}
-                  epnsReadProvider={epnsReadProvider}
-                  epnsWriteProvide={epnsWriteProvide}
-                />
+                <>
+                {showWayPoint(index) && (<Waypoint onEnter = {updateCurrentPage}/>)}
+                <div
+                  key={paginatedChannels[index].addr}
+                >
+                  <ViewChannelItem
+                    channelObject={paginatedChannels[index]}
+                    isOwner={isOwner}
+                    epnsReadProvider={epnsReadProvider}
+                    epnsWriteProvide={epnsWriteProvide}
+                    epnsCommReadProvider={epnsCommReadProvider}
+                    epnsCommWriteProvider={epnsCommWriteProvider}
+                  />
+                </div>
+                </>
               );
             }
             else {
-              return null;
+              return(
+                <>
+                {showWayPoint(index) && (<Waypoint onEnter = {updateCurrentPage}/>)}
+                </>
+              )
             }
           })}
+          {moreLoading && channels.length &&
+            <CenterContainer>
+              <Loader
+              type="Oval"
+              color="#35c5f3"
+              height={40}
+              width={40}
+              />
+            </CenterContainer>
+          }
         </Items>
       }
     </Container>
@@ -163,6 +207,11 @@ const Container = styled.div`
 const ContainerInfo = styled.div`
   padding: 20px;
 `
+
+const CenterContainer = styled(ContainerInfo)`
+  width: fit-content;
+  margin: auto;
+`;
 
 const Items = styled.div`
   display: block;
