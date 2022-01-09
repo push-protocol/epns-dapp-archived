@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.3.7",
+    "@davatar/react": "^1.8.1",
     "@ethersproject/providers": "^5.0.0-beta.151",
     "@ethersproject/units": "^5.0.0-beta.132",
     "@material-ui/core": "4.11.0",
@@ -33,8 +34,6 @@
     "@web3-react/types": "6.0.7",
     "@yisheng90/react-loading": "1.2.3",
     "babel-plugin-styled-components": "1.10.7",
-    "blockies": "0.0.2",
-    "blockies-identicon": "0.1.0",
     "browserslist": "4.14.6",
     "crypto-js": "4.0.0",
     "dotenv": "8.2.0",

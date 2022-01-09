@@ -374,7 +374,7 @@ const EPNSCoreHelper = {
     }
   },
   // Metric Formatter, thanks: https://stackoverflow.com/questions/9461621/format-a-number-as-2-5k-if-a-thousand-or-more-otherwise-900
-  metricFormatter: (num, digits) => {
+  shortenAddress: (num, digits) => {
     var si = [
       { value: 1, symbol: "" },
       { value: 1E3, symbol: "k" },
@@ -393,7 +393,9 @@ const EPNSCoreHelper = {
     }
     return (num / si[i].value).toFixed(digits).replace(rx, "$1") + si[i].symbol;
   },
-
+  shortenAddress: (address, chars = 6) => {
+    return `${address.substring(0, chars + 2)}...${address.substring(42 - chars)}`
+  }
 }
 
 export default EPNSCoreHelper;
