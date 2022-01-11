@@ -61,7 +61,7 @@ export default function App() {
   ReactGA.pageview("/login");
   // Initialize GA
   // return ;
-  if(currentTime<countdown.countdownEpoch)
+  if(currentTime < countdown.countdownEpoch)
   return (
     <div style={{display:"flex",justifyContent:"center",alignItems:"center",height:"100vh"}}>
       <TimerComponent/>

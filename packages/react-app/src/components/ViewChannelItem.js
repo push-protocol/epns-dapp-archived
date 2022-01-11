@@ -104,10 +104,9 @@ function ViewChannelItem({ channelObjectProp }) {
   };
   // to fetch channels
   const fetchChannelJson = async () => {
-     
     try {
       let channelJson = {};
-      setCopyText(channelObject.addr)
+      setCopyText(channelObject.addr);
       if (channelsCache[channelObject.addr]) {
         channelJson = channelsCache[channelObject.addr];
       } else {
@@ -121,19 +120,19 @@ function ViewChannelItem({ channelObjectProp }) {
           })
         );
       }
-        const channelSubscribers = await postReq("/channels/get_subscribers", {
-          channel: channelObject.addr,
-          op: "read",
+      const channelSubscribers = await postReq("/channels/get_subscribers", {
+        channel: channelObject.addr,
+        op: "read",
+      })
+        .then(({ data }) => {
+          const subs = data.subscribers;
+
+          return subs;
         })
-          .then(({ data }) => {
-            const subs = data.subscribers;
-  
-            return subs
-          })
-          .catch((err) => {
-            console.log(`getChannelSubscribers => ${err.message}`);
-            return [];
-          });
+        .catch((err) => {
+          console.log(`getChannelSubscribers => ${err.message}`);
+          return [];
+        });
       const subscribed = channelSubscribers.find((sub) => {
         return sub.toLowerCase() === account.toLowerCase();
       });
@@ -143,8 +142,9 @@ function ViewChannelItem({ channelObjectProp }) {
       setSubscribed(subscribed);
       setIsVerified(
         Boolean(
-          channelObject.verifiedBy !== ZERO_ADDRESS ||
-            channelObject.addr === pushAdminAddress
+          channelObject && channelObject.verifiedBy &&
+            (channelObject.verifiedBy !== ZERO_ADDRESS ||
+              channelObject.addr === pushAdminAddress)
         )
       );
       setCanUnverify(channelObject.verifiedBy == account);
@@ -168,7 +168,9 @@ function ViewChannelItem({ channelObjectProp }) {
     subscribeAction(false);
   };
   const formatAddress = (addressText) => {
-    return addressText.length > 40 ? `${addressText.slice(0, 4)}....${addressText.slice(36)}` : addressText;
+    return addressText.length > 40
+      ? `${addressText.slice(0, 4)}....${addressText.slice(36)}`
+      : addressText;
   };
 
   // Toastify
@@ -340,17 +342,17 @@ function ViewChannelItem({ channelObjectProp }) {
   const copyToClipboard = (url) => {
     // fallback for non navigator browser support
     if (navigator && navigator.clipboard) {
-        navigator.clipboard.writeText(url);
+      navigator.clipboard.writeText(url);
     } else {
-        const el = document.createElement("textarea");
-        el.value = url;
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand("copy");
-        document.body.removeChild(el);
+      const el = document.createElement("textarea");
+      el.value = url;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
     }
-};
-  
+  };
+
   const unsubscribeAction = async () => {
     let txToast;
     try {
@@ -483,33 +485,33 @@ function ViewChannelItem({ channelObjectProp }) {
               </SkeletonWrapper>
             </>
           ) : (
-            <>
-              <Subscribers>
-                <IoMdPeople size={20} color="#ccc" />
-                <SubscribersCount>{memberCount}</SubscribersCount>
-              </Subscribers>
+            <ColumnFlex>
+              <FlexBox style={{ marginBottom: "5px" }}>
+                <Subscribers>
+                  <IoMdPeople size={20} color="#ccc" />
+                  <SubscribersCount>{memberCount}</SubscribersCount>
+                </Subscribers>
 
-              <Subscribers
-                style={{ marginLeft: "10px" }}
-              >
-                <FaRegAddressCard size={20} color="#ccc" />
-                <SubscribersCount
-                  onClick={() => {
-                    copyToClipboard(channelJson.addr);
-                    setCopyText("copied");
-                  }}
-                  onMouseEnter={() => {
-                    setCopyText("click to copy");
-                  }}
-                  onMouseLeave={() => {
-                    setCopyText(channelJson.addr);
-                  }}
-                  style={{ cursor: "pointer" }}
-                >
-                  <AiTwotoneCopy />
-                  {formatAddress(copyText)}
-                </SubscribersCount>
-              </Subscribers>
+                <Subscribers style={{ marginLeft: "10px" }}>
+                  <FaRegAddressCard size={20} color="#ccc" />
+                  <SubscribersCount
+                    onClick={() => {
+                      copyToClipboard(channelJson.addr);
+                      setCopyText("copied");
+                    }}
+                    onMouseEnter={() => {
+                      setCopyText("click to copy");
+                    }}
+                    onMouseLeave={() => {
+                      setCopyText(channelJson.addr);
+                    }}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <AiTwotoneCopy />
+                    {formatAddress(copyText)}
+                  </SubscribersCount>
+                </Subscribers>
+              </FlexBox>
               {verifierDetails && (
                 <Subscribers>
                   <VerifiedBy>Verified by:</VerifiedBy>
@@ -517,7 +519,7 @@ function ViewChannelItem({ channelObjectProp }) {
                   <VerifierName>{verifierDetails.name}</VerifierName>
                 </Subscribers>
               )}
-            </>
+            </ColumnFlex>
           )}
         </ChannelMeta>
       </ChannelInfo>
@@ -603,6 +605,13 @@ function ViewChannelItem({ channelObjectProp }) {
   );
 }
 
+const FlexBox = styled.div`
+  display: flex;
+`;
+
+const ColumnFlex = styled(FlexBox)`
+  flex-direction: column;
+`;
 // css styles
 const Container = styled.div`
   flex: 1;
@@ -699,7 +708,6 @@ const VerifiedBy = styled.span`
   letter-spacing: 0.05em;
   font-weight: 600;
   display: inline-block;
-  margin-left: 10px;
 `;
 
 const VerifierIcon = styled.img`
