@@ -9,7 +9,7 @@ import { injected, walletconnect, portis, ledger } from "connectors";
 import Home from "pages/Home";
 import Header from "segments/Header";
 import styled from "styled-components";
-import { Item, ItemH, Span, H2, B, A } from "components/SharedStyling";
+import { Item, ItemH, Span, H2, B, A,C } from "components/SharedStyling";
 import UnderProgressModal from './components/UnderProgressModal';
 import "react-toastify/dist/ReactToastify.min.css";
 import TimerComponent from './segments/TimerComponent';
@@ -155,6 +155,17 @@ export default function App() {
               </A>
               .
             </Span>
+            <Item
+              bg="#fafafa"
+              border="1px solid #ddd"
+              padding="30px 15px"
+              radius="12px"
+              width="50rem"
+            >
+              <div>
+               Note: the EPNS protocol has been under development for 1+ year,  and completed a <C href="https://epns.io/EPNS-Protocol-Audit2021.pdf" target="_blank"> ChainSafe audit </C> in October 2021. However, the mainnet is still a new product milestone.  Always DYOR, and anticipate bugs and UI improvements.  Learn how to report any bugs in our  <C href="https://discord.com/invite/YVPB99F9W5" target="_blank">Discord.</C>
+              </div>
+            </Item>
           </Item>
         )}
       </ParentContainer>

@@ -116,10 +116,10 @@ function Feedbox() {
   return (
     <FullWidth>
       <Wrapper>
-        <Button active={currentTab == "inbox"} onClick={() => setCurrentTab("inbox")}>Inbox</Button>
-        <Button active={currentTab == "spambox"} onClick={() => setCurrentTab("spambox")} spam>
+        {/* <Button active={currentTab == "inbox"} onClick={() => setCurrentTab("inbox")}>Inbox</Button> */}
+        {/* <Button active={currentTab == "spambox"} onClick={() => setCurrentTab("spambox")} spam>
           Spam
-        </Button>
+        </Button> */}
       </Wrapper>
       {currentTab == "spambox" ? (
         <SpamBox currentTab={currentTab} />

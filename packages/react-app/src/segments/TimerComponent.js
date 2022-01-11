@@ -15,7 +15,7 @@ const Wrapper=styled.div`
     display:flex;
     height:100vh;
     width:100%;
-    background:url("/DOWNTIME2.png") content-box;
+    /* background:url("/DOWNTIME2.png") content-box; */
     background-repeat:no-repeat;
     background-size:100%;
 `;
