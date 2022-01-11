@@ -30,7 +30,7 @@ const web3Connectors = {
     title: "Wallet Connect",
   },
   // Trezor: {obj: trezor, logo: './svg/login/trezor.svg', title: 'Trezor'},
-  Ledger: { obj: ledger, logo: "./svg/login/ledger.svg", title: "Ledger" },
+  // Ledger: { obj: ledger, logo: "./svg/login/ledger.svg", title: "Ledger" },
   Portis: { obj: portis, logo: "./svg/login/portis.svg", title: "Portis" },
 };
 
@@ -162,9 +162,9 @@ export default function App() {
               radius="12px"
               width="50rem"
             >
-              <div>
-               Note: the EPNS protocol has been under development for 1+ year,  and completed a <C href="https://epns.io/EPNS-Protocol-Audit2021.pdf" target="_blank"> ChainSafe audit </C> in October 2021. However, the mainnet is still a new product milestone.  Always DYOR, and anticipate bugs and UI improvements.  Learn how to report any bugs in our  <C href="https://discord.com/invite/YVPB99F9W5" target="_blank">Discord.</C>
-              </div>
+              <StyledItem>
+              <span> Note: </span> The EPNS protocol has been under development for 1+ year,  and completed a <C href="https://epns.io/EPNS-Protocol-Audit2021.pdf" target="_blank"> ChainSafe audit </C> in October 2021. However, the mainnet is still a new product milestone.  Always DYOR, and anticipate bugs and UI improvements.  Learn how to report any bugs in our  <C href="https://discord.com/invite/YVPB99F9W5" target="_blank">Discord.</C>
+              </StyledItem>
             </Item>
           </Item>
         )}
@@ -184,6 +184,14 @@ export default function App() {
 }
 
 // CSS STYLES
+const StyledItem = styled(Item)`
+  font-size: 14px;
+  letter-spacing: 0.4px;
+  display: block;
+  span{
+    color: #e20880;
+  }
+`;
 const HeaderContainer = styled.header`
   left: 0;
   right: 0;
