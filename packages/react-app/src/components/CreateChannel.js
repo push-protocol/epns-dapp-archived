@@ -239,7 +239,7 @@ function CreateChannel() {
         console.log(tx);
         console.log("Check: " + account);
         try {
-          await library.waitForTransaction(tx.hash);
+          await tx.wait(1);
           setProcessing(3);
           setProcessingInfo("Channel Created");
         } catch (err) {
