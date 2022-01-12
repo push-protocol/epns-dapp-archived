@@ -9,7 +9,7 @@ import { injected, walletconnect, portis, ledger } from "connectors";
 import Home from "pages/Home";
 import Header from "segments/Header";
 import styled from "styled-components";
-import { Item, ItemH, Span, H2, B, A } from "components/SharedStyling";
+import { Item, ItemH, Span, H2, B, A,C } from "components/SharedStyling";
 import UnderProgressModal from './components/UnderProgressModal';
 import "react-toastify/dist/ReactToastify.min.css";
 import TimerComponent from './segments/TimerComponent';
@@ -30,7 +30,7 @@ const web3Connectors = {
     title: "Wallet Connect",
   },
   // Trezor: {obj: trezor, logo: './svg/login/trezor.svg', title: 'Trezor'},
-  Ledger: { obj: ledger, logo: "./svg/login/ledger.svg", title: "Ledger" },
+  // Ledger: { obj: ledger, logo: "./svg/login/ledger.svg", title: "Ledger" },
   Portis: { obj: portis, logo: "./svg/login/portis.svg", title: "Portis" },
 };
 
@@ -45,7 +45,7 @@ export default function App() {
   React.useEffect(()=>{
     const now = Date.now()/ 1000;
     setcurrentTime(now)
-  })
+  },[])
   React.useEffect(() => {
     if (activatingConnector && activatingConnector === connector) {
       setActivatingConnector(undefined);
@@ -155,6 +155,17 @@ export default function App() {
               </A>
               .
             </Span>
+            <Item
+              bg="#fafafa"
+              border="1px solid #ddd"
+              padding="30px 15px"
+              radius="12px"
+              width="50rem"
+            >
+              <StyledItem>
+              <span> Note: </span> The EPNS protocol has been under development for 1+ year,  and completed a <C href="https://epns.io/EPNS-Protocol-Audit2021.pdf" target="_blank"> ChainSafe audit </C> in October 2021. However, the mainnet is still a new product milestone.  Always DYOR, and anticipate bugs and UI improvements.  Learn how to report any bugs in our  <C href="https://discord.com/invite/YVPB99F9W5" target="_blank">Discord.</C>
+              </StyledItem>
+            </Item>
           </Item>
         )}
       </ParentContainer>
@@ -173,6 +184,14 @@ export default function App() {
 }
 
 // CSS STYLES
+const StyledItem = styled(Item)`
+  font-size: 14px;
+  letter-spacing: 0.4px;
+  display: block;
+  span{
+    color: #e20880;
+  }
+`;
 const HeaderContainer = styled.header`
   left: 0;
   right: 0;
@@ -231,13 +250,11 @@ const ProviderButton = styled.button`
   &:hover {
     opacity: 0.9;
     cursor: pointer;
-    pointer: hand;
     border: 1px solid ${(props) => props.border};
   }
   &:active {
     opacity: 0.75;
     cursor: pointer;
-    pointer: hand;
     border: 1px solid ${(props) => props.border};
   }
 `;

@@ -1,5 +1,5 @@
 
-import React from "react";
+import React from 'react';
 import styled from "styled-components";
 import Loader from "react-loader-spinner";
 import { Waypoint } from "react-waypoint";
@@ -15,7 +15,7 @@ import ChannelsDataStore from "singletons/ChannelsDataStore";
 import { setChannelMeta, incrementPage } from "redux/slices/channelSlice";
 
 
-const CHANNELS_PER_PAGE = 10; //pagination parameter which indicates how many channels to return over one iteration
+const CHANNELS_PER_PAGE = 30; //pagination parameter which indicates how many channels to return over one iteration
 const SEARCH_TRIAL_LIMIT = 5; //ONLY TRY SEARCHING 5 TIMES BEFORE GIVING UP
 const DEBOUNCE_TIMEOUT = 500; //time in millisecond which we want to wait for then to finish typing
 
@@ -166,16 +166,16 @@ function ViewChannels() {
             {(search ? channelToShow : channels).map(
               (channel: any, index: any) =>
                 channel &&
-                channel.addr !== ZERO_ADDRESS && (
-                  <>
-                    <div key={channel.addr}>
-                      <ViewChannelItem channelObjectProp={channel} />
-                    </div>
-                    {showWayPoint(index) && (
-                      <Waypoint onEnter={updateCurrentPage} />
-                    )}
-                  </>
-                )
+              channel.addr !== ZERO_ADDRESS && (
+                <>
+                  <div key={channel.addr}>
+                    <ViewChannelItem channelObjectProp={channel} />
+                  </div>
+                  {showWayPoint(index) && (
+                    <Waypoint onEnter={updateCurrentPage} />
+                  )}
+                </>
+              )
             )}
             {/* render all channels depending on if we are searching or not */}
 

@@ -70,7 +70,7 @@ function Home() {
         <span style={{ color: "#e20880" }}> Invalid Network </span>
       ),
       notificationBody:
-        "Please connect to the Kovan network to access channels",
+        "Please connect to the Main network to access channels",
     });
   };
 
@@ -460,12 +460,10 @@ const ControlButton = styled.div`
   &:hover {
     opacity: 0.9;
     cursor: pointer;
-    pointer: hand;
   }
   &:active {
     opacity: 0.75;
     cursor: pointer;
-    pointer: hand;
   }
 `;
 
