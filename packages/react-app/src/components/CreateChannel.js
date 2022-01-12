@@ -238,9 +238,15 @@ function CreateChannel() {
       .then(async function(tx) {
         console.log(tx);
         console.log("Check: " + account);
-        await library.waitForTransaction(tx.hash);
-        setProcessing(3);
-        setProcessingInfo("Channel Created");
+        try {
+          await library.waitForTransaction(tx.hash);
+          setProcessing(3);
+          setProcessingInfo("Channel Created");
+        } catch (err) {
+          setProcessingInfo(
+            `There was an error creating your channel, Please refer to the guide -> "https://www.notion.so/epns/How-to-EPNS-853afe64839b4cdd8c63209342a783d0"`
+          );
+        }
       })
       .catch((err) => {
         console.log("Error --> %o", err);
@@ -349,8 +355,7 @@ function CreateChannel() {
                 accept="image/jpeg,image/png"
               />
             </Item>
-            {
-              chainId != 1 ? (
+            {chainId != 1 ? (
               <Item align="flex-end">
                 <Minter
                   onClick={() => {
@@ -363,8 +368,9 @@ function CreateChannel() {
                   </Pool>
                 </Minter>
               </Item>
-              ): <></>
-            }
+            ) : (
+              <></>
+            )}
           </Content>
         </Section>
       )}
