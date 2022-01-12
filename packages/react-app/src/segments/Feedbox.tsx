@@ -139,6 +139,7 @@ function Feedbox() {
                   message,
                   app,
                   icon,
+                  url,
                   image,
                 } = oneNotification;
 
@@ -155,6 +156,7 @@ function Feedbox() {
                       app={app}
                       icon={icon}
                       image={image}
+                      url={url}
                     />
                   </div>
                 );

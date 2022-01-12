@@ -59,15 +59,9 @@ export default function App() {
   // Initialize GA
   ReactGA.initialize("UA-165415629-5");
   ReactGA.pageview("/login");
-  // Initialize GA
-  // return ;
-  if(currentTime < countdown.countdownEpoch)
-  return (
-    <div style={{display:"flex",justifyContent:"center",alignItems:"center",height:"100vh"}}>
-      <TimerComponent/>
-    </div>
-  )
-  else
+  
+  // Production 
+  console.log = function(){}
   return (
     <>
     
