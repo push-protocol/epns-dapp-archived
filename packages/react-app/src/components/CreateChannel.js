@@ -247,7 +247,7 @@ function CreateChannel() {
         console.log({ err });
         setProcessing(3);
         setProcessingInfo(
-          "!!!PRODUCTION ENV!!! Contact support@epns.io to whitelist your wallet"
+          `There was an error creating your channel, Please refer to the guide -> "https://www.notion.so/epns/How-to-EPNS-853afe64839b4cdd8c63209342a783d0"`
         );
       });
   };
