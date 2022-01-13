@@ -241,7 +241,10 @@ function CreateChannel() {
         try {
           await tx.wait(1);
           setProcessing(3);
-          setProcessingInfo("Channel Created");
+          setProcessingInfo("Channel Created! Reloading...");
+          setTimeout(() => {
+          window.location.reload();
+        }, 2000);
         } catch (err) {
           setProcessingInfo(
             `There was an error creating your channel, Please refer to the guide -> "https://www.notion.so/epns/How-to-EPNS-853afe64839b4cdd8c63209342a783d0"`
