@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React from "react";
 import styled from "styled-components";
 import Loader from "react-loader-spinner";
 import { Waypoint } from "react-waypoint";
@@ -13,7 +12,6 @@ import ViewChannelItem from "components/ViewChannelItem";
 import Faucets from "components/Faucets";
 import ChannelsDataStore from "singletons/ChannelsDataStore";
 import { setChannelMeta, incrementPage } from "redux/slices/channelSlice";
-
 
 const CHANNELS_PER_PAGE = 30; //pagination parameter which indicates how many channels to return over one iteration
 const SEARCH_TRIAL_LIMIT = 5; //ONLY TRY SEARCHING 5 TIMES BEFORE GIVING UP
@@ -59,7 +57,7 @@ function ViewChannels() {
       channelsVisited,
       CHANNELS_PER_PAGE
     );
-    dispatch(incrementPage())
+    dispatch(incrementPage());
     if (!channels.length) {
       dispatch(setChannelMeta(channelsMeta));
     }
@@ -88,7 +86,6 @@ function ViewChannels() {
     if (!channels.length) return;
     setChannelToShow(channels);
   }, [channels]);
-
 
   function searchForChannel() {
     if (loadingChannel) return; //if we are already loading, do nothing
@@ -128,7 +125,7 @@ function ViewChannels() {
       clearTimeout(timeout);
     };
   }, [search]);
-  
+
   return (
     <>
       <Container>
@@ -146,8 +143,8 @@ function ViewChannels() {
           >
             {!loading && (
               <Header style={{ minHeight: "140px" }}>
-                  {/* if on mainnet then occupy full width*/}
-                <InputWrapper style={{width: isMainnet ? "100%" : "50%"}}>
+                {/* if on mainnet then occupy full width*/}
+                <InputWrapper style={{ width: isMainnet ? "100%" : "50%" }}>
                   <SearchBar
                     type="text"
                     value={search}
@@ -155,9 +152,9 @@ function ViewChannels() {
                     className="input"
                     placeholder="Search By Name/Address"
                   />
-                  <SearchIconImage src='/searchicon.svg' alt="" />
+                  <SearchIconImage src="/searchicon.svg" alt="" />
                 </InputWrapper>
-                {!isMainnet && <Faucets />} 
+                {!isMainnet && <Faucets />}
                 {/* only display faucets on mainnet */}
               </Header>
             )}
@@ -166,16 +163,18 @@ function ViewChannels() {
             {(search ? channelToShow : channels).map(
               (channel: any, index: any) =>
                 channel &&
-              channel.addr !== ZERO_ADDRESS && (
-                <>
-                  <div key={channel.addr}>
-                    <ViewChannelItem channelObjectProp={channel} />
-                  </div>
-                  {showWayPoint(index) && (
-                    <Waypoint onEnter={updateCurrentPage} />
-                  )}
-                </>
-              )
+                channel.addr !== ZERO_ADDRESS && (
+                  <>
+                    <div key={channel.addr}>
+                      <ViewChannelItem channelObjectProp={channel} />
+                    </div>
+                    {showWayPoint(index) && (
+                      <div style={{ width: "100%", height: "40px" }}>
+                        <Waypoint onEnter={updateCurrentPage} />
+                      </div>
+                    )}
+                  </>
+                )
             )}
             {/* render all channels depending on if we are searching or not */}
 
