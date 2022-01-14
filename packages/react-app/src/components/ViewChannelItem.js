@@ -140,20 +140,24 @@ function ViewChannelItem({ channelObjectProp }) {
       setIsPushAdmin(pushAdminAddress === account);
       setMemberCount(channelSubscribers.length);
       setSubscribed(subscribed);
-      setIsVerified(
-        Boolean(
-          channelObject && channelObject.verifiedBy &&
-            (channelObject.verifiedBy !== ZERO_ADDRESS ||
-              channelObject.addr === pushAdminAddress)
-        )
-      );
-      setCanUnverify(channelObject.verifiedBy == account);
       setChannelJson({ ...channelJson, addr: channelObject.addr });
       setLoading(false);
     } catch (err) {
       setIsBlocked(true);
     }
   };
+
+  React.useEffect(() => {
+    if(!channelObject) return;
+    setIsVerified(
+      Boolean(
+        (channelObject.verifiedBy &&
+          channelObject.verifiedBy !== ZERO_ADDRESS) ||
+          channelObject.addr === pushAdminAddress
+      )
+    );
+    setCanUnverify(channelObject.verifiedBy == account);
+  }, [channelObject]);
 
   // toast customize
   const LoaderToast = ({ msg, color }) => (
@@ -200,8 +204,8 @@ function ViewChannelItem({ channelObjectProp }) {
           autoClose: 5000,
         });
 
-        // await tx.wait(1);
-        // console.log ("Transaction Mined!");
+        await tx.wait(1);
+        console.log ("Transaction Mined!");
         setIsVerified(true);
       })
       .catch((err) => {
@@ -429,7 +433,7 @@ function ViewChannelItem({ channelObjectProp }) {
         <ChannelLogoOuter>
           <ChannelLogoInner>
             {loading ? (
-              <Skeleton color="#eee"  height="100%" />
+              <Skeleton color="#eee" height="100%" />
             ) : (
               <ChannelLogoImg src={`${channelJson.icon}`} />
             )}
@@ -486,10 +490,10 @@ function ViewChannelItem({ channelObjectProp }) {
             </>
           ) : (
             <ColumnFlex>
-              <FlexBox style={{ marginBottom: "5px" }}>
+              <FlexBox style={{ marginBottom: "10px" }}>
                 <Subscribers>
                   <IoMdPeople size={20} color="#ccc" />
-                  <SubscribersCount>{memberCount}</SubscribersCount>
+                  <SubscribersCount>{memberCount?.toLocaleString()}</SubscribersCount>
                 </Subscribers>
 
                 <Subscribers style={{ marginLeft: "10px" }}>
@@ -624,7 +628,7 @@ const Container = styled.div`
 
   margin: 15px 0px;
   justify-content: center;
-  padding: 10px;
+  padding: 20px 10px;
 `;
 
 const SkeletonWrapper = styled.div`
@@ -731,6 +735,7 @@ const ChannelDesc = styled.div`
   color: rgba(0, 0, 0, 0.75);
   font-weight: 400;
   flex-direction: column;
+  margin-bottom: 30px
 `;
 
 const ChannelDescLabel = styled.label`
