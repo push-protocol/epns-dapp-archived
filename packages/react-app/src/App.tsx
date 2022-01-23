@@ -57,7 +57,7 @@ export default function App() {
   // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
   useInactiveListener(!triedEager || !!activatingConnector);
   // Initialize GA
-  ReactGA.initialize("UA-165415629-5");
+  ReactGA.initialize("UA-165415629-2");
   ReactGA.pageview("/login");
   
   // Production 
