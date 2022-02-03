@@ -19,6 +19,7 @@ import {
   resetState,
   updateTopNotifications,
 } from "redux/slices/notificationSlice";
+import Button from "@material-ui/core/Button/Button";
 
 const NOTIFICATIONS_PER_PAGE = 10;
 // Create Header
@@ -111,25 +112,59 @@ function Feedbox() {
       !bgUpdateLoading
     );
   };
+  const [clicked, setClicked] = React.useState(false);
 
   // Render
   return (
     <FullWidth>
       <Wrapper>
-        {/* <Button active={currentTab == "inbox"} onClick={() => setCurrentTab("inbox")}>Inbox</Button> */}
-        {/* <Button active={currentTab == "spambox"} onClick={() => setCurrentTab("spambox")} spam>
-          Spam
-        </Button> */}
+        {bgUpdateLoading && (
+          <div style={{ marginTop: "10px", marginLeft: "21px" }}>
+            <Loader type="Oval" color="#35c5f3" height={40} width={40} />
+          </div>
+        )}
+        <ControlButtonBack
+          active={currentTab == "inbox"}
+          onClick={() => {
+            setCurrentTab("inbox");
+            setClicked(false);
+          }}
+        >
+          {/* Inbox */}
+          <img src="./arrow_back.png" />
+          <img style={{ marginLeft: "15px" }} src="./svg/INBOX.svg" />
+          {/* <ControlText color="#35C5F3">INBOX</ControlText> */}
+        </ControlButtonBack>
+
+        <ControlButton
+          active={currentTab == "spambox"}
+          onClick={() => {
+            setCurrentTab("spambox");
+            setClicked(true);
+          }}
+          spam
+        >
+          {/* spambox */}
+          <Button
+            style={{
+              border: "2px solid black",
+              width: "35px",
+              height: "45px",
+              borderRadius: "10px",
+            }}
+          >
+            <ControlImage
+              active={currentTab == "spambox"}
+              src={clicked ? "./bin-white.png" : "./svg/bin.svg"}
+            />
+          </Button>
+        </ControlButton>
       </Wrapper>
+
       {currentTab == "spambox" ? (
         <SpamBox currentTab={currentTab} />
       ) : (
         <Container>
-          {bgUpdateLoading && (
-            <div style={{ marginTop: "10px" }}>
-              <Loader type="Oval" color="#35c5f3" height={40} width={40} />
-            </div>
-          )}
           {notifications && (
             <Items id="scrollstyle-secondary">
               {notifications.map((oneNotification, index) => {
@@ -139,7 +174,6 @@ function Feedbox() {
                   message,
                   app,
                   icon,
-                  url,
                   image,
                 } = oneNotification;
 
@@ -156,7 +190,6 @@ function Feedbox() {
                       app={app}
                       icon={icon}
                       image={image}
-                      url={url}
                     />
                   </div>
                 );
@@ -180,48 +213,76 @@ function Feedbox() {
   );
 }
 
+// const Controls = styled.div`
+//   flex: 0;
+//   display: flex;
+//   flex-direction: row;
+//   display: flex;
+//   flex-wrap: wrap;
+//   justify-content: space-between;
+// `;
+
+const ControlButtonBack = styled.div`
+  flex: 1 1 21%;
+  height: 20px;
+  min-width: 70px;
+  background: #fff;
+  margin-top: 10px;
+  margin-left: 27px;
+
+  overflow: hidden;
+  background: #fafafa;
+
+  display: flex;
+  visibility:${(props) => (props.active ? "hidden" : "")};
+
+  // opacity: ${(props) => (props.active ? "1" : "0.4")};
+
+  &:hover {
+    opacity: 0.9;
+    cursor: pointer;
+    pointer: hand;
+  }
+`;
+
+const ControlButton = styled.div`
+  display: flex;
+  height: 44px;
+  min-width: 40px;
+  border-radius: 10px;
+  margin-right: 30px;
+  margin-bottom: 20px;
+
+  opacity: ${(props) => (props.active ? "1" : "0.4")};
+  background-color: ${(props) => (props.active ? "#E20880" : "")};
+
+  &:hover {
+    opacity: 0.9;
+    cursor: pointer;
+    pointer: hand;
+  }
+`;
+
+const ControlImage = styled.img`
+  height: 30px;
+  width: 30px;
+`;
+
+const ControlText = styled.div`
+  font-size: 20px;
+  font-weight: 400;
+  margin-left: 15px;
+  opacity: ${(props) => (props.active ? "1" : "0.75")};
+`;
+
 const FullWidth = styled.div`
   width: 100%;
 `;
 const Wrapper = styled.div`
   display: flex;
-  flex-wrap: wrap;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  justify-content: space-between;
-`;
-
-const Button = styled.div`
-  border: 0;
-  outline: 0;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  padding: 8px 15px;
-  margin: 10px;
-  color: #fff;
-  border-radius: 5px;
-  font-size: 14px;
-  font-weight: 400;
-  position: relative;
-  background: ${(props: any) => (props.spam ? "#e20880" : "#674C9F")};
-  min-width: 100px;
-  width: 45%;
-  cursor: ${(props: any) => (props.active ? "not-allowed" : "pointer")};
-  opacity: ${(props: any) => (props.active ? 0.5 : 1)};
-
-  &:hover {
-    opacity: ${(props: any) => (props.active ? 0.5 : 0.8)};
-  }
+  flex-direction: row;
+  padding-top: 20px;
+  background: #fafafa;
 `;
 
 const EmptyWrapper = styled.div`
