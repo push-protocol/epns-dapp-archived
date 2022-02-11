@@ -120,19 +120,7 @@ function ViewChannelItem({ channelObjectProp }) {
           })
         );
       }
-      const channelSubscribers = await postReq("/channels/get_subscribers", {
-        channel: channelObject.addr,
-        op: "read",
-      })
-        .then(({ data }) => {
-          const subs = data.subscribers;
-
-          return subs;
-        })
-        .catch((err) => {
-          console.log(`getChannelSubscribers => ${err.message}`);
-          return [];
-        });
+      const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(channelObject.addr);
       const subscribed = channelSubscribers.find((sub) => {
         return sub.toLowerCase() === account.toLowerCase();
       });
@@ -328,7 +316,7 @@ function ViewChannelItem({ channelObjectProp }) {
           type: toaster.TYPE.SUCCESS,
           autoClose: 5000,
         });
-        console.log(res);
+        ChannelsDataStore.instance.optInCache(channelObject.addr, account);
         setTxInProgress(false);
       });
     } catch (err) {
@@ -399,6 +387,7 @@ function ViewChannelItem({ channelObjectProp }) {
         .then((res) => {
           setSubscribed(false);
           setMemberCount(memberCount - 1);
+          ChannelsDataStore.instance.optOutCache(channelObject.addr, account);
           toaster.update(txToast, {
             render: "Successfully opted out of channel !",
             type: toaster.TYPE.SUCCESS,

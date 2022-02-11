@@ -442,6 +442,25 @@ export default class ChannelsDataStore {
       }
     });
   };
+  
+  optInCache = async (channelAddress, userAddress) => {
+    const cachedSubscribers = [...this.state.subscribers[channelAddress]];
+    if (!cachedSubscribers) return;
+    this.state.subscribers[channelAddress] = [
+      ...cachedSubscribers,
+      userAddress,
+    ];
+    return cachedSubscribers;
+  };
+
+  optOutCache = async (channelAddress, userAddress) => {
+    const cachedSubscribers = [...this.state.subscribers[channelAddress]];
+    if (!cachedSubscribers) return;
+    this.state.subscribers[channelAddress] = cachedSubscribers.filter(
+      (sub) => sub != userAddress
+    );
+    return cachedSubscribers;
+  };
 
   getChannelSubscribers = async (channelAddress) => {
     const cachedSubscribers = this.state.subscribers[channelAddress];
