@@ -19,21 +19,20 @@ import {
   updateTopNotifications,
 } from "redux/slices/notificationSlice";
 
-import {Section, Item, ItemH, Span, Anchor, RouterLink, Image} from 'components/SharedStyling';
+import { Item } from "components/SharedStyling";
 
 const NOTIFICATIONS_PER_PAGE = 10;
 // Create Header
 function Feedbox() {
   const dispatch = useDispatch();
   const { account } = useWeb3React();
-  const { epnsCommReadProvider } = useSelector((state: any) => state.contracts);
   const { notifications, page, finishedFetching, toggle } = useSelector(
     (state: any) => state.notifications
   );
 
   const [bgUpdateLoading, setBgUpdateLoading] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const [currentTab, setCurrentTab] = React.useState("inbox");
+  const [currentTab] = React.useState("inbox");
 
   const loadNotifications = async () => {
     if (loading || finishedFetching) return;
@@ -93,10 +92,12 @@ function Feedbox() {
     if (account && currentTab === "inbox") {
       fetchLatestNotifications();
     }
+    // eslint-disable-next-line
   }, [account, currentTab]);
 
   React.useEffect(() => {
     fetchLatestNotifications();
+    // eslint-disable-next-line
   }, [toggle]);
 
   //function to query more notifications
@@ -118,24 +119,14 @@ function Feedbox() {
     <Container>
       {notifications && (
         <Notifs id="scrollstyle-secondary">
-
           {bgUpdateLoading && (
-            <Item
-              padding="10px 20px"
-            >
+            <Item padding="10px 20px">
               <Loader type="Oval" color="#35c5f3" height={40} width={40} />
             </Item>
           )}
 
           {notifications.map((oneNotification, index) => {
-            const {
-              cta,
-              title,
-              message,
-              app,
-              icon,
-              image,
-            } = oneNotification;
+            const { cta, title, message, app, icon, image } = oneNotification;
 
             // render the notification item
             return (
@@ -156,9 +147,7 @@ function Feedbox() {
           })}
 
           {loading && !bgUpdateLoading && (
-            <Item
-              padding="10px 20px"
-            >
+            <Item padding="10px 20px">
               <Loader type="Oval" color="#35c5f3" height={40} width={40} />
             </Item>
           )}
@@ -193,11 +182,11 @@ const Notifs = styled.div`
   align-self: stretch;
   padding: 10px 20px;
   overflow-y: scroll;
-  background: ${props => props.theme.mainBg};
+  background: ${(props) => props.theme.mainBg};
   flex: 1;
 
   "-webkit-scrollbar-track": {
-    background-color: #EEE;
+    background-color: #eee;
     border-radius: 10px;
   }
 `;

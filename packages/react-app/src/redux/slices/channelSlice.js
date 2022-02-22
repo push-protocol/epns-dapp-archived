@@ -31,10 +31,7 @@ export const contractSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const {
-  setChannelMeta,
-  incrementPage,
-  cacheChannelInfo,
-} = contractSlice.actions;
+export const { setChannelMeta, incrementPage, cacheChannelInfo } =
+  contractSlice.actions;
 
 export default contractSlice.reducer;

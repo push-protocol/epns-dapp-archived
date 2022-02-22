@@ -1,23 +1,23 @@
 import React, { useContext } from "react";
-import { useLocation } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
 
-import { useWeb3React, UnsupportedChainIdError } from '@web3-react/core'
+import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
 import {
   NoEthereumProviderError,
-  UserRejectedRequestError as UserRejectedRequestErrorInjected
-} from '@web3-react/injected-connector'
-import { Web3Provider } from 'ethers/providers'
+  UserRejectedRequestError as UserRejectedRequestErrorInjected,
+} from "@web3-react/injected-connector";
+import { Web3Provider } from "ethers/providers";
 
-import { DarkModeSwitch } from 'react-toggle-dark-mode';
+import { DarkModeSwitch } from "react-toggle-dark-mode";
 
-import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
+import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 
 import styled, { css, useTheme } from "styled-components";
-import {Section, Item, ItemH, Button, Span} from 'components/SharedStyling';
+import { Section, Item, ItemH, Button, Span } from "components/SharedStyling";
 
-import Profile from 'components/Profile';
-import Bell from 'components/Bell';
-import NavigationButton from 'components/NavigationButton';
+import Profile from "components/Profile";
+import Bell from "components/Bell";
+import NavigationButton from "components/NavigationButton";
 
 import { NavigationContext } from "contexts/NavigationContext";
 
@@ -29,12 +29,12 @@ function Header({ isDarkMode, darkModeToggle }) {
   const theme = useTheme();
 
   // Get Web3 Context
-  const context = useWeb3React<Web3Provider>()
+  const context = useWeb3React<Web3Provider>();
 
-  const { navigationSetup } = useContext(NavigationContext)
+  const { navigationSetup } = useContext(NavigationContext);
 
   const { active, error } = useWeb3React();
-  const { deactivate } = context
+  const { deactivate } = context;
 
   const [showLoginControls, setShowLoginControls] = React.useState(false);
 
@@ -42,21 +42,23 @@ function Header({ isDarkMode, darkModeToggle }) {
   const [showNavBar, setShowNavBar] = React.useState(false);
 
   // Handle Header Tag
-  const [ headerTag, setHeaderTag ] = React.useState(null);
+  const [headerTag, setHeaderTag] = React.useState(null);
 
   // Get Location
   const location = useLocation();
 
   React.useEffect(() => {
     // runs when navigation setup is updated, will run on init
-    updateHeaderTag(location)
-  }, [navigationSetup])
+    updateHeaderTag(location);
+    // eslint-disable-next-line
+  }, [navigationSetup]);
 
   // Change text based on change of location
   React.useEffect(() => {
     // runs on location, i.e. route, change
-    updateHeaderTag(location)
-  }, [location])
+    updateHeaderTag(location);
+    // eslint-disable-next-line
+  }, [location]);
 
   // handle header tag update
   const updateHeaderTag = (location) => {
@@ -66,89 +68,70 @@ function Header({ isDarkMode, darkModeToggle }) {
         if (location.pathname === item.data.href) {
           setHeaderTag(item.data.headerTag);
         }
-      })
+      });
     }
-    console.log(navigationSetup)
-  }
-
+    console.log(navigationSetup);
+  };
 
   // handle error functions
   function getErrorMessage(error: Error) {
     if (error instanceof NoEthereumProviderError) {
-      return 'Web3 not enabled, install MetaMask on desktop or visit from a dApp browser on mobile'
+      return "Web3 not enabled, install MetaMask on desktop or visit from a dApp browser on mobile";
     } else if (error instanceof UnsupportedChainIdError) {
-      return "Unsupported Network, please connect to the Ethereum mainnet or Polygon network"
-    } else if (
-      error instanceof UserRejectedRequestErrorInjected
-    ) {
-      return 'Please authorize this website to access the dApp'
+      return "Unsupported Network, please connect to the Ethereum mainnet or Polygon network";
+    } else if (error instanceof UserRejectedRequestErrorInjected) {
+      return "Please authorize this website to access the dApp";
     } else {
-      console.error(error)
-      return 'An unknown error occurred. Check the console for more details'
+      console.error(error);
+      return "An unknown error occurred. Check the console for more details";
     }
   }
 
   const bellPressed = () => {
     setShowLoginControls(!showLoginControls);
-  }
+  };
 
   const disconnect = () => {
     setShowLoginControls(false);
     deactivate();
-  }
+  };
 
   return (
-    <Container
-      direction="row"
-      padding="0px 15px"
-    >
-      
-      <ItemH
-        justify="flex-start"
-        flex="0"
-      >
-        <RightBarContainer
-          justify="flex-start"
-          flex="0"
-        >
-          <RightBarDesktop
-            justify="flex-start"
-            flex="0"
-          >
-            {active && !error &&
-              <Profile />
-            }
-            {!active &&
-              <Logo src="epns.png" />
-            }
+    <Container direction="row" padding="0px 15px">
+      <ItemH justify="flex-start" flex="0">
+        <RightBarContainer justify="flex-start" flex="0">
+          <RightBarDesktop justify="flex-start" flex="0">
+            {active && !error && <Profile />}
+            {!active && <Logo src="epns.png" />}
           </RightBarDesktop>
-          
-          {active && !error &&
+
+          {active && !error && (
             <RightBarMobile>
               <Button
                 bg="transparent"
                 padding="5px"
                 radius="4px"
-                onClick={() => {setShowNavBar(!showNavBar)}}
+                onClick={() => {
+                  setShowNavBar(!showNavBar);
+                }}
               >
-                <AiOutlineMenu size={30} color={theme.headerIconsBg}/>
+                <AiOutlineMenu size={30} color={theme.headerIconsBg} />
               </Button>
             </RightBarMobile>
-          }
+          )}
         </RightBarContainer>
-        
-        {navigationSetup && showNavBar && active && !error &&
-          <NavMenuContainer
-            align="flex-start"
-          >
-            <NavMenu
-            >
+
+        {navigationSetup && showNavBar && active && !error && (
+          <NavMenuContainer align="flex-start">
+            <NavMenu>
               <Profile />
-              
-              {Object.keys(navigationSetup.navigation).map(function(key) {
+
+              {Object.keys(navigationSetup.navigation).map(function (key) {
                 return (
                   <Item
-                    onClick={() => {setShowNavBar(!showNavBar)}}
+                    onClick={() => {
+                      setShowNavBar(!showNavBar);
+                    }}
                   >
                     <NavigationButton
                       item={navigationSetup.navigation[key]}
@@ -161,33 +144,25 @@ function Header({ isDarkMode, darkModeToggle }) {
               })}
             </NavMenu>
 
-            <Item
-              position="absolute"
-              top="15px"
-              right="5px"
-            >
+            <Item position="absolute" top="15px" right="5px">
               <Button
                 bg="transparent"
                 padding="5px"
                 radius="4px"
-                onClick={() => {setShowNavBar(!showNavBar)}}
+                onClick={() => {
+                  setShowNavBar(!showNavBar);
+                }}
               >
-                <AiOutlineClose size={30} color={theme.headerIconsBg}/>
+                <AiOutlineClose size={30} color={theme.headerIconsBg} />
               </Button>
             </Item>
-
           </NavMenuContainer>
-        }
+        )}
       </ItemH>
 
-      <ItemH
-        justify="flex-end"
-      >
-        {headerTag && 
-          <HeaderTag
-            align="flex-start"
-            overflow="hidden"
-          >
+      <ItemH justify="flex-end">
+        {headerTag && (
+          <HeaderTag align="flex-start" overflow="hidden">
             <Span
               textTransform="uppercase"
               spacing="0.1em"
@@ -199,17 +174,17 @@ function Header({ isDarkMode, darkModeToggle }) {
               {headerTag.title}
             </Span>
           </HeaderTag>
-        }
-        
-        {active && !error &&
+        )}
+
+        {active && !error && (
           <Bell
             badgeCount={0}
             bellPressedCB={bellPressed}
             width={32}
             height={32}
           />
-        }
-      
+        )}
+
         <DarkMode
           flex="initial"
           justify="flex-end"
@@ -218,12 +193,9 @@ function Header({ isDarkMode, darkModeToggle }) {
           position="relative"
           border-radius="100%"
         >
-          <Item
-            position="absolute"
-            top="4px"
-          >
+          <Item position="absolute" top="4px">
             <DarkModeSwitch
-              style={{ marginBottom: '2rem' }}
+              style={{ marginBottom: "2rem" }}
               checked={isDarkMode}
               onChange={darkModeToggle}
               size={24}
@@ -232,10 +204,8 @@ function Header({ isDarkMode, darkModeToggle }) {
           </Item>
         </DarkMode>
 
-        {showLoginControls &&
-          <Item
-            position="absolute"
-          >
+        {showLoginControls && (
+          <Item position="absolute">
             <Button
               bg="#000"
               size="12px"
@@ -248,19 +218,14 @@ function Header({ isDarkMode, darkModeToggle }) {
               Disconnect
             </Button>
           </Item>
-        }
+        )}
 
-        <ItemH
-          justify="flex-end"
-          flex="initial"
-        >
-          {!!error &&
-            <PrimaryTheme>{getErrorMessage(error)}</PrimaryTheme>
-          }
-          {!active && !error &&
+        <ItemH justify="flex-end" flex="initial">
+          {!!error && <PrimaryTheme>{getErrorMessage(error)}</PrimaryTheme>}
+          {!active && !error && (
             <ThirdTheme>Please connect to a Web3 Network</ThirdTheme>
-          }
-          <Connection phase={active ? 'active' : error ? 'error' : 'waiting'} />
+          )}
+          <Connection phase={active ? "active" : error ? "error" : "waiting"} />
         </ItemH>
       </ItemH>
     </Container>
@@ -269,32 +234,30 @@ function Header({ isDarkMode, darkModeToggle }) {
 
 // CSS Styles
 const Container = styled(Section)`
-  background: ${props => props.theme.headerBg};
-  border-bottom: 1px solid ${props => props.theme.sectionBorderBg};
+  background: ${(props) => props.theme.headerBg};
+  border-bottom: 1px solid ${(props) => props.theme.sectionBorderBg};
   height: ${GLOBALS.CONSTANTS.HEADER_HEIGHT}px;
-`
+`;
 
 const Logo = styled.img`
   height: 40px;
-`
+`;
 
-const RightBarContainer = styled(ItemH)`
-
-`
+const RightBarContainer = styled(ItemH)``;
 
 const RightBarDesktop = styled(ItemH)`
   @media (max-width: 992px) {
     display: none;
   }
-`
+`;
 
 const RightBarMobile = styled(ItemH)`
   margin: 5px 5px 5px -5px;
-  
+
   @media (min-width: 993px) {
     display: none;
   }
-`
+`;
 
 const NavMenuContainer = styled(Item)`
   position: fixed;
@@ -308,16 +271,16 @@ const NavMenuContainer = styled(Item)`
   z-index: 1;
   align-items: flex-start;
 
-  background: ${props => props.theme.navMenuBg};
+  background: ${(props) => props.theme.navMenuBg};
   backdrop-filter: blur(30px);
   z-index: 11;
-`
+`;
 
 const NavMenu = styled(Item)`
   align-items: stretch;
   justify-content: flex-start;
   padding: 10px 10px;
-`
+`;
 
 const Notice = styled.span`
   border: 0;
@@ -330,15 +293,15 @@ const Notice = styled.span`
   color: #fff;
   border-radius: 20px;
   font-size: 14px;
-`
+`;
 
 const PrimaryTheme = styled(Notice)`
   background: #e20880;
-`
+`;
 
 const ThirdTheme = styled(Notice)`
   background: #674c9f;
-`
+`;
 
 const Connection = styled.span`
   height: 10px;
@@ -346,33 +309,37 @@ const Connection = styled.span`
   border-radius: 100%;
   flex-shrink: 0;
 
-  ${props => props.phase === 'active' && css`
-    background: #77DD77;
-  `};
+  ${(props) =>
+    props.phase === "active" &&
+    css`
+      background: #77dd77;
+    `};
 
-  ${props => props.phase === 'waiting' && css`
-    background: #FFAE42;
-  `};
+  ${(props) =>
+    props.phase === "waiting" &&
+    css`
+      background: #ffae42;
+    `};
 
-  ${props => props.phase === 'error' && css`
-    background: #DC143C;
-  `};
-`
+  ${(props) =>
+    props.phase === "error" &&
+    css`
+      background: #dc143c;
+    `};
+`;
 
 const HeaderTag = styled(Item)`
   flex: 1;
-  margin="5px 15px"
-
-  @media (min-width: 993px) {
+  margin="5px 15px" @media (min-width: 993px) {
     margin: "5px 10px";
   }
-`
+`;
 
 const DarkMode = styled(Item)`
   @media (max-width: 768px) {
     display: none;
   }
-`
+`;
 
 // Export Default
 export default Header;

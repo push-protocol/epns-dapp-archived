@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import styled, { useTheme } from "styled-components";
 import Loader from "react-loader-spinner";
 import { Waypoint } from "react-waypoint";
@@ -9,13 +9,10 @@ import searchIcon from "assets/searchicon.svg";
 
 import DisplayNotice from "components/DisplayNotice";
 import ViewChannelItem from "components/ViewChannelItem";
-import Faucets from "components/Faucets";
 import ChannelsDataStore from "singletons/ChannelsDataStore";
 import { setChannelMeta, incrementPage } from "redux/slices/channelSlice";
 
-import {ThemeProvider} from "styled-components";
-import { themeLight, themeDark } from "config/Themization";
-
+import { ThemeProvider } from "styled-components";
 
 const CHANNELS_PER_PAGE = 10; //pagination parameter which indicates how many channels to return over one iteration
 const SEARCH_TRIAL_LIMIT = 5; //ONLY TRY SEARCHING 5 TIMES BEFORE GIVING UP
@@ -24,11 +21,12 @@ const DEBOUNCE_TIMEOUT = 500; //time in millisecond which we want to wait for th
 // Create Header
 function Channels() {
   const themes = useTheme();
-  const [darkMode, setDarkMode] = useState(false);
 
   const dispatch = useDispatch();
   const { account, chainId } = useWeb3React();
-  const { channels, page, ZERO_ADDRESS } = useSelector((state: any) => state.channels);
+  const { channels, page, ZERO_ADDRESS } = useSelector(
+    (state: any) => state.channels
+  );
 
   const [loading, setLoading] = React.useState(false);
   const [moreLoading, setMoreLoading] = React.useState(false);
@@ -43,6 +41,8 @@ function Channels() {
   React.useEffect(() => {
     setLoading(!channels.length); //if there are no channels initially then, set the loader
     fetchInitialsChannelMeta();
+
+    // eslint-disable-next-line
   }, [account, chainId]);
 
   // to update a page
@@ -131,12 +131,13 @@ function Channels() {
     return () => {
       clearTimeout(timeout);
     };
+    // eslint-disable-next-line
   }, [search]);
 
   return (
     <ThemeProvider theme={themes}>
       <Container>
-        {!loading && channels.length == 0 ? (
+        {!loading && channels.length === 0 ? (
           <ContainerInfo>
             <DisplayNotice
               title="That's weird, No Channels in EPNS... world is ending... right?"
@@ -213,7 +214,6 @@ const Header = styled.div`
   position: sticky;
   top: 0px;
   z-index: 2;
-
   @media (max-width: 600px) {
     flex-direction: column;
   }
@@ -221,11 +221,9 @@ const Header = styled.div`
 
 //background: red;
 
-
 const InputWrapper = styled.div`
   width: 50%;
   position: relative;
-
   @media (max-width: 600px) {
     width: 100%;
     margin: 2rem 0;
@@ -237,7 +235,6 @@ const SearchBar = styled.input`
   padding-right: 50px;
   height: 60px;
   padding-left: 40px;
-
   background: rgb(255, 255, 255);
   border: 1px solid rgba(169, 169, 169, 0.5);
   box-sizing: border-box;
@@ -245,7 +242,6 @@ const SearchBar = styled.input`
   transition: 500ms;
   text-transform: capitalize;
   font-size: 16px;
-
   input[type="reset"] {
     display: none;
   }
@@ -265,12 +261,10 @@ const Container = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
-
   font-weight: 200;
   align-content: center;
   align-items: center;
   justify-content: center;
-
   max-height: 92vh;
 `;
 
@@ -295,8 +289,7 @@ const Items = styled.div`
   align-self: stretch;
   padding: 10px 20px;
   overflow-y: scroll;
-  background: ${props => props.theme.channelBg};
-
+  background: ${(props) => props.theme.channelBg};
 `;
 
 //background: red;

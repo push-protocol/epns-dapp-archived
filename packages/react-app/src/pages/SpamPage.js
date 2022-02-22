@@ -1,9 +1,8 @@
 import React from "react";
 import ReactGA from "react-ga";
 import { ethers } from "ethers";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
-import Loader from "react-loader-spinner";
 import hex2ascii from "hex2ascii";
 import { addresses, abis } from "@project/contracts";
 import { useWeb3React } from "@web3-react/core";
@@ -13,11 +12,9 @@ import EPNSCoreHelper from "helpers/EPNSCoreHelper";
 import NotificationToast from "components/NotificationToast";
 import AliasVerificationodal from "components/AliasVerificationModal";
 import Info from "segments/Info";
-import Feedbox from "segments/Feedbox";
 import Spambox from "pages/Spambox";
 import Channels from "pages/Channels";
 import ChannelOwnerDashboard from "segments/ChannelOwnerDashboard";
-import ChannelCreationDashboard from "segments/ChannelCreationDashboard";
 import ChannelsDataStore from "singletons/ChannelsDataStore";
 import UsersDataStore from "singletons/UsersDataStore";
 import { postReq } from "api";
@@ -43,11 +40,8 @@ function InboxPage() {
 
   const dispatch = useDispatch();
   const { account, library, chainId } = useWeb3React();
-  const {
-    epnsReadProvider,
-    epnsWriteProvider,
-    epnsCommReadProvider,
-  } = useSelector((state) => state.contracts);
+  const { epnsReadProvider, epnsWriteProvider, epnsCommReadProvider } =
+    useSelector((state) => state.contracts);
 
   const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
   const INITIAL_OPEN_TAB = CHANNEL_TAB; //if they are not on a core network.redirect then to the notifications page
@@ -57,21 +51,14 @@ function InboxPage() {
   const [adminStatusLoaded, setAdminStatusLoaded] = React.useState(false);
   const [aliasEthAccount, setAliasEthAccount] = React.useState(null);
   const [aliasVerified, setAliasVerified] = React.useState(null); // null means error, false means unverified and true means verified
-  const [channelAdmin, setChannelAdmin] = React.useState(false);
-  const [channelJson, setChannelJson] = React.useState([]);
+
+  const [, setChannelAdmin] = React.useState(false);
+  const [, setChannelJson] = React.useState([]);
 
   // toast related section
   const [toast, showToast] = React.useState(null);
   const clearToast = () => showToast(null);
-  const showNetworkToast = () => {
-    showToast({
-      notificationTitle: (
-        <span style={{ color: "#e20880" }}> Invalid Network </span>
-      ),
-      notificationBody:
-        "Please connect to the Ethereum network to access channels",
-    });
-  };
+
   /**
    * Event listener for new notifications
    */
@@ -81,12 +68,7 @@ function InboxPage() {
     const cb = async (eventChannelAddress, eventUserAddress, identityHex) => {
       const userAddress = account;
       const identity = hex2ascii(identityHex);
-      const notificationId = identity
-        .concat("+")
-        .concat(eventChannelAddress)
-        .concat("+")
-        .concat(eventUserAddress)
-        .toLocaleLowerCase();
+
       const ipfsId = identity.split("+")[1];
       const channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(
         eventChannelAddress
@@ -116,9 +98,10 @@ function InboxPage() {
           };
 
           if (ipfsNotification.data.type === "1") {
-            const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(
-              eventChannelAddress
-            );
+            const channelSubscribers =
+              await ChannelsDataStore.instance.getChannelSubscribers(
+                eventChannelAddress
+              );
             const isSubscribed = channelSubscribers.find((sub) => {
               return sub.toLowerCase() === account.toLowerCase();
             });
@@ -227,6 +210,7 @@ function InboxPage() {
         dispatch(setCommunicatorWriteProvider(communicatorSignerInstance));
       }
     })();
+    // eslint-disable-next-line
   }, [account, chainId]);
 
   /**
@@ -242,13 +226,14 @@ function InboxPage() {
     userClickedAt(INITIAL_OPEN_TAB);
     setChannelJson([]);
     // save push admin to global state
-    epnsReadProvider.pushChannelAdmin()
-    .then((response) => {
-      dispatch(setPushAdmin(response));
-    })
-    .catch(err =>{
-      console.log({err})
-    });
+    epnsReadProvider
+      .pushChannelAdmin()
+      .then((response) => {
+        dispatch(setPushAdmin(response));
+      })
+      .catch((err) => {
+        console.log({ err });
+      });
 
     // EPNS Read Provider Set
     if (epnsReadProvider != null && epnsCommReadProvider != null) {
@@ -267,6 +252,7 @@ function InboxPage() {
       listenFornewNotifications();
       fetchDelegators();
     }
+    // eslint-disable-next-line
   }, [epnsReadProvider, epnsCommReadProvider]);
 
   // handle user action at control center
@@ -285,7 +271,7 @@ function InboxPage() {
         // fetch basic information abouot the channels and store it to state
         if (delegators && delegators.channelOwners) {
           const channelInformationPromise = [
-            ...new Set([account, ...delegators.channelOwners])//make the accounts unique
+            ...new Set([account, ...delegators.channelOwners]), //make the accounts unique
           ].map((channelAddress) =>
             ChannelsDataStore.instance
               .getChannelJsonAsync(channelAddress)
@@ -313,13 +299,11 @@ function InboxPage() {
     EPNSCoreHelper.getChannelJsonFromUserAddress(ownerAccount, epnsReadProvider)
       .then(async (response) => {
         // if channel admin, then get if the channel is verified or not, then also fetch more details about the channel
-        const verificationStatus = await epnsWriteProvider.getChannelVerfication(
-          ownerAccount
-        );
+        const verificationStatus =
+          await epnsWriteProvider.getChannelVerfication(ownerAccount);
         const channelJson = await epnsWriteProvider.channels(ownerAccount);
-        const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(
-          ownerAccount
-        );
+        const channelSubscribers =
+          await ChannelsDataStore.instance.getChannelSubscribers(ownerAccount);
         dispatch(
           setUserChannelDetails({
             ...response,
@@ -349,10 +333,10 @@ function InboxPage() {
   return (
     <Container>
       <Interface>
-        {controlAt == 0 && <Spambox />}
-        {controlAt == 1 && <Channels />}
-        {controlAt == 2 && adminStatusLoaded && <ChannelOwnerDashboard />}
-        {controlAt == 3 && <Info />}
+        {controlAt === 0 && <Spambox />}
+        {controlAt === 1 && <Channels />}
+        {controlAt === 2 && adminStatusLoaded && <ChannelOwnerDashboard />}
+        {controlAt === 3 && <Info />}
         {toast && (
           <NotificationToast notification={toast} clearToast={clearToast} />
         )}
@@ -376,116 +360,9 @@ const Container = styled.div`
   min-height: calc(100vh - 100px);
 `;
 
-const Controls = styled.div`
-  flex: 0;
-  display: flex;
-  flex-direction: row;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-`;
-
-const ControlButton = styled.div`
-  flex: 1 1 21%;
-  height: 120px;
-  min-width: 200px;
-  background: #fff;
-
-  box-shadow: 0px 15px 20px -5px rgba(0, 0, 0, 0.1);
-  border-radius: 15px;
-  border: 1px solid rgb(225, 225, 225);
-
-  border-bottom: 10px solid rgb(180, 180, 180);
-  margin: 20px;
-  overflow: hidden;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-bottom: 10px solid
-    ${(props) => (props.active ? props.border : "rgb(180,180,180)")};
-
-  &:hover {
-    opacity: 0.9;
-    cursor: pointer;
-    pointer: hand;
-  }
-  &:active {
-    opacity: 0.75;
-    cursor: pointer;
-    pointer: hand;
-  }
-`;
-
-const ControlImage = styled.img`
-  height: 30%;
-  margin-right: 15px;
-  filter: ${(props) => (props.active ? "brightness(1)" : "brightness(0)")};
-  opacity: ${(props) => (props.active ? "1" : "0.25")};
-
-  transition: transform 0.2s ease-out;
-  ${(props) =>
-    props.active &&
-    css`
-      transform: scale(3.5) translate(-20px, 0px);
-      opacity: 0.4;
-    `};
-`;
-
-const ControlText = styled.label`
-  font-size: 16px;
-  font-weight: 200;
-  opacity: ${(props) => (props.active ? "1" : "0.75")};
-
-  transition: transform 0.2s ease-out;
-  ${(props) =>
-    props.active &&
-    css`
-      transform: scale(1.3) translate(-10px, 0px);
-    `};
-`;
-
-const ControlChannelContainer = styled.div`
-  margin: 0px 20px;
-  flex-direction: column;
-  align-items: center;
-  display: flex;
-`;
-
-const ControlChannelImage = styled.img`
-  width: 20%;
-  margin-bottom: 10px;
-  transition: transform 0.2s ease-out;
-  ${(props) =>
-    props.active &&
-    css`
-      transform: scale(3.5) translate(-40px, 5px);
-      opacity: 0.2;
-      z-index: 1;
-    `};
-`;
-
-const ControlChannelText = styled.label`
-  font-size: 16px;
-  font-weight: 300;
-  opacity: ${(props) => (props.active ? "1" : "0.75")};
-  transition: transform 0.2s ease-out;
-  background: -webkit-linear-gradient(#db268a, #34c6f3);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  z-index: 2;
-  ${(props) =>
-    props.active &&
-    css`
-      transform: scale(1.1) translate(0px, -20px);
-    `};
-`;
-
 const Interface = styled.div`
   flex: 1;
   display: flex;
-
   margin-bottom: 15px;
   overflow: hidden;
 `;

@@ -6,15 +6,15 @@ export default class App extends React.Component {
     super(props);
 
     this.state = {
-      value: localStorage.getItem('myValueInLocalStorage') || '',
+      value: localStorage.getItem("myValueInLocalStorage") || "",
     };
   }
 
   componentDidUpdate() {
-    localStorage.setItem('myValueInLocalStorage', this.state.value);
+    localStorage.setItem("myValueInLocalStorage", this.state.value);
   }
 
-  onChange = event => {
+  onChange = (event) => {
     this.setState({ value: event.target.value });
   };
 
@@ -23,11 +23,7 @@ export default class App extends React.Component {
       <div>
         <h1>Hello React ES6 Class Component!</h1>
 
-        <input
-          value={this.state.value}
-          type="text"
-          onChange={this.onChange}
-        />
+        <input value={this.state.value} type="text" onChange={this.onChange} />
 
         <Text>{this.state.value}</Text>
       </div>
@@ -41,4 +37,4 @@ const Text = styled.div`
   margin-bottom: 16px;
   pointer-events: none;
   font-size: 15px;
-`
+`;

@@ -5,8 +5,6 @@ import {
   Content,
   Item,
   ItemH,
-  WaveOuter,
-  WaveInner,
   H2,
   H3,
   Span,
@@ -15,7 +13,6 @@ import {
   Input,
   TextField,
 } from "components/SharedStyling";
-import Wave from "react-wavify";
 import Dropdown from "react-dropdown";
 import styled from "styled-components";
 import { FaCheckCircle } from "react-icons/fa";
@@ -50,68 +47,78 @@ const SupportPage = () => {
   const [contactFormError, setContactFormError] = React.useState("");
 
   const handleContactFormSubmit = (e) => {
-		e.preventDefault();
-	
-		// Check everything in order
-		if (validateEmail(contactFormEmail)) {
-			if (isEmpty(contactFormName)) {
-				setContactFormError("Name can't be empty");
-				setContactFormProcessing(0);
-			} else if (isEmpty(contactFormSub)) {
-				setContactFormError("Subject can't be empty");
-				setContactFormProcessing(0);
-			} else if (isEmpty(contactFormMsg)) {
-				setContactFormError("Message can't be empty");
-				setContactFormProcessing(0);
-			} else {
-				setContactFormProcessing(1);
-	
-				const requestOptions = {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({
-						from: contactFormEmail,
-						name: contactFormName,
-						topic: contactFormTopic,
-						sub: contactFormSub,
-						msg: contactFormMsg,
-					}),
-				};
-	
-				fetch(
-					"https://backend-kovan.epns.io/apis/mailing/send_mail",
-					requestOptions
-				)
-					.then((response) => response.json())
-					.then((jsondata) => {
-						// console.log(jsondata);
-						setContactFormProcessing(2);
-					})
-					.catch((err) => {
-						// console.log(err);
-						setContactFormError(
-							"Mayday! Mayday! something went wrong. Please retry..."
-						);
-						setContactFormProcessing(0);
-					});
-			}
-		} else {
-			setContactFormError("Incorrect e-mail, please check and retry!");
-			setContactFormProcessing(0);
-		}
-	};
+    e.preventDefault();
+
+    // Check everything in order
+    if (validateEmail(contactFormEmail)) {
+      if (isEmpty(contactFormName)) {
+        setContactFormError("Name can't be empty");
+        setContactFormProcessing(0);
+      } else if (isEmpty(contactFormSub)) {
+        setContactFormError("Subject can't be empty");
+        setContactFormProcessing(0);
+      } else if (isEmpty(contactFormMsg)) {
+        setContactFormError("Message can't be empty");
+        setContactFormProcessing(0);
+      } else {
+        setContactFormProcessing(1);
+
+        const requestOptions = {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            from: contactFormEmail,
+            name: contactFormName,
+            topic: contactFormTopic,
+            sub: contactFormSub,
+            msg: contactFormMsg,
+          }),
+        };
+
+        fetch(
+          "https://backend-kovan.epns.io/apis/mailing/send_mail",
+          requestOptions
+        )
+          .then((response) => response.json())
+          .then((jsondata) => {
+            // console.log(jsondata);
+            setContactFormProcessing(2);
+          })
+          .catch((err) => {
+            // console.log(err);
+            setContactFormError(
+              "Mayday! Mayday! something went wrong. Please retry..."
+            );
+            setContactFormProcessing(0);
+          });
+      }
+    } else {
+      setContactFormError("Incorrect e-mail, please check and retry!");
+      setContactFormProcessing(0);
+    }
+  };
 
   return (
     <Section id="contact" theme="#FAFAFA">
       <Content className="contentBox" padding="10px 0">
         <Item align="stretch" justify="flex-start" margin="0px 20px">
-            <Item align="stretch" align="flex-end" tabletAlign="flex-start" margin="0px 16px 0px 0px" textAlign="right" tabletTextAlign="left">
-              <H2 textTransform="uppercase" spacing="0.1em" bg="#fff">
-                <Span color="#000" weight="600" padding="0px">Contact US!</Span>
-                {/* <Span weight="200" color="#000"> Us!</Span> */}
-              </H2>
-              <H3 bg="#fff" color="#000">Get in Touch</H3>
-            </Item>
+          <Item
+            align="flex-end"
+            tabletAlign="flex-start"
+            margin="0px 16px 0px 0px"
+            textAlign="right"
+            tabletTextAlign="left"
+          >
+            <H2 textTransform="uppercase" spacing="0.1em" bg="#fff">
+              <Span color="#000" weight="600" padding="0px">
+                Contact US!
+              </Span>
+              {/* <Span weight="200" color="#000"> Us!</Span> */}
+            </H2>
+            <H3 bg="#fff" color="#000">
+              Get in Touch
+            </H3>
+          </Item>
           <Item self="stretch">
             <FormSubmision
               flex="1"
@@ -133,7 +140,7 @@ const SupportPage = () => {
                         minWidth="280px"
                       >
                         <ContactInput
-													required
+                          required
                           radius="4px"
                           padding="12px"
                           bg="#fff"
@@ -144,8 +151,7 @@ const SupportPage = () => {
                             setContactFormName(e.target.value);
                           }}
                           autocomplete="name"
-                          style={{
-                          }}
+                          style={{}}
                         />
                         {contactFormName.trim().length === 0 && (
                           <Span
@@ -374,7 +380,7 @@ const DropdownStyled = styled(Dropdown)`
     font-weight: 400;
     letter-spacing: 0.2em;
     font-size: 0.8em;
-		padding-left: 6px
+    padding-left: 6px;
   }
 
   .Dropdown-arrow {
@@ -410,17 +416,17 @@ const DropdownStyled = styled(Dropdown)`
 `;
 
 const ContactInput = styled(Input)`
-	background: #FFFFFF;
-	border: 1px solid #D4D4D4;
-	box-sizing: border-box;
-	border-radius: 4px;
-`
+  background: #ffffff;
+  border: 1px solid #d4d4d4;
+  box-sizing: border-box;
+  border-radius: 4px;
+`;
 
 const ContactTextArea = styled(TextField)`
-	background: #FFFFFF;
-	border: 1px solid #D4D4D4;
-	box-sizing: border-box;
-	border-radius: 4px;
-`
+  background: #ffffff;
+  border: 1px solid #d4d4d4;
+  box-sizing: border-box;
+  border-radius: 4px;
+`;
 
 export { SupportPage };

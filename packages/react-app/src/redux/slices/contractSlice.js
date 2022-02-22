@@ -42,7 +42,7 @@ export const {
   setCoreWriteProvider,
   setCommunicatorReadProvider,
   setCommunicatorWriteProvider,
-  setPushAdmin
+  setPushAdmin,
 } = contractSlice.actions;
 
 export default contractSlice.reducer;

@@ -1,9 +1,8 @@
 import React from "react";
-import ReactGA from "react-ga";
-import { Navigate, Routes, Route, Link } from "react-router-dom";
+import { Navigate, Routes, Route } from "react-router-dom";
 
 import styled from "styled-components";
-import { Item, ItemH, Span, H2, B, A } from "components/SharedStyling";
+import { Item } from "components/SharedStyling";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
@@ -20,7 +19,7 @@ import YieldFarmingPage from "pages/YieldFarmingPage";
 import NFTPage from "pages/NFTPage";
 import AirdropPage from "pages/AirdropPage";
 
-import {SupportPage} from "pages/SupportPage";
+import { SupportPage } from "pages/SupportPage";
 
 import GLOBALS from "config/Globals";
 
@@ -42,11 +41,8 @@ function MasterInterfacePage() {
           <Route path="yield" element={<YieldFarmingPage />} />
           <Route path="rockstar" element={<NFTPage />} />
           <Route path="gratitude" element={<AirdropPage />} />
-          <Route
-              path="/"
-              element={<Navigate to="/channels" />}
-          />
-          <Route path="support" element={<SupportPage/>}/>
+          <Route path="/" element={<Navigate to="/channels" />} />
+          <Route path="support" element={<SupportPage />} />
         </Routes>
       </Interface>
 
@@ -68,8 +64,11 @@ function MasterInterfacePage() {
 const Container = styled.div`
   flex: 1;
   flex-direction: column;
-  min-height: calc(100vh - ${GLOBALS.CONSTANTS.HEADER_HEIGHT}px - 20px - ${props => props.theme.interfaceTopPadding});
-  padding: ${props => props.theme.interfaceTopPadding} 20px 20px 20px;
+  min-height: calc(
+    100vh - ${GLOBALS.CONSTANTS.HEADER_HEIGHT}px - 20px -
+      ${(props) => props.theme.interfaceTopPadding}
+  );
+  padding: ${(props) => props.theme.interfaceTopPadding} 20px 20px 20px;
   align-items: stretch;
 `;
 
@@ -88,7 +87,7 @@ const Interface = styled(Item)`
   @media (max-width: 992px) {
     margin: 15px 0px;
   }
-`
+`;
 
 // Export Default
 export default MasterInterfacePage;

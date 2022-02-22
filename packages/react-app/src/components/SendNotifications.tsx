@@ -30,7 +30,6 @@ import { useWeb3React } from "@web3-react/core";
 import { CloseIcon } from "assets/icons";
 import EPNSCoreHelper from "helpers/EPNSCoreHelper";
 import CryptoHelper from "helpers/CryptoHelper";
-const ethers = require("ethers");
 
 // Set Notification Form Type | 0 is reserved for protocol storage
 const NFTypes = [
@@ -131,6 +130,7 @@ function SendNotifications() {
     } else {
       setNFRecipient("");
     }
+    // eslint-disable-next-line
   }, [nfType]);
 
   // validate the body being sent, return true if no errors
@@ -174,7 +174,6 @@ function SendNotifications() {
     setNFProcessing(1);
 
     // Form signer and contract connection
-    const communicatorContract = epnsCommWriteProvider;
     // define the epns comms contracts
 
     // For payload basic
@@ -346,8 +345,6 @@ function SendNotifications() {
     }
     if (nfType === "1" || nfType === "2" || nfType === "3" || nfType === "4") {
       // Prepare Identity and send notification
-      const identity = nfType + "+" + storagePointer;
-      const identityBytes = ethers.utils.toUtf8Bytes(identity);
 
       const EPNS_DOMAIN = {
         name: "EPNS COMM V1",
@@ -577,7 +574,7 @@ function SendNotifications() {
   };
 
   const isEmpty = (field: any) => {
-    if (field.trim().length == 0) {
+    if (field.trim().length === 0) {
       return true;
     }
 
@@ -607,7 +604,7 @@ function SendNotifications() {
               <H3>
                 EPNS supports three types of notifications (for now!).{" "}
                 <b>Groups</b>, <b>Secrets</b>, and <b>Targetted</b>
-                 {/* and{" "} <b>Subsets</b>. */}
+                {/* and{" "} <b>Subsets</b>. */}
               </H3>
             ) : (
               <H3>This channel has been deactivated, please reactivate it!.</H3>
@@ -646,7 +643,7 @@ function SendNotifications() {
                             setChannelAddress(option.value);
                           }}
                           value={delegateeOptions.find(
-                            (d) => d.value == channelAddress
+                            (d) => d.value === channelAddress
                           )}
                         />
                       </DropdownStyledParentWhite>
@@ -783,7 +780,7 @@ function SendNotifications() {
                         setNFRecipient(e.target.value);
                       }}
                     />
-                    {nfRecipient.trim().length == 0 && (
+                    {nfRecipient.trim().length === 0 && (
                       <Span
                         padding="4px 10px"
                         right="0px"
@@ -834,7 +831,7 @@ function SendNotifications() {
                           }
                         }}
                       />
-                      {nfRecipient.trim().length == 0 && (
+                      {nfRecipient.trim().length === 0 && (
                         <Span
                           padding="4px 10px"
                           right="0px"
@@ -872,7 +869,7 @@ function SendNotifications() {
                         setNFSub(e.target.value);
                       }}
                     />
-                    {nfSub.trim().length == 0 && (
+                    {nfSub.trim().length === 0 && (
                       <Span
                         padding="4px 10px"
                         right="0px"
@@ -938,7 +935,7 @@ function SendNotifications() {
                           setNFMedia(e.target.value);
                         }}
                       />
-                      {nfMedia.trim().length == 0 && (
+                      {nfMedia.trim().length === 0 && (
                         <Span
                           padding="4px 10px"
                           right="0px"
@@ -980,7 +977,7 @@ function SendNotifications() {
                           setNFCTA(e.target.value);
                         }}
                       />
-                      {nfCTA.trim().length == 0 && (
+                      {nfCTA.trim().length === 0 && (
                         <Span
                           padding="4px 10px"
                           right="0px"
@@ -998,7 +995,7 @@ function SendNotifications() {
                   </ItemH>
                 )}
 
-                {nfInfo && nfProcessing != 1 && (
+                {nfInfo && nfProcessing !== 1 && (
                   <Item
                     color="#fff"
                     bg="#e1087f"
@@ -1030,9 +1027,9 @@ function SendNotifications() {
                       flex="1"
                       radius="0px"
                       padding="20px 10px"
-                      disabled={nfProcessing == 1 ? true : false}
+                      disabled={nfProcessing === 1 ? true : false}
                     >
-                      {nfProcessing == 1 && (
+                      {nfProcessing === 1 && (
                         <Loader
                           type="Oval"
                           color="#fff"
@@ -1040,7 +1037,7 @@ function SendNotifications() {
                           width={24}
                         />
                       )}
-                      {nfProcessing != 1 && (
+                      {nfProcessing !== 1 && (
                         <Input
                           cursor="hand"
                           textTransform="uppercase"

@@ -6,16 +6,10 @@ import {
   Content,
   Item,
   ItemH,
-  ItemBreak,
-  H1,
   H2,
   H3,
-  Image,
-  P,
   Span,
-  Anchor,
   Button,
-  Showoff,
   FormSubmision,
   Input,
   TextField,
@@ -26,24 +20,21 @@ import { FiLink } from "react-icons/fi";
 import "react-dropzone-uploader/dist/styles.css";
 import Dropzone from "react-dropzone-uploader";
 
-import { makeStyles } from "@material-ui/core/styles";
 import Slider from "@material-ui/core/Slider";
 
 import Loader from "react-loader-spinner";
 
-import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
+import { useWeb3React } from "@web3-react/core";
 
 import { addresses, abis } from "@project/contracts";
 const ethers = require("ethers");
-
-const ipfs = require("ipfs-api")();
 
 const minStakeFees = 50;
 const ALIAS_CHAINS = [{ value: "POLYGON_TEST_MUMBAI:80001", label: "Polygon" }];
 
 // Create Header
 function CreateChannel() {
-  const { active, error, account, library, chainId } = useWeb3React();
+  const { account, library, chainId } = useWeb3React();
 
   const [processing, setProcessing] = React.useState(0);
   const [processingInfo, setProcessingInfo] = React.useState("");
@@ -69,7 +60,7 @@ function CreateChannel() {
     console.log(status, meta, file);
   };
 
-  const onDropHandler = (files) => {
+  const onDropHandler = () => {
     //   var file = files[0]
     //   const reader = new FileReader();
     //   reader.onload = (event) => {
@@ -90,7 +81,7 @@ function CreateChannel() {
       reader.readAsDataURL(file);
       // console.log(f.file);
 
-      reader.onloadend = function(e) {
+      reader.onloadend = function (e) {
         // console.log(reader.result);
         const response = handleLogoSizeLimitation(reader.result);
         if (response.success) {
@@ -126,14 +117,13 @@ function CreateChannel() {
     // This is brilliant: https://stackoverflow.com/questions/27886677/javascript-get-extension-from-base64-image
     // char(0) => '/' : jpg
     // char(0) => 'i' : png
-    let fileext;
     console.log(base64Data.charAt(0));
-    if (base64Data.charAt(0) == "/") {
+    if (base64Data.charAt(0) === "/") {
       return {
         success: 1,
         info: "Image checks passed",
       };
-    } else if (base64Data.charAt(0) == "i") {
+    } else if (base64Data.charAt(0) === "i") {
       return {
         success: 1,
         info: "Image checks passed",
@@ -235,7 +225,7 @@ function CreateChannel() {
 
     setProcessingInfo("Creating Channel TX in progress");
     anotherSendTxPromise
-      .then(async function(tx) {
+      .then(async function (tx) {
         console.log(tx);
         console.log("Check: " + account);
         await library.waitForTransaction(tx.hash);
@@ -253,7 +243,7 @@ function CreateChannel() {
   };
 
   const isEmpty = (field) => {
-    if (field.trim().length == 0) {
+    if (field.trim().length === 0) {
       return true;
     }
 
@@ -349,8 +339,7 @@ function CreateChannel() {
                 accept="image/jpeg,image/png"
               />
             </Item>
-            {
-              chainId != 1 ? (
+            {chainId !== 1 ? (
               <Item align="flex-end">
                 <Minter
                   onClick={() => {
@@ -363,8 +352,9 @@ function CreateChannel() {
                   </Pool>
                 </Minter>
               </Item>
-              ): <></>
-            }
+            ) : (
+              <></>
+            )}
           </Content>
         </Section>
       )}
@@ -464,7 +454,7 @@ function CreateChannel() {
                     setChannelName(e.target.value);
                   }}
                 />
-                {channelName.trim().length == 0 && (
+                {channelName.trim().length === 0 && (
                   <Span
                     padding="4px 10px"
                     right="0px"
@@ -568,7 +558,7 @@ function CreateChannel() {
                       setChannelURL(e.target.value);
                     }}
                   />
-                  {channelURL.trim().length == 0 && (
+                  {channelURL.trim().length === 0 && (
                     <Span
                       padding="4px 10px"
                       right="0px"
@@ -597,12 +587,12 @@ function CreateChannel() {
                   flex="1"
                   radius="0px"
                   padding="20px 10px"
-                  disabled={processing == 1 ? true : false}
+                  disabled={processing === 1 ? true : false}
                 >
-                  {processing == 1 && (
+                  {processing === 1 && (
                     <Loader type="Oval" color="#fff" height={24} width={24} />
                   )}
-                  {processing != 1 && (
+                  {processing !== 1 && (
                     <Input
                       cursor="hand"
                       textTransform="uppercase"
@@ -622,10 +612,10 @@ function CreateChannel() {
       )}
 
       {/* Channel Setup Progress */}
-      {(processing == 1 || processing == 3) && (
+      {(processing === 1 || processing === 3) && (
         <Section>
           <Content padding="0px 0px 0px 0px">
-            {processing == 1 && (
+            {processing === 1 && (
               <Item margin="20px 0px 10px 0px">
                 <Loader type="Oval" color="#000" height={24} width={24} />
               </Item>
@@ -633,7 +623,7 @@ function CreateChannel() {
 
             <Item
               color="#fff"
-              bg={processing == 1 ? "#e1087f" : "#000"}
+              bg={processing === 1 ? "#e1087f" : "#000"}
               padding="10px 15px"
               margin="15px 0px"
             >
@@ -663,7 +653,7 @@ const Step = styled.div`
   border-radius: 100%;
 
   ${({ type }) =>
-    type == "active" &&
+    type === "active" &&
     css`
       background: ${(props) => props.activeBG || "#ddd"};
       border: 4px solid #00000022;
@@ -680,71 +670,6 @@ const Line = styled.div`
   z-index: -1;
 `;
 
-const Channel = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-`;
-
-const Notice = styled.div`
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-`;
-
-const Title = styled.h1`
-  color: #674c9f;
-  font-size: 30px;
-  font-weight: 300;
-  margin-top: 0px;
-  margin-bottom: 30px;
-`;
-
-const Info = styled.label`
-  padding-bottom: 20px;
-  font-size: 14px;
-  color: #000;
-`;
-
-const Info2 = styled(Info)``;
-const Name = styled(Input)`
-  border-bottom: 1px solid #e20880;
-  font-size: 24px;
-`;
-
-const ShortInfo = styled.textarea`
-  outline: 0;
-  border: 0;
-  border-bottom: 1px solid #35c5f3;
-  margin: 10px;
-  font-size: 18px;
-  min-height: 80px;
-  color: #111;
-`;
-
-const Url = styled(Input)`
-  border-bottom: 1px solid #674c9f;
-  font-size: 1=8px;
-`;
-
-const Text = styled.span``;
-
-const Continue = styled.button`
-  border: 0;
-  outline: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  border-radius: 20px;
-  font-size: 14px;
-  background: ${(props) => props.theme || "#674c9f"};
-  margin: 30px 0px 0px 0px;
-  border-radius: 8px;
-  padding: 16px;
-  font-size: 16px;
-  font-weight: 400;
-`;
 const Minter = styled.div`
   display: flex;
   flex-direction: row;

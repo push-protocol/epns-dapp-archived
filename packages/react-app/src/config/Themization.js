@@ -1,32 +1,32 @@
 // Define what props.theme will look like
 const themeLight = {
   // Section Theme
-  sectionBorderBg: 'transparent',
+  sectionBorderBg: "transparent",
 
   // Header Theme
-  headerBg: '#fff',
-  headerTagBg: '#000',
-  headerTagFg: '#fff',
+  headerBg: "#fff",
+  headerTagBg: "#000",
+  headerTagFg: "#fff",
 
-  headerIconsBg: '#000',
+  headerIconsBg: "#000",
 
-  // Nav Menu 
-  navMenuBg: '#00000066',
+  // Nav Menu
+  navMenuBg: "#00000066",
 
   // Left Bar Theme
-  leftBarLoaderBg: '#ddd',
+  leftBarLoaderBg: "#ddd",
 
-  leftBarBg: '#fff',
-  leftBarButtonBg: '#fff',
-  leftBarHoverColor: '#5c5c5c',
-  leftBarFontColor: '#000',
+  leftBarBg: "#fff",
+  leftBarButtonBg: "#fff",
+  leftBarHoverColor: "#5c5c5c",
+  leftBarFontColor: "#000",
 
-  leftBarSocialBg: '#eee',
-  leftBarSocialIconBg: '#ddd',
+  leftBarSocialBg: "#eee",
+  leftBarSocialIconBg: "#ddd",
 
   // Interface Theme
-  interfaceTopPadding: '0px',
-  mainBg: '#fff',
+  interfaceTopPadding: "0px",
+  mainBg: "#fff",
 
   yieldBg: "#f3f3f3",
 
@@ -36,38 +36,37 @@ const themeLight = {
 
   color: "#000",
 
-  channelBg: "#fafafa"
-
+  channelBg: "#fafafa",
 };
 
 const themeDark = {
   // Section Theme
-  sectionBorderBg: '#333',
+  sectionBorderBg: "#333",
 
   // Header Theme
-  headerBg: '#000',
-  headerTagBg: '#fff',
-  headerTagFg: '#000',
+  headerBg: "#000",
+  headerTagBg: "#fff",
+  headerTagFg: "#000",
 
-  headerIconsBg: '#fff',
+  headerIconsBg: "#fff",
 
-  // Nav Menu 
-  navMenuBg: '#000',
+  // Nav Menu
+  navMenuBg: "#000",
 
   // Left Bar Theme
-  leftBarLoaderBg: '#ddd',
+  leftBarLoaderBg: "#ddd",
 
-  leftBarBg: '#000',
-  leftBarButtonBg: '#000',
-  leftBarHoverColor: '#fff',
-  leftBarFontColor: '#fff',
+  leftBarBg: "#000",
+  leftBarButtonBg: "#000",
+  leftBarHoverColor: "#fff",
+  leftBarFontColor: "#fff",
 
-  leftBarSocialBg: '#222',
-  leftBarSocialIconBg: '#000',
+  leftBarSocialBg: "#222",
+  leftBarSocialIconBg: "#000",
 
   // Interface Theme
-  interfaceTopPadding: '20px',
-  mainBg: '#000',
+  interfaceTopPadding: "20px",
+  mainBg: "#000",
 
   color: "#fff",
 
@@ -79,12 +78,10 @@ const themeDark = {
 
   greyText: "#818589",
 
-  channelBg: "#000"
-
-
-}
+  channelBg: "#000",
+};
 
 module.exports = {
-    themeLight: themeLight,
-    themeDark: themeDark
-}
+  themeLight: themeLight,
+  themeDark: themeDark,
+};

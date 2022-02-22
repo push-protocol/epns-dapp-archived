@@ -8,6 +8,6 @@ const countdown = {
   buttonTitle: "Are you ready for Governance",
   buttonText: "Hold a Bit!",
   hide: false,
-}
+};
 
 export default countdown;

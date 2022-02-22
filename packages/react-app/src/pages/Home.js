@@ -4,7 +4,6 @@ import { ethers } from "ethers";
 import styled, { css } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import Loader from "react-loader-spinner";
-import hex2ascii from "hex2ascii";
 import { addresses, abis, envConfig } from "@project/contracts";
 import { useWeb3React } from "@web3-react/core";
 
@@ -14,13 +13,11 @@ import NotificationToast from "components/NotificationToast";
 import AliasVerificationodal from "components/AliasVerificationModal";
 
 import Info from "segments/Info";
-import SpamBox from "segments/spam";
 
 import Channels from "pages/Channels";
 import Feedbox from "segments/Feedbox";
 
 import ChannelOwnerDashboard from "segments/ChannelOwnerDashboard";
-import ChannelCreationDashboard from "segments/ChannelCreationDashboard";
 
 import ChannelsDataStore from "singletons/ChannelsDataStore";
 import UsersDataStore from "singletons/UsersDataStore";
@@ -38,7 +35,7 @@ import {
   setCanVerify,
   setDelegatees,
 } from "redux/slices/adminSlice";
-import { addNewNotification, toggleToggler, resetState } from "redux/slices/notificationSlice";
+import { toggleToggler, resetState } from "redux/slices/notificationSlice";
 
 export const ALLOWED_CORE_NETWORK = envConfig.coreContractChain; //chainId of network which we have deployed the core contract on
 const CHANNEL_TAB = 1; //Default to 1 which is the channel tab
@@ -49,11 +46,8 @@ function Home() {
 
   const dispatch = useDispatch();
   const { account, library, chainId } = useWeb3React();
-  const {
-    epnsReadProvider,
-    epnsWriteProvider,
-    epnsCommReadProvider,
-  } = useSelector((state) => state.contracts);
+  const { epnsReadProvider, epnsWriteProvider, epnsCommReadProvider } =
+    useSelector((state) => state.contracts);
 
   const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
   const INITIAL_OPEN_TAB = CHANNEL_TAB; //if they are not on a core network.redirect then to the notifications page
@@ -89,8 +83,8 @@ function Home() {
 
   React.useEffect(() => {
     dispatch(resetState());
-    setTimeout(() => dispatch(toggleToggler()), 300)
-  }, [account]);
+    setTimeout(() => dispatch(toggleToggler()), 300);
+  }, [account, dispatch]);
 
   /**
    * Logic to get channel alias and alias verification status as well as create instances of core and comunicator contract
@@ -168,7 +162,7 @@ function Home() {
         dispatch(setCommunicatorWriteProvider(communicatorSignerInstance));
       }
     })();
-  }, [account, chainId]);
+  }, [account, chainId, dispatch, library, onCoreNetwork]);
 
   /**
    * When we instantiate the contract instances, fetch basic information about the user
@@ -188,7 +182,7 @@ function Home() {
     });
 
     // EPNS Read Provider Set
-    if (epnsReadProvider != null && epnsCommReadProvider != null) {
+    if (epnsReadProvider !== null && epnsCommReadProvider !== null) {
       // Instantiate Data Stores
       UsersDataStore.instance.init(
         account,
@@ -203,7 +197,16 @@ function Home() {
       checkUserForChannelOwnership();
       fetchDelegators();
     }
-  }, [epnsReadProvider, epnsCommReadProvider]);
+    // eslint-disable-next-line
+  }, [
+    epnsReadProvider,
+    epnsCommReadProvider,
+    dispatch,
+    INITIAL_OPEN_TAB,
+    account,
+    checkUserForChannelOwnership,
+    fetchDelegators,
+  ]);
 
   // handle user action at control center
   const userClickedAt = (controlIndex) => {
@@ -221,7 +224,7 @@ function Home() {
         // fetch basic information abouot the channels and store it to state
         if (delegators && delegators.channelOwners) {
           const channelInformationPromise = [
-            ...new Set([account, ...delegators.channelOwners])//make the accounts unique
+            ...new Set([account, ...delegators.channelOwners]), //make the accounts unique
           ].map((channelAddress) =>
             ChannelsDataStore.instance
               .getChannelJsonAsync(channelAddress)
@@ -249,13 +252,11 @@ function Home() {
     EPNSCoreHelper.getChannelJsonFromUserAddress(ownerAccount, epnsReadProvider)
       .then(async (response) => {
         // if channel admin, then get if the channel is verified or not, then also fetch more details about the channel
-        const verificationStatus = await epnsWriteProvider.getChannelVerfication(
-          ownerAccount
-        );
+        const verificationStatus =
+          await epnsWriteProvider.getChannelVerfication(ownerAccount);
         const channelJson = await epnsWriteProvider.channels(ownerAccount);
-        const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(
-          ownerAccount
-        );
+        const channelSubscribers =
+          await ChannelsDataStore.instance.getChannelSubscribers(ownerAccount);
         dispatch(
           setUserChannelDetails({
             ...response,
@@ -287,7 +288,7 @@ function Home() {
       <Controls>
         <ControlButton
           index={0}
-          active={controlAt == 0 ? 1 : 0}
+          active={controlAt === 0 ? 1 : 0}
           border="#e20880"
           onClick={() => {
             userClickedAt(0);
@@ -295,14 +296,14 @@ function Home() {
         >
           <ControlImage
             src="./svg/feedbox.svg"
-            active={controlAt == 0 ? 1 : 0}
+            active={controlAt === 0 ? 1 : 0}
           />
-          <ControlText active={controlAt == 0 ? 1 : 0}>Inbox</ControlText>
+          <ControlText active={controlAt === 0 ? 1 : 0}>Inbox</ControlText>
         </ControlButton>
 
         <ControlButton
           index={1}
-          active={controlAt == 1 ? 1 : 0}
+          active={controlAt === 1 ? 1 : 0}
           border="#35c5f3"
           onClick={() => {
             userClickedAt(1);
@@ -310,14 +311,14 @@ function Home() {
         >
           <ControlImage
             src="./svg/channel.svg"
-            active={controlAt == 1 ? 1 : 0}
+            active={controlAt === 1 ? 1 : 0}
           />
-          <ControlText active={controlAt == 1 ? 1 : 0}>Channels</ControlText>
+          <ControlText active={controlAt === 1 ? 1 : 0}>Channels</ControlText>
         </ControlButton>
 
         <ControlButton
           index={2}
-          active={controlAt == 2 ? 1 : 0}
+          active={controlAt === 2 ? 1 : 0}
           border="#674c9f"
           disabled={!adminStatusLoaded}
           onClick={() => {
@@ -342,9 +343,9 @@ function Home() {
               <ControlChannelContainer>
                 <ControlChannelImage
                   src={`${channelJson.icon}`}
-                  active={controlAt == 2 ? 1 : 0}
+                  active={controlAt === 2 ? 1 : 0}
                 />
-                <ControlChannelText active={controlAt == 2 ? 1 : 0}>
+                <ControlChannelText active={controlAt === 2 ? 1 : 0}>
                   {channelJson.name}
                 </ControlChannelText>
               </ControlChannelContainer>
@@ -356,9 +357,9 @@ function Home() {
               <ControlChannelContainer>
                 <ControlChannelImage
                   src={`${channelJson.icon}`}
-                  active={controlAt == 2 ? 1 : 0}
+                  active={controlAt === 2 ? 1 : 0}
                 />
-                <ControlChannelText active={controlAt == 2 ? 1 : 0}>
+                <ControlChannelText active={controlAt === 2 ? 1 : 0}>
                   Verify channel alias
                 </ControlChannelText>
               </ControlChannelContainer>
@@ -370,9 +371,9 @@ function Home() {
               <ControlChannelContainer>
                 <ControlChannelImage
                   src={`${channelJson.icon}`}
-                  active={controlAt == 2 ? 1 : 0}
+                  active={controlAt === 2 ? 1 : 0}
                 />
-                <ControlChannelText active={controlAt == 2 ? 1 : 0}>
+                <ControlChannelText active={controlAt === 2 ? 1 : 0}>
                   Contact the admin
                 </ControlChannelText>
               </ControlChannelContainer>
@@ -381,9 +382,9 @@ function Home() {
             <>
               <ControlImage
                 src="./svg/channeladmin.svg"
-                active={controlAt == 2 ? 1 : 0}
+                active={controlAt === 2 ? 1 : 0}
               />
-              <ControlText active={controlAt == 2 ? 1 : 0}>
+              <ControlText active={controlAt === 2 ? 1 : 0}>
                 Create Your Channel
               </ControlText>
             </>
@@ -392,23 +393,26 @@ function Home() {
 
         <ControlButton
           index={3}
-          active={controlAt == 3 ? 1 : 0}
+          active={controlAt === 3 ? 1 : 0}
           border="#e20880"
           onClick={() => {
             userClickedAt(3);
           }}
         >
-          <ControlImage src="./svg/share.svg" active={controlAt == 3 ? 1 : 0} />
-          <ControlText active={controlAt == 3 ? 1 : 0}>
+          <ControlImage
+            src="./svg/share.svg"
+            active={controlAt === 3 ? 1 : 0}
+          />
+          <ControlText active={controlAt === 3 ? 1 : 0}>
             Receive Notifs
           </ControlText>
         </ControlButton>
       </Controls>
       <Interface>
-        {controlAt == 0 && <Feedbox />}
-        {controlAt == 1 && <Channels />}
-        {controlAt == 2 && adminStatusLoaded && <ChannelOwnerDashboard />}
-        {controlAt == 3 && <Info />}
+        {controlAt === 0 && <Feedbox />}
+        {controlAt === 1 && <Channels />}
+        {controlAt === 2 && adminStatusLoaded && <ChannelOwnerDashboard />}
+        {controlAt === 3 && <Info />}
         {toast && (
           <NotificationToast notification={toast} clearToast={clearToast} />
         )}

@@ -1,7 +1,5 @@
 import EPNSCoreHelper from "helpers/EPNSCoreHelper";
-import { ethers } from "ethers";
 
-import { addresses, abis } from "@project/contracts";
 import { postReq } from "api";
 
 // STATIC SINGLETON
@@ -85,7 +83,7 @@ export default class ChannelsDataStore {
 
       // then perform callbacks
       if (this.state.callbacks[ChannelEvents.ADD_CHANNEL_ANY]) {
-        for (let [callbackID, callback] of Object.entries(
+        for (let [, callback] of Object.entries(
           this.state.callbacks[ChannelEvents.ADD_CHANNEL_ANY]
         )) {
           if (callback) {
@@ -107,7 +105,7 @@ export default class ChannelsDataStore {
 
       // then perform callbacks
       if (this.state.callbacks[ChannelEvents.ADD_CHANNEL_SELF]) {
-        for (let [callbackID, callback] of Object.entries(
+        for (let [, callback] of Object.entries(
           this.state.callbacks[ChannelEvents.ADD_CHANNEL_SELF]
         )) {
           if (callback) {
@@ -126,7 +124,7 @@ export default class ChannelsDataStore {
     contract.on(filter, async (channel, ipfs) => {
       // then perform callbacks
       if (this.state.callbacks[ChannelEvents.UPDATE_CHANNEL_ANY]) {
-        for (let [callbackID, callback] of Object.entries(
+        for (let [, callback] of Object.entries(
           this.state.callbacks[ChannelEvents.UPDATE_CHANNEL_ANY]
         )) {
           if (callback) {
@@ -145,7 +143,7 @@ export default class ChannelsDataStore {
     contract.on(filter, async (channel, ipfs) => {
       // then perform callbacks
       if (this.state.callbacks[ChannelEvents.UPDATE_CHANNEL_SELF]) {
-        for (let [callbackID, callback] of Object.entries(
+        for (let [, callback] of Object.entries(
           this.state.callbacks[ChannelEvents.UPDATE_CHANNEL_SELF]
         )) {
           if (callback) {
@@ -172,7 +170,7 @@ export default class ChannelsDataStore {
 
       // then perform callbacks
       if (this.state.callbacks[ChannelEvents.SUBSCRIBER_ANY_CHANNEL]) {
-        for (let [callbackID, callback] of Object.entries(
+        for (let [, callback] of Object.entries(
           this.state.callbacks[ChannelEvents.SUBSCRIBER_ANY_CHANNEL]
         )) {
           if (callback) {
@@ -191,7 +189,7 @@ export default class ChannelsDataStore {
     contract.on(filter, async (channel, user) => {
       // then perform callbacks
       if (this.state.callbacks[ChannelEvents.SUBSCRIBER_SELF_CHANNEL]) {
-        for (let [callbackID, callback] of Object.entries(
+        for (let [, callback] of Object.entries(
           this.state.callbacks[ChannelEvents.SUBSCRIBER_SELF_CHANNEL]
         )) {
           if (callback) {
@@ -218,7 +216,7 @@ export default class ChannelsDataStore {
 
       // then perform callbacks
       if (this.state.callbacks[ChannelEvents.UNSUBSCRIBER_ANY_CHANNEL]) {
-        for (let [callbackID, callback] of Object.entries(
+        for (let [, callback] of Object.entries(
           this.state.callbacks[ChannelEvents.UNSUBSCRIBER_ANY_CHANNEL]
         )) {
           if (callback) {
@@ -237,7 +235,7 @@ export default class ChannelsDataStore {
     contract.on(filter, async (channel, user) => {
       // then perform callbacks
       if (this.state.callbacks[ChannelEvents.UNSUBSCRIBER_SELF_CHANNEL]) {
-        for (let [callbackID, callback] of Object.entries(
+        for (let [, callback] of Object.entries(
           this.state.callbacks[ChannelEvents.UNSUBSCRIBER_SELF_CHANNEL]
         )) {
           if (callback) {
@@ -272,11 +270,9 @@ export default class ChannelsDataStore {
     const enableLogs = 0;
 
     return new Promise(async (resolve, reject) => {
-      if (this.state.channelsCount == -1) {
+      if (this.state.channelsCount === -1) {
         // Count not set, get and set it first
-        const count = EPNSCoreHelper.getTotalNumberOfChannels(
-          this.state.epnsReadProvider
-        )
+        EPNSCoreHelper.getTotalNumberOfChannels(this.state.epnsReadProvider)
           .then((response) => {
             this.state.channelsCount = response;
 
@@ -323,7 +319,9 @@ export default class ChannelsDataStore {
       pageSize: pageCount,
       op: "write",
     }).then((response) => {
-      const output = response.data.results.map(({channel}) => ({addr: channel}));
+      const output = response.data.results.map(({ channel }) => ({
+        addr: channel,
+      }));
       return output;
     });
   };
@@ -332,14 +330,14 @@ export default class ChannelsDataStore {
   // get channels meta in a paginated format
   // by passing in the starting index and the number of items per page
   getChannelsMetaAsync = async (startIndex, pageCount) => {
-    this.getChannelFromApi(startIndex, pageCount)
-    return new Promise(async (resolve, reject) => {
+    this.getChannelFromApi(startIndex, pageCount);
+    return new Promise(async (resolve, _) => {
       // get total number of channels
       const channelsCount = await this.getChannelsCountAsync();
       let stopIndex = startIndex + pageCount;
 
       // if the stop index is -1 then get all channels
-      if (stopIndex == -1 || stopIndex > channelsCount) {
+      if (stopIndex === -1 || stopIndex > channelsCount) {
         stopIndex = channelsCount;
       }
 

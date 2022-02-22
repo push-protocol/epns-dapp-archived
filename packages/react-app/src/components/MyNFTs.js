@@ -1,19 +1,17 @@
 import React from "react";
-import styled, { css } from 'styled-components';
-import Loader from 'react-loader-spinner'
-import { Waypoint } from "react-waypoint";
+import styled from "styled-components";
+import Loader from "react-loader-spinner";
 
-import { useWeb3React } from '@web3-react/core'
+import { useWeb3React } from "@web3-react/core";
 import { addresses, abis } from "@project/contracts";
-import NFTHelper from 'helpers/NFTHelper';
+import NFTHelper from "helpers/NFTHelper";
 import { ethers } from "ethers";
 
 import DisplayNotice from "components/DisplayNotice";
 import ViewNFTItem from "components/ViewNFTItem";
 
-
 // Create Header
-function MyNFTs({controlAt, setControlAt, setTokenId}) {
+function MyNFTs({ controlAt, setControlAt, setTokenId }) {
   const { account, library } = useWeb3React();
 
   const [nftReadProvider, setNftReadProvider] = React.useState(null);
@@ -24,62 +22,82 @@ function MyNFTs({controlAt, setControlAt, setTokenId}) {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-
     if (!!(library && account)) {
-      const contractInstance = new ethers.Contract(addresses.rockstar, abis.rockstar, library);
+      const contractInstance = new ethers.Contract(
+        addresses.rockstar,
+        abis.rockstar,
+        library
+      );
       setNftReadProvider(contractInstance);
       let signer = library.getSigner(account);
-      const signerInstance = new ethers.Contract(addresses.rockstar, abis.rockstar, signer);
+      const signerInstance = new ethers.Contract(
+        addresses.rockstar,
+        abis.rockstar,
+        signer
+      );
       setNftWriteProvider(signerInstance);
-      const NFTRewardsInstance = new ethers.Contract(addresses.NFTRewards, abis.NFTRewards, signer);
+      const NFTRewardsInstance = new ethers.Contract(
+        addresses.NFTRewards,
+        abis.NFTRewards,
+        signer
+      );
       setNFTRewardsContract(NFTRewardsInstance);
     }
-  }, [account,library]);
+  }, [account, library]);
 
   React.useEffect(() => {
-    if(nftReadProvider && NFTRewardsContract){
+    if (nftReadProvider && NFTRewardsContract) {
       fetchNFTDetails();
     }
-  }, [account, nftReadProvider, nftWriteProvider, NFTRewardsContract]);
+    // eslint-disable-next-line
+  }, [
+    account,
+    nftReadProvider,
+    nftWriteProvider,
+    NFTRewardsContract,
+    fetchNFTDetails,
+  ]);
 
   // to fetch NFT Details
+  // eslint-disable-next-line
   const fetchNFTDetails = async () => {
     let balance = await NFTHelper.getNFTBalance(account, nftReadProvider);
     setLoading(false);
-    for(let i=0; i<balance; i++){
-      let tokenId = await NFTHelper.getTokenOfOwnerByIndex(account, i, nftReadProvider)
-      let NFTObject = await NFTHelper.getTokenData(tokenId, nftReadProvider, NFTRewardsContract)
-      await setNFTObjects(prev => [...prev, NFTObject])
+    for (let i = 0; i < balance; i++) {
+      let tokenId = await NFTHelper.getTokenOfOwnerByIndex(
+        account,
+        i,
+        nftReadProvider
+      );
+      let NFTObject = await NFTHelper.getTokenData(
+        tokenId,
+        nftReadProvider,
+        NFTRewardsContract
+      );
+      await setNFTObjects((prev) => [...prev, NFTObject]);
     }
-  }
+  };
 
   return (
     <>
-      {loading &&
+      {loading && (
         <ContainerInfo>
-          <Loader
-           type="Oval"
-           color="#35c5f3"
-           height={40}
-           width={40}
-          />
+          <Loader type="Oval" color="#35c5f3" height={40} width={40} />
         </ContainerInfo>
-      }
+      )}
 
-      {!loading && NFTObjects.length == 0 &&
+      {!loading && NFTObjects.length === 0 && (
         <ContainerInfo>
           <DisplayNotice
             title="No ROCKSTAR tokens are available in your account"
             theme="primary"
           />
         </ContainerInfo>
-      }
+      )}
 
-
-      {!loading && NFTObjects.length != 0 &&
+      {!loading && NFTObjects.length !== 0 && (
         <Items id="scrollstyle-secondary">
-
-          {Object.keys(NFTObjects).map(index => {
+          {Object.keys(NFTObjects).map((index) => {
             if (NFTObjects[index].id) {
               return (
                 <ViewNFTItem
@@ -92,31 +110,20 @@ function MyNFTs({controlAt, setControlAt, setTokenId}) {
                   setTokenId={setTokenId}
                 />
               );
+            } else {
+              return <></>;
             }
-
           })}
         </Items>
-      }
+      )}
     </>
   );
 }
 
 // css styles
-const Container = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-
-  font-weight: 200;
-  align-content: center;
-  align-items: center;
-  justify-content: center;
-
-  max-height: 80vh;
-`
 const ContainerInfo = styled.div`
   padding: 20px;
-`
+`;
 
 const Items = styled.div`
   display: block;
@@ -124,7 +131,7 @@ const Items = styled.div`
   padding: 10px 20px;
   overflow-y: scroll;
   background: #fafafa;
-`
+`;
 
 // Export Default
 export default MyNFTs;

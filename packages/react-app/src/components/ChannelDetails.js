@@ -19,7 +19,7 @@ export default function ChannelDetails() {
 
   React.useEffect(() => {
     if (!channelDetails || !canVerify) return;
-    (async function() {
+    (async function () {
       let channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(
         channelDetails.verifiedBy
       );
@@ -29,13 +29,13 @@ export default function ChannelDetails() {
 
   React.useEffect(() => {
     if (!channelDetails) return;
-    (async function() {
+    (async function () {
       const bn = channelDetails.channelStartBlock.toString();
       const block = await library.getBlock(+bn);
-      const date = moment(block.timestamp * 1000);//convert from millisecs
-      setCreationDate(date.format(DATE_FORMAT))
+      const date = moment(block.timestamp * 1000); //convert from millisecs
+      setCreationDate(date.format(DATE_FORMAT));
     })();
-  }, [channelDetails]);
+  }, [channelDetails, library]);
 
   return (
     <ChannelDetailsWrapper>
@@ -55,7 +55,7 @@ export default function ChannelDetails() {
               : "BLOCKED"}
           </ChanneStateText>
           <Subscribers>
-            <img src="/people.svg"></img>
+            <img src="/people.svg" alt="people img"></img>
             <SubscribersCount>
               {channelDetails.subscribers.length}
             </SubscribersCount>
@@ -128,13 +128,6 @@ const Subscribers = styled.div`
   align-items: center;
 `;
 
-const ActiveIcon = styled.span`
-  width: 8px;
-  height: 8px;
-  background: #57c255;
-  border-radius: 50%;
-`;
-
 const ChanneStateText = styled.span`
   color: #57c255;
   font-family: Source Sans Pro;
@@ -182,10 +175,6 @@ const SubscribersCount = styled.span`
 const Details = styled.div`
   display: flex;
   flex-direction: column;
-`;
-const SectionLine = styled.div`
-  margin-left: 30px;
-  margin-right: 30px;
 `;
 
 const Date = styled.div`

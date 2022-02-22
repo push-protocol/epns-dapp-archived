@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import styled, { css, useTheme } from "styled-components";
 import { Device } from "assets/Device";
 
@@ -13,9 +13,7 @@ import { AiTwotoneCopy } from "react-icons/ai";
 import { useWeb3React } from "@web3-react/core";
 import { useDispatch, useSelector } from "react-redux";
 
-import {ThemeProvider} from "styled-components";
-
-import { themeLight, themeDark } from "config/Themization";
+import { ThemeProvider } from "styled-components";
 
 import { postReq } from "api";
 import NotificationToast from "components/NotificationToast";
@@ -27,8 +25,6 @@ function ViewChannelItem({ channelObjectProp }) {
   const dispatch = useDispatch();
 
   const themes = useTheme();
-  const [darkMode, setDarkMode] = useState(false);
-
 
   const {
     epnsReadProvider,
@@ -87,6 +83,7 @@ function ViewChannelItem({ channelObjectProp }) {
         fetchChannelJson();
       });
     }
+    // eslint-disable-next-line
   }, [account, channelObject, chainId]);
 
   React.useEffect(() => {
@@ -104,6 +101,7 @@ function ViewChannelItem({ channelObjectProp }) {
       .catch((err) => {
         console.log(channelObject.verifiedBy, err);
       });
+    // eslint-disable-next-line
   }, [isVerified, channelObject]);
 
   const EPNS_DOMAIN = {
@@ -151,12 +149,13 @@ function ViewChannelItem({ channelObjectProp }) {
       setSubscribed(subscribed);
       setIsVerified(
         Boolean(
-          channelObject && channelObject.verifiedBy &&
+          channelObject &&
+            channelObject.verifiedBy &&
             (channelObject.verifiedBy !== ZERO_ADDRESS ||
               channelObject.addr === pushAdminAddress)
         )
       );
-      setCanUnverify(channelObject.verifiedBy == account);
+      setCanUnverify(channelObject.verifiedBy === account);
       setChannelJson({ ...channelJson, addr: channelObject.addr });
       setLoading(false);
     } catch (err) {
@@ -434,185 +433,187 @@ function ViewChannelItem({ channelObjectProp }) {
   // render
   return (
     <ThemeProvider theme={themes}>
-    <Container key={channelObject.addr}>
-      <ChannelLogo>
-        <ChannelLogoOuter>
-          <ChannelLogoInner>
+      <Container key={channelObject.addr}>
+        <ChannelLogo>
+          <ChannelLogoOuter>
+            <ChannelLogoInner>
+              {loading ? (
+                <Skeleton color="#eee" height="100%" />
+              ) : (
+                <ChannelLogoImg src={`${channelJson.icon}`} />
+              )}
+            </ChannelLogoInner>
+          </ChannelLogoOuter>
+        </ChannelLogo>
+
+        <ChannelInfo>
+          <ChannelTitle>
             {loading ? (
-              <Skeleton color="#eee"  height="100%" />
+              <Skeleton color="#eee" width="50%" height={24} />
             ) : (
-              <ChannelLogoImg src={`${channelJson.icon}`} />
-            )}
-          </ChannelLogoInner>
-        </ChannelLogoOuter>
-      </ChannelLogo>
-
-      <ChannelInfo>
-        <ChannelTitle>
-          {loading ? (
-            <Skeleton color="#eee" width="50%" height={24} />
-          ) : (
-            <ChannelTitleLink
-              href={channelJson.url}
-              target="_blank"
-              rel="nofollow"
-              
-            >
-              {channelJson.name}
-              {isVerified && (
-                <Subscribers style={{ display: "inline", marginLeft: "8px" }}>
-                  <GoVerified size={18} color="#35c4f3" />
-                </Subscribers>
-              )}
-            </ChannelTitleLink>
-          )}
-        </ChannelTitle>
-
-        <ChannelDesc>
-          {loading ? (
-            <>
-              <SkeletonWrapper atH={5} atW={100}>
-                <Skeleton color="#eee" width="100%" height={5} />
-              </SkeletonWrapper>
-
-              <SkeletonWrapper atH={5} atW={100}>
-                <Skeleton color="#eee" width="100%" height={5} />
-              </SkeletonWrapper>
-
-              <SkeletonWrapper atH={5} atW={100}>
-                <Skeleton color="#eee" width="40%" height={5} />
-              </SkeletonWrapper>
-            </>
-          ) : (
-            <ChannelDescLabel>{channelJson.info}</ChannelDescLabel>
-          )}
-        </ChannelDesc>
-
-        <ChannelMeta>
-          {loading ? (
-            <>
-              <SkeletonWrapper atH={10} atW={30} marginBottom="0">
-                <Skeleton />
-              </SkeletonWrapper>
-            </>
-          ) : (
-            <ColumnFlex>
-              <FlexBox style={{ marginBottom: "5px" }}>
-                <Subscribers>
-                  <IoMdPeople size={20} color="#ccc" />
-                  <SubscribersCount>{memberCount}</SubscribersCount>
-                </Subscribers>
-
-                <Subscribers style={{ marginLeft: "10px" }}>
-                  <FaRegAddressCard size={20} color="#ccc" />
-                  <SubscribersCount
-                    onClick={() => {
-                      copyToClipboard(channelJson.addr);
-                      setCopyText("copied");
-                    }}
-                    onMouseEnter={() => {
-                      setCopyText("click to copy");
-                    }}
-                    onMouseLeave={() => {
-                      setCopyText(channelJson.addr);
-                    }}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <AiTwotoneCopy />
-                    {formatAddress(copyText)}
-                  </SubscribersCount>
-                </Subscribers>
-              </FlexBox>
-              {verifierDetails && (
-                <Subscribers>
-                  <VerifiedBy>Verified by:</VerifiedBy>
-                  <VerifierIcon src={verifierDetails.icon} />
-                  <VerifierName>{verifierDetails.name}</VerifierName>
-                </Subscribers>
-              )}
-            </ColumnFlex>
-          )}
-        </ChannelMeta>
-      </ChannelInfo>
-      {!!account && !!library && (
-        <>
-          <LineBreak />
-          <ChannelActions>
-            {loading && (
-              <SkeletonButton>
-                <Skeleton />
-              </SkeletonButton>
-            )}
-            {!loading && isPushAdmin && (
-              <SubscribeButton onClick={blockChannel} disabled={bLoading}>
-                {bLoading && (
-                  <ActionLoader>
-                    <Loader type="Oval" color="#FFF" height={16} width={16} />
-                  </ActionLoader>
+              <ChannelTitleLink
+                href={channelJson.url}
+                target="_blank"
+                rel="nofollow"
+              >
+                {channelJson.name}
+                {isVerified && (
+                  <Subscribers style={{ display: "inline", marginLeft: "8px" }}>
+                    <GoVerified size={18} color="#35c4f3" />
+                  </Subscribers>
                 )}
-                <ActionTitle hideit={bLoading}>Block channel</ActionTitle>
-              </SubscribeButton>
+              </ChannelTitleLink>
             )}
-            {!loading && (isPushAdmin || canVerify) && !isVerified && (
-              <SubscribeButton onClick={verifyChannel} disabled={vLoading}>
-                {vLoading && (
-                  <ActionLoader>
-                    <Loader type="Oval" color="#FFF" height={16} width={16} />
-                  </ActionLoader>
-                )}
-                <ActionTitle hideit={vLoading}>Verify Channel</ActionTitle>
-              </SubscribeButton>
-            )}
-            {!loading && (isPushAdmin || canUnverify) && isVerified && (
-              <UnsubscribeButton onClick={unverifyChannel} disabled={vLoading}>
-                {vLoading && (
-                  <ActionLoader>
-                    <Loader type="Oval" color="#FFF" height={16} width={16} />
-                  </ActionLoader>
-                )}
-                <ActionTitle hideit={vLoading}>Unverify Channel</ActionTitle>
-              </UnsubscribeButton>
-            )}
-            {!loading && !subscribed && (
-              <SubscribeButton onClick={subscribe} disabled={txInProgress}>
-                {txInProgress && (
-                  <ActionLoader>
-                    <Loader type="Oval" color="#FFF" height={16} width={16} />
-                  </ActionLoader>
-                )}
-                <ActionTitle hideit={txInProgress}>Opt-In</ActionTitle>
-              </SubscribeButton>
-            )}
-            {!loading && subscribed && (
+          </ChannelTitle>
+
+          <ChannelDesc>
+            {loading ? (
               <>
-                {isOwner && <OwnerButton disabled>Owner</OwnerButton>}
-                {!isOwner && (
-                  <UnsubscribeButton
-                    onClick={unsubscribeAction}
-                    disabled={txInProgress}
-                  >
-                    {txInProgress && (
-                      <ActionLoader>
-                        <Loader
-                          type="Oval"
-                          color="#FFF"
-                          height={16}
-                          width={16}
-                        />
-                      </ActionLoader>
-                    )}
-                    <ActionTitle hideit={txInProgress}>Opt-Out</ActionTitle>
-                  </UnsubscribeButton>
-                )}
+                <SkeletonWrapper atH={5} atW={100}>
+                  <Skeleton color="#eee" width="100%" height={5} />
+                </SkeletonWrapper>
+
+                <SkeletonWrapper atH={5} atW={100}>
+                  <Skeleton color="#eee" width="100%" height={5} />
+                </SkeletonWrapper>
+
+                <SkeletonWrapper atH={5} atW={100}>
+                  <Skeleton color="#eee" width="40%" height={5} />
+                </SkeletonWrapper>
               </>
+            ) : (
+              <ChannelDescLabel>{channelJson.info}</ChannelDescLabel>
             )}
-          </ChannelActions>
-        </>
-      )}
-      {toast && (
-        <NotificationToast notification={toast} clearToast={clearToast} />
-      )}
-    </Container>
+          </ChannelDesc>
+
+          <ChannelMeta>
+            {loading ? (
+              <>
+                <SkeletonWrapper atH={10} atW={30} marginBottom="0">
+                  <Skeleton />
+                </SkeletonWrapper>
+              </>
+            ) : (
+              <ColumnFlex>
+                <FlexBox style={{ marginBottom: "5px" }}>
+                  <Subscribers>
+                    <IoMdPeople size={20} color="#ccc" />
+                    <SubscribersCount>{memberCount}</SubscribersCount>
+                  </Subscribers>
+
+                  <Subscribers style={{ marginLeft: "10px" }}>
+                    <FaRegAddressCard size={20} color="#ccc" />
+                    <SubscribersCount
+                      onClick={() => {
+                        copyToClipboard(channelJson.addr);
+                        setCopyText("copied");
+                      }}
+                      onMouseEnter={() => {
+                        setCopyText("click to copy");
+                      }}
+                      onMouseLeave={() => {
+                        setCopyText(channelJson.addr);
+                      }}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <AiTwotoneCopy />
+                      {formatAddress(copyText)}
+                    </SubscribersCount>
+                  </Subscribers>
+                </FlexBox>
+                {verifierDetails && (
+                  <Subscribers>
+                    <VerifiedBy>Verified by:</VerifiedBy>
+                    <VerifierIcon src={verifierDetails.icon} />
+                    <VerifierName>{verifierDetails.name}</VerifierName>
+                  </Subscribers>
+                )}
+              </ColumnFlex>
+            )}
+          </ChannelMeta>
+        </ChannelInfo>
+        {!!account && !!library && (
+          <>
+            <LineBreak />
+            <ChannelActions>
+              {loading && (
+                <SkeletonButton>
+                  <Skeleton />
+                </SkeletonButton>
+              )}
+              {!loading && isPushAdmin && (
+                <SubscribeButton onClick={blockChannel} disabled={bLoading}>
+                  {bLoading && (
+                    <ActionLoader>
+                      <Loader type="Oval" color="#FFF" height={16} width={16} />
+                    </ActionLoader>
+                  )}
+                  <ActionTitle hideit={bLoading}>Block channel</ActionTitle>
+                </SubscribeButton>
+              )}
+              {!loading && (isPushAdmin || canVerify) && !isVerified && (
+                <SubscribeButton onClick={verifyChannel} disabled={vLoading}>
+                  {vLoading && (
+                    <ActionLoader>
+                      <Loader type="Oval" color="#FFF" height={16} width={16} />
+                    </ActionLoader>
+                  )}
+                  <ActionTitle hideit={vLoading}>Verify Channel</ActionTitle>
+                </SubscribeButton>
+              )}
+              {!loading && (isPushAdmin || canUnverify) && isVerified && (
+                <UnsubscribeButton
+                  onClick={unverifyChannel}
+                  disabled={vLoading}
+                >
+                  {vLoading && (
+                    <ActionLoader>
+                      <Loader type="Oval" color="#FFF" height={16} width={16} />
+                    </ActionLoader>
+                  )}
+                  <ActionTitle hideit={vLoading}>Unverify Channel</ActionTitle>
+                </UnsubscribeButton>
+              )}
+              {!loading && !subscribed && (
+                <SubscribeButton onClick={subscribe} disabled={txInProgress}>
+                  {txInProgress && (
+                    <ActionLoader>
+                      <Loader type="Oval" color="#FFF" height={16} width={16} />
+                    </ActionLoader>
+                  )}
+                  <ActionTitle hideit={txInProgress}>Opt-In</ActionTitle>
+                </SubscribeButton>
+              )}
+              {!loading && subscribed && (
+                <>
+                  {isOwner && <OwnerButton disabled>Owner</OwnerButton>}
+                  {!isOwner && (
+                    <UnsubscribeButton
+                      onClick={unsubscribeAction}
+                      disabled={txInProgress}
+                    >
+                      {txInProgress && (
+                        <ActionLoader>
+                          <Loader
+                            type="Oval"
+                            color="#FFF"
+                            height={16}
+                            width={16}
+                          />
+                        </ActionLoader>
+                      )}
+                      <ActionTitle hideit={txInProgress}>Opt-Out</ActionTitle>
+                    </UnsubscribeButton>
+                  )}
+                </>
+              )}
+            </ChannelActions>
+          </>
+        )}
+        {toast && (
+          <NotificationToast notification={toast} clearToast={clearToast} />
+        )}
+      </Container>
     </ThemeProvider>
   );
 }
@@ -629,12 +630,9 @@ const Container = styled.div`
   flex: 1;
   display: flex;
   flex-wrap: wrap;
-
-  background: ${props => props.theme.mainBg};
+  background: ${(props) => props.theme.mainBg};
   border-radius: 10px;
   border: 1px solid rgb(237, 237, 237);
-
-
   margin: 15px 0px;
   justify-content: center;
   padding: 10px;
@@ -662,7 +660,6 @@ const ChannelLogo = styled.div`
   flex-direction: column;
   justify-content: center;
   align-self: flex-start;
-
 `;
 
 const ChannelLogoOuter = styled.div`
@@ -697,7 +694,6 @@ const ChannelInfo = styled.div`
   flex-grow: 4;
   flex-direction: column;
   display: flex;
-
 `;
 
 const ChannelTitle = styled.div`
@@ -746,8 +742,7 @@ const ChannelDesc = styled.div`
   color: rgba(0, 0, 0, 0.75);
   font-weight: 400;
   flex-direction: column;
-  color: ${props => props.theme.color};
-
+  color: ${(props) => props.theme.color};
 `;
 
 const ChannelDescLabel = styled.label`
@@ -784,22 +779,10 @@ const SubscribersCount = styled(ChannelMetaBox)`
   transition: 300ms;
 `;
 
-const Pool = styled.div`
-  margin: 0px 10px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`;
-
-const PoolShare = styled(ChannelMetaBox)`
-  background: #674c9f;
-`;
-
 const LineBreak = styled.div`
   display: none;
   flex-basis: 100%;
   height: 0;
-
   @media ${Device.tablet} {
     display: block;
   }

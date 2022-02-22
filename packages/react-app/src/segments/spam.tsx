@@ -24,13 +24,10 @@ const NOTIFICATIONS_PER_PAGE = 10;
 function SpamBox({ currentTab }) {
   const dispatch = useDispatch();
   const { account, chainId, library } = useWeb3React();
-  const { epnsCommReadProvider } = useSelector(
-    (state: any) => state.contracts
-  );
+  const { epnsCommReadProvider } = useSelector((state: any) => state.contracts);
 
-  const { notifications, page, finishedFetching } = useSelector((state: any) => state.spam);
-  const { toggle } = useSelector(
-    (state: any) => state.notifications
+  const { notifications, page, finishedFetching } = useSelector(
+    (state: any) => state.spam
   );
   const EPNS_DOMAIN = {
     name: "EPNS COMM V1",
@@ -127,12 +124,14 @@ function SpamBox({ currentTab }) {
     if (account && currentTab === "spambox") {
       fetchLatestNotifications();
     }
+    // eslint-disable-next-line
   }, [account, currentTab]);
 
   React.useEffect(() => {
     if (epnsCommReadProvider) {
       loadNotifications();
     }
+    // eslint-disable-next-line
   }, [epnsCommReadProvider, account]);
 
   //function to query more notifications
@@ -150,7 +149,6 @@ function SpamBox({ currentTab }) {
   };
 
   const onSubscribeToChannel = async (channelAddress) => {
-    let txToast;
     const type = {
       Subscribe: [
         { name: "channel", type: "address" },

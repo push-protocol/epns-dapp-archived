@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import ReactGA from "react-ga";
 
 import { Web3Provider } from "ethers/providers";
@@ -7,16 +7,13 @@ import { AbstractConnector } from "@web3-react/abstract-connector";
 import { useEagerConnect, useInactiveListener } from "hooks";
 import { injected, walletconnect, portis, ledger } from "connectors";
 
-import styled, {ThemeProvider} from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
 import { Item, ItemH, Span, H2, B, A } from "components/SharedStyling";
 
 import Header from "sections/Header";
 import Navigation from "sections/Navigation";
 
 import NavigationContextProvider from "contexts/NavigationContext";
-
-import Home from "pages/Home";
-import Channels from "pages/Channels";
 
 import MasterInterfacePage from "pages/MasterInterfacePage";
 
@@ -45,15 +42,14 @@ const web3Connectors = {
 
 export default function App() {
   const { connector, activate, active, error } = useWeb3React<Web3Provider>();
-  const [activatingConnector, setActivatingConnector] = React.useState<
-    AbstractConnector
-  >();
-  const [currentTime,setcurrentTime]=React.useState(0);
+  const [activatingConnector, setActivatingConnector] =
+    React.useState<AbstractConnector>();
+  const [, setcurrentTime] = React.useState(0);
 
-  React.useEffect(()=>{
-    const now = Date.now()/ 1000;
-    setcurrentTime(now)
-  },[])
+  React.useEffect(() => {
+    const now = Date.now() / 1000;
+    setcurrentTime(now);
+  }, []);
   React.useEffect(() => {
     if (activatingConnector && activatingConnector === connector) {
       setActivatingConnector(undefined);
@@ -75,73 +71,60 @@ export default function App() {
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
-  }
-
+  };
 
   React.useEffect(() => {
-    const data = localStorage.getItem('theme')
-    if(data){
-      setDarkMode(JSON.parse(data))
+    const data = localStorage.getItem("theme");
+    if (data) {
+      setDarkMode(JSON.parse(data));
     }
-  },[])
+  }, []);
 
   React.useEffect(() => {
-    localStorage.setItem('theme', JSON.stringify(darkMode))
-  })
+    localStorage.setItem("theme", JSON.stringify(darkMode));
+  });
 
-
-  React.useEffect(()=>{
+  React.useEffect(() => {
     window?.Olvy?.init({
       organisation: "epns",
-    target: "#olvy-target",
-    type: "sidebar",
-    view: {
-      showSearch: false,
-      compact: false,
-      showHeader: true, // only applies when widget type is embed. you cannot hide header for modal and sidebar widgets
-      showUnreadIndicator: true,
-      unreadIndicatorColor: "#cc1919",
-      unreadIndicatorPosition: "top-right"
-    }
+      target: "#olvy-target",
+      type: "sidebar",
+      view: {
+        showSearch: false,
+        compact: false,
+        showHeader: true, // only applies when widget type is embed. you cannot hide header for modal and sidebar widgets
+        showUnreadIndicator: true,
+        unreadIndicatorColor: "#cc1919",
+        unreadIndicatorPosition: "top-right",
+      },
     });
     return function cleanup() {
       window?.Olvy?.teardown();
     };
-  
-});
+  });
 
   return (
-    <ThemeProvider theme={darkMode ? themeDark : themeLight }>
+    <ThemeProvider theme={darkMode ? themeDark : themeLight}>
       <NavigationContextProvider>
         <HeaderContainer>
-          <Header
-            isDarkMode={darkMode}
-            darkModeToggle={toggleDarkMode}
-          />  
+          <Header isDarkMode={darkMode} darkModeToggle={toggleDarkMode} />
         </HeaderContainer>
 
-        <ParentContainer
-          headerHeight={GLOBALS.CONSTANTS.HEADER_HEIGHT}
-        >
-
-          {(active) && !error && (
+        <ParentContainer headerHeight={GLOBALS.CONSTANTS.HEADER_HEIGHT}>
+          {active && !error && (
             <>
-              <LeftBarContainer
-                leftBarWidth={GLOBALS.CONSTANTS.LEFT_BAR_WIDTH}
-              >
+              <LeftBarContainer leftBarWidth={GLOBALS.CONSTANTS.LEFT_BAR_WIDTH}>
                 <Navigation />
               </LeftBarContainer>
 
-              <ContentContainer
-                leftBarWidth={GLOBALS.CONSTANTS.LEFT_BAR_WIDTH}
-              >
+              <ContentContainer leftBarWidth={GLOBALS.CONSTANTS.LEFT_BAR_WIDTH}>
                 {/* Shared among all pages, load universal things here */}
                 <MasterInterfacePage />
               </ContentContainer>
             </>
           )}
 
-          {(!active) && (
+          {!active && (
             <Item>
               <ProviderLogo
                 src="./epnshomelogo.png"
@@ -154,7 +137,12 @@ export default function App() {
                 radius="12px"
               >
                 <H2 textTransform="uppercase" spacing="0.1em">
-                  <Span bg="#e20880" color="#fff" weight="600" padding="0px 8px">
+                  <Span
+                    bg="#e20880"
+                    color="#fff"
+                    weight="600"
+                    padding="0px 8px"
+                  >
                     Connect
                   </Span>
                   <Span weight="200"> Your Wallet</Span>
@@ -234,21 +222,21 @@ const ParentContainer = styled.div`
   flex-direction: row;
   justify-content: center;
   flex: 1;
-  background: ${props => props.theme.mainBg};
-  margin: ${props => props.headerHeight}px 0px 0px 0px;
+  background: ${(props) => props.theme.mainBg};
+  margin: ${(props) => props.headerHeight}px 0px 0px 0px;
 `;
 
 const LeftBarContainer = styled.div`
   left: 0;
   top: 0;
   bottom: 0;
-  width: ${props => props.leftBarWidth}px;
+  width: ${(props) => props.leftBarWidth}px;
   position: fixed;
 
   @media (max-width: 992px) {
     display: none;
   }
-`
+`;
 
 const ContentContainer = styled.div`
   display: flex;
@@ -256,8 +244,7 @@ const ContentContainer = styled.div`
   align-self: center;
   width: 100%;
 
-
-  margin: 0px 0px 0px ${props => props.leftBarWidth}px;
+  margin: 0px 0px 0px ${(props) => props.leftBarWidth}px;
 
   @media (max-width: 992px) {
     margin: 0px;

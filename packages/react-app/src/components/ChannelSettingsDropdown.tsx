@@ -1,5 +1,4 @@
 import React from "react";
-import { Section, Content, Item } from "components/SharedStyling";
 import { useSelector, useDispatch } from "react-redux";
 import styled, { css } from "styled-components";
 import { useWeb3React } from "@web3-react/core";
@@ -40,19 +39,15 @@ function ChannelSettings() {
   const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
 
   const [loading, setLoading] = React.useState(false);
-  const [
-    showActivateChannelPopup,
-    setShowActivateChannelPopup,
-  ] = React.useState(false);
-  const [channelStakeFees, setChannelStakeFees] = React.useState(
-    MIN_STAKE_FEES
-  );
+  const [showActivateChannelPopup, setShowActivateChannelPopup] =
+    React.useState(false);
+  const [channelStakeFees, setChannelStakeFees] =
+    React.useState(MIN_STAKE_FEES);
   const [poolContrib, setPoolContrib] = React.useState(0);
   const [addDelegateLoading, setAddDelegateLoading] = React.useState(false);
   const [addModalOpen, setAddModalOpen] = React.useState(false);
-  const [removeDelegateLoading, setRemoveDelegateLoading] = React.useState(
-    false
-  );
+  const [removeDelegateLoading, setRemoveDelegateLoading] =
+    React.useState(false);
   const [removeModalOpen, setRemoveModalOpen] = React.useState(false);
 
   // toaster customize
@@ -88,6 +83,8 @@ function ChannelSettings() {
         true
       )
     );
+
+    // eslint-disable-next-line
   }, [account]);
 
   const toggleChannelActivationState = () => {
@@ -169,11 +166,10 @@ function ChannelSettings() {
     });
 
     const pushValue = response.response.data.quote.PUSH.price;
-    const amountsOut = pushValue * Math.pow(10, 18);
 
     await epnsWriteProvider
       // .deactivateChannel(amountsOut.toString().replace(/0+$/, "")) //use this to remove trailing zeros 1232323200000000 -> 12323232
-      .deactivateChannel(Math.floor(pushValue)) 
+      .deactivateChannel(Math.floor(pushValue))
       .then(async (tx: any) => {
         console.log(tx);
         console.log("Transaction Sent!");
@@ -237,15 +233,13 @@ function ChannelSettings() {
           onClick={toggleChannelActivationState}
         >
           <ActionTitle>
-            {loading ? (
-              "Loading ..."
-            ) : isChannelBlocked ? (
-              "Channel Blocked"
-            ) : isChannelDeactivated ? (
-              "Activate Channel"
-            ) : (
-              "Deactivate Channel"
-            )}
+            {loading
+              ? "Loading ..."
+              : isChannelBlocked
+              ? "Channel Blocked"
+              : isChannelDeactivated
+              ? "Activate Channel"
+              : "Deactivate Channel"}
           </ActionTitle>
         </DeactivateButton>
         <ActiveChannelWrapper>
@@ -401,13 +395,6 @@ const ChannelActionButton = styled.button`
     pointer: hand;
   }
   opacity: ${(props) => (props.disabled ? 0.5 : 1)};
-`;
-
-const Settings = styled.img`
-  width: 40px;
-  height: 40px;
-  margin-left: auto;
-  margin-right: 30px;
 `;
 
 // Export Default

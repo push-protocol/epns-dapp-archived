@@ -1,9 +1,15 @@
 import React from "react";
 
-import styled, { css } from 'styled-components';
-import {Section, Content, Item, ItemH, Span, Anchor} from 'components/SharedStyling';
+import {
+  Section,
+  Content,
+  Item,
+  ItemH,
+  Span,
+  Anchor,
+} from "components/SharedStyling";
 
-import { FaGasPump } from 'react-icons/fa';
+import { FaGasPump } from "react-icons/fa";
 
 // Faucet URLs
 function Faucets() {
@@ -40,7 +46,7 @@ function Faucets() {
               target="_blank"
               rel="nofollow"
             >
-              <FaGasPump size={30} color="#674c9f"/>
+              <FaGasPump size={30} color="#674c9f" />
               <Span
                 bg="#000"
                 color="#fff"
@@ -64,7 +70,7 @@ function Faucets() {
               target="_blank"
               rel="nofollow"
             >
-              <FaGasPump size={30} color="#674c9f"/>
+              <FaGasPump size={30} color="#674c9f" />
               <Span
                 bg="#000"
                 color="#fff"
@@ -81,7 +87,6 @@ function Faucets() {
               </Span>
             </Anchor>
           </Item>
-
         </ItemH>
       </Content>
     </Section>
