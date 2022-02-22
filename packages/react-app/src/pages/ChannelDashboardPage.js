@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactGA from "react-ga";
 import { ethers } from "ethers";
-import styled, { css } from "styled-components";
+import styled, { css, useTheme } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import Loader from "react-loader-spinner";
 import hex2ascii from "hex2ascii";
@@ -33,12 +33,18 @@ import {
   setDelegatees,
 } from "redux/slices/adminSlice";
 import { addNewNotification } from "redux/slices/notificationSlice";
+
+
 export const ALLOWED_CORE_NETWORK = 1; //chainId of network which we have deployed the core contract on
 const CHANNEL_TAB = 2; //Default to 1 which is the channel tab
 
 // Create Header
 function ChannelDashboardPage() {
   ReactGA.pageview("/dashboard");
+
+  const themes = useTheme();
+
+  const [darkMode, setDarkMode] = useState(false);
 
   const dispatch = useDispatch();
   const { account, library, chainId } = useWeb3React();
