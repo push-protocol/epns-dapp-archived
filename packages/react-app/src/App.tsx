@@ -244,9 +244,7 @@ const ParentContainer = styled.div`
   justify-content: center;
   flex: 1;
   background:${props => props.theme.mainBg};
-  margin: ${props => props.headerHeight}px 0px 0px 0px;
-  height: 110vh;
-  
+  margin: ${props => props.headerHeight}px 0px 0px 0px;  
 `;
 
 const LeftBarContainer = styled.div`
