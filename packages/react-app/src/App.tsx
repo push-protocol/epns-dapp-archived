@@ -243,9 +243,10 @@ const ParentContainer = styled.div`
   flex-direction: row;
   justify-content: center;
   flex: 1;
-  background: ${props => props.theme.mainBg};
+  background:${props => props.theme.mainBg};
   margin: ${props => props.headerHeight}px 0px 0px 0px;
-  height: 91vh;
+  height: 110vh;
+  
 `;
 
 const LeftBarContainer = styled.div`
@@ -265,6 +266,7 @@ const ContentContainer = styled.div`
   flex: 1;
   align-self: center;
   width: 100%;
+
 
 
   margin: 0px 0px 0px ${props => props.leftBarWidth}px;
