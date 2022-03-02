@@ -560,7 +560,7 @@ function CreateChannel() {
                 align="center"
               >
                 <Item flex="0" margin="0px 5px 0px 0px">
-                  <FiLink size={24} color="#000" />
+                  <FiLink size={24} color={themes.color} />
                 </Item>
                 <Item flex="1" margin="0px 0px 0px 5px" align="stretch">
                   <Input
