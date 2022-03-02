@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { postReq } from "api";
 import { useWeb3React } from "@web3-react/core";
 import { envConfig } from "@project/contracts";
+import queryString from "query-string";
 
 import DisplayNotice from "components/DisplayNotice";
 import ViewChannelItem from "components/ViewChannelItem";
@@ -16,6 +17,8 @@ import { setChannelMeta, incrementPage } from "redux/slices/channelSlice";
 const CHANNELS_PER_PAGE = 30; //pagination parameter which indicates how many channels to return over one iteration
 const SEARCH_TRIAL_LIMIT = 5; //ONLY TRY SEARCHING 5 TIMES BEFORE GIVING UP
 const DEBOUNCE_TIMEOUT = 500; //time in millisecond which we want to wait for then to finish typing
+const ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/;
+const SEARCH_DELAY = 1500;
 
 // Create Header
 function ViewChannels() {
@@ -40,6 +43,16 @@ function ViewChannels() {
     setLoading(!channels.length); //if there are no channels initially then, set the loader
     fetchInitialsChannelMeta();
   }, [account, chainId]);
+
+  React.useEffect(() => {
+    const parsedChannel = String(
+      queryString.parse(window.location.search).channel
+    );
+    if (!ADDRESS_REGEX.test(parsedChannel)) return; //match it against a regex to confirm its actually an address and not a random string
+    setTimeout(() => {
+      setSearch(parsedChannel);
+    }, SEARCH_DELAY);
+  }, []);
 
   // to update a page
   const updateCurrentPage = () => {
