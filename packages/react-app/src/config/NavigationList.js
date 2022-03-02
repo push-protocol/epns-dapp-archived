@@ -256,6 +256,17 @@ const NavigationList = {
             newTab: false,
             isRoute: true,  
             hasMenuLogic: true,
+            headerTag: {
+              title: "App Walkthrough",
+              light: {
+                bg: GLOBALS.COLORS.GRADIENT_PRIMARY,
+                fg: themeLight.headerTagFg,
+              },
+              dark: {
+                bg: themeDark.headerTagBg,
+                fg: themeDark.headerTagFg,
+              }
+            }
           },
           faq: {
             src: "svg/qna.svg",
