@@ -55,6 +55,7 @@ function NavigationButton({ item, data, sectionID, active }) {
             margin="0 5px"
             alt={`${data.alt}`}
             active={active}
+            className={data.name.toLowerCase()}
           />
           
           <Span 

@@ -13,6 +13,8 @@ import { Item, ItemH, Span, H2, B, A } from "components/SharedStyling";
 import Header from "sections/Header";
 import Navigation from "sections/Navigation";
 
+import Joyride, { ACTIONS, CallBackProps, EVENTS, STATUS, Step } from "react-joyride";
+
 import NavigationContextProvider from "contexts/NavigationContext";
 
 import Home from "pages/Home";
@@ -20,10 +22,13 @@ import Channels from "pages/Channels";
 
 import MasterInterfacePage from "pages/MasterInterfacePage";
 
+import {incrementStepIndex, decrementStepIndex, setRun, setIndex} from "redux/slices/userJourneySlice";
+
 import { themeLight, themeDark } from "config/Themization";
 import GLOBALS from "config/Globals";
 
 import * as dotenv from "dotenv";
+import { useSelector, useDispatch } from "react-redux";
 dotenv.config();
 
 // define the different type of connectors which we use
@@ -43,12 +48,38 @@ const web3Connectors = {
   Portis: { obj: portis, logo: "./svg/login/portis.svg", title: "Portis" },
 };
 
+const steps = [
+  {
+    content: <h2>Let's begin our journey!</h2>,
+    locale: { next: <strong aria-label="next">NEXT</strong> },
+    placement: 'center',
+    target: 'body',
+    spotlightClicks: true,
+    disableOverlayClose: false,
+  },
+  {
+    content: <h2>Click on tutorial!</h2>,
+    placement: 'auto',
+    target: '.tutorial',
+  },
+  {
+    content: <h2>Click on Channels!</h2>,
+    placement: 'auto',
+    target: '.channels',
+  },
+];
+
 export default function App() {
+  const dispatch = useDispatch();
   const { connector, activate, active, error } = useWeb3React<Web3Provider>();
   const [activatingConnector, setActivatingConnector] = React.useState<
     AbstractConnector
   >();
-  const [currentTime,setcurrentTime]=React.useState(0);
+  const [currentTime, setcurrentTime] = React.useState(0);
+  const {
+    run,
+    stepIndex
+  } = useSelector((state: any) => state.userJourney);
 
   React.useEffect(()=>{
     const now = Date.now()/ 1000;
@@ -110,9 +141,30 @@ export default function App() {
   
 });
 
+  const handleJoyrideCallback = (data: CallBackProps) => {
+    console.log(data);
+    const { action, lifecycle } = data;
+    if (action === 'close' || action === 'skip') {
+      dispatch(setRun(false));
+      dispatch(setIndex(0));
+    } else if (action === 'next' && lifecycle === 'complete') {
+      dispatch(incrementStepIndex());
+    }
+  }
+
   return (
     <ThemeProvider theme={darkMode ? themeDark : themeLight }>
       <NavigationContextProvider>
+        <Joyride
+          run={run}
+          steps={steps}
+          continuous={true}
+          stepIndex={stepIndex}
+          scrollToFirstStep={true}
+          showProgress={true}
+          showSkipButton={true}
+          callback={handleJoyrideCallback}
+        />
         <HeaderContainer>
           <Header
             isDarkMode={darkMode}
