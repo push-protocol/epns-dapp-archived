@@ -166,7 +166,7 @@ export default function App() {
                   <Span weight="200" color={darkMode ? themeDark : themeLight}> Your Wallet</Span>
                 </H2>
 
-                <ItemH maxWidth="800px" align="stretch">
+                <ItemH maxWidth="700px" height="500px" align="stretch">
                   {Object.keys(web3Connectors).map((name) => {
                     const currentConnector = web3Connectors[name].obj;
                     const connected = currentConnector === connector;
@@ -195,7 +195,7 @@ export default function App() {
                           textTransform="uppercase"
                           size="12px"
                           weight="600"
-                          padding="10px"
+                          padding="20px"
                           background={darkMode ? themeDark : themeLight}
                           color={darkMode ? themeDark : themeLight}
 
@@ -244,7 +244,8 @@ const ParentContainer = styled.div`
   justify-content: center;
   flex: 1;
   background:${props => props.theme.mainBg};
-  margin: ${props => props.headerHeight}px 0px 0px 0px;  
+  margin: ${props => props.headerHeight}px 0px 0px 0px;
+  height: 800px;
 `;
 
 const LeftBarContainer = styled.div`
