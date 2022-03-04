@@ -21,6 +21,7 @@ import { postReq } from "api";
 import NotificationToast from "components/NotificationToast";
 import ChannelsDataStore from "singletons/ChannelsDataStore";
 import { cacheChannelInfo } from "redux/slices/channelSlice";
+import { incrementStepIndex } from "redux/slices/userJourneySlice";
 
 // Create Header
 function ViewChannelItem({ channelObjectProp }) {
@@ -30,7 +31,8 @@ function ViewChannelItem({ channelObjectProp }) {
   const [darkMode, setDarkMode] = useState(false);
 
   const {
-    run
+    run,
+    stepIndex
   } = useSelector((state) => state.userJourney);
 
 
@@ -162,6 +164,11 @@ function ViewChannelItem({ channelObjectProp }) {
       );
       setCanUnverify(channelObject.verifiedBy == account);
       setChannelJson({ ...channelJson, addr: channelObject.addr });
+      
+      if (channelObject.addr === '0xB88460Bb2696CAb9D66013A05dFF29a28330689D' && run && stepIndex === 3) {
+        console.log(channelObject.addr);
+        dispatch(incrementStepIndex());
+      }
       setLoading(false);
     } catch (err) {
       setIsBlocked(true);
@@ -322,6 +329,13 @@ function ViewChannelItem({ channelObjectProp }) {
           progress: undefined,
         }
       );
+      
+
+        /*
+          CHANGES 
+        */
+
+
 
       postReq("/channels/subscribe_offchain", {
         signature,
@@ -444,9 +458,9 @@ function ViewChannelItem({ channelObjectProp }) {
           <ChannelLogoInner>
             {loading ? (
               <Skeleton color="#eee"  height="100%" />
-            ) : (
+              ) : (
               <ChannelLogoImg src={`${channelJson.icon}`} />
-            )}
+              )}
           </ChannelLogoInner>
         </ChannelLogoOuter>
       </ChannelLogo>
@@ -578,13 +592,13 @@ function ViewChannelItem({ channelObjectProp }) {
               </UnsubscribeButton>
             )}
             {!loading && (!subscribed || run) && (
-              <SubscribeButton onClick={subscribe} disabled={txInProgress}>
+              <SubscribeButton onClick={subscribe} disabled={txInProgress} className="optin">
                 {txInProgress && (
                   <ActionLoader>
                     <Loader type="Oval" color="#FFF" height={16} width={16} />
                   </ActionLoader>
                 )}
-                <ActionTitle hideit={txInProgress} className={`optin`}>Opt-In</ActionTitle>
+                <ActionTitle hideit={txInProgress}>Opt-In</ActionTitle>
               </SubscribeButton>
             )}
             {!loading && subscribed && !run &&(

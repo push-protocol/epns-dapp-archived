@@ -149,23 +149,29 @@ export default function App() {
       ),
     placement: 'auto',
     target: '.tutorial',
+    spotlightClicks: true,
   },
-  {
-    content: (
-      <div>
-        <h2>Click on channels!</h2>
-        <button onClick={
-          () => dispatch(incrementStepIndex())
-        }>Next</button>
+    {
+      content: (
+        <div>
+          <h2>Click on channels!</h2>
+          <button onClick={
+            () => dispatch(incrementStepIndex())
+          }>Next</button>
         </div>
       ),
-    placement: 'auto',
-    target: '.channels',
+      placement: 'auto',
+      target: '.channels',
+      spotlightClicks: true,
+    },
+    {
+      content: <div></div>,
+      target: 'body',
     },
   {
     content: <h2>Click on Opt-in!</h2>,
     placement: 'auto',
-    target: `.optin`,
+    target: `.0xB88460Bb2696CAb9D66013A05dFF29a28330689D`,
   },
 ];
   
