@@ -147,7 +147,7 @@ export default function App() {
           )}
 
           {(!active) && (
-            <Item>
+            <Item margin="70px">
               <ProviderLogo
                 src="./epnshomelogo.png"
                 srcSet={"./epnshomelogo@2x.png 2x, ./epnshomelogo@2x.png 3x"}
@@ -166,7 +166,7 @@ export default function App() {
                   <Span weight="200" color={darkMode ? themeDark : themeLight}> Your Wallet</Span>
                 </H2>
 
-                <ItemH maxWidth="700px" height="500px" align="stretch">
+                <ItemH maxWidth="700px" align="stretch">
                   {Object.keys(web3Connectors).map((name) => {
                     const currentConnector = web3Connectors[name].obj;
                     const connected = currentConnector === connector;
@@ -243,9 +243,8 @@ const ParentContainer = styled.div`
   flex-direction: row;
   justify-content: center;
   flex: 1;
-  background:${props => props.theme.mainBg};
+  background: ${props => props.theme.mainBg};
   margin: ${props => props.headerHeight}px 0px 0px 0px;
-  height: 800px;
 `;
 
 const LeftBarContainer = styled.div`
