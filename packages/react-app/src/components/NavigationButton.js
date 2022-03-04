@@ -41,6 +41,7 @@ function NavigationButton({ item, data, sectionID, active }) {
       target={data.isRoute ? null : data.newTab ? "_blank" : "self"}
       disabled={data.disabled}
       hoverBG={theme.leftBarHoverColor}
+      className={data.name.toLowerCase()}
       radius="12px"
       align="stretch"
       padding="10px"
@@ -55,7 +56,7 @@ function NavigationButton({ item, data, sectionID, active }) {
             margin="0 5px"
             alt={`${data.alt}`}
             active={active}
-            className={data.name.toLowerCase()}
+            
           />
           
           <Span 

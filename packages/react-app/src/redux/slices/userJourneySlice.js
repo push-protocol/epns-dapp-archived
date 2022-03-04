@@ -23,7 +23,7 @@ export const userJourneySlice = createSlice({
             state.run = action.payload;
         },
         setIndex: (state, action) => {
-          state.index = action.payload;
+          state.stepIndex = action.payload;
         },
     }
 });

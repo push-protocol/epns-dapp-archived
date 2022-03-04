@@ -48,26 +48,7 @@ const web3Connectors = {
   Portis: { obj: portis, logo: "./svg/login/portis.svg", title: "Portis" },
 };
 
-const steps = [
-  {
-    content: <h2>Let's begin our journey!</h2>,
-    locale: { next: <strong aria-label="next">NEXT</strong> },
-    placement: 'center',
-    target: 'body',
-    spotlightClicks: true,
-    disableOverlayClose: false,
-  },
-  {
-    content: <h2>Click on tutorial!</h2>,
-    placement: 'auto',
-    target: '.tutorial',
-  },
-  {
-    content: <h2>Click on Channels!</h2>,
-    placement: 'auto',
-    target: '.channels',
-  },
-];
+
 
 export default function App() {
   const dispatch = useDispatch();
@@ -141,15 +122,64 @@ export default function App() {
   
 });
 
+  const steps = [
+  {
+    content: (
+      <div>
+        <h2>Let's begin our journey!</h2>
+        <button onClick={
+          () => dispatch(incrementStepIndex())
+        }>Next</button>
+        </div>
+      ),
+    locale: { next: <strong aria-label="next">NEXT</strong> },
+    placement: 'center',
+    target: 'body',
+    spotlightClicks: true,
+    // disableOverlayClose: false,
+  },
+  {
+    content: (
+      <div>
+        <h2>Click on Tutorial!</h2>
+        <button onClick={
+          () => dispatch(incrementStepIndex())
+        }>Next</button>
+        </div>
+      ),
+    placement: 'auto',
+    target: '.tutorial',
+  },
+  {
+    content: (
+      <div>
+        <h2>Click on channels!</h2>
+        <button onClick={
+          () => dispatch(incrementStepIndex())
+        }>Next</button>
+        </div>
+      ),
+    placement: 'auto',
+    target: '.channels',
+    },
+  {
+    content: <h2>Click on Opt-in!</h2>,
+    placement: 'auto',
+    target: `.optin`,
+  },
+];
+  
   const handleJoyrideCallback = (data: CallBackProps) => {
     console.log(data);
-    const { action, lifecycle } = data;
+    // console.log(STATUS);
+    const { action, lifecycle, status } = data;
     if (action === 'close' || action === 'skip') {
       dispatch(setRun(false));
       dispatch(setIndex(0));
-    } else if (action === 'next' && lifecycle === 'complete') {
-      dispatch(incrementStepIndex());
     }
+    // else if (action === 'next' && status === 'running') {
+    //   dispatch(incrementStepIndex());
+    // }
   }
 
   return (
@@ -158,9 +188,10 @@ export default function App() {
         <Joyride
           run={run}
           steps={steps}
-          continuous={true}
+          // continuous={true}
           stepIndex={stepIndex}
-          scrollToFirstStep={true}
+          // scrollToFirstStep={true}
+          disableOverlayClose={false}
           showProgress={true}
           showSkipButton={true}
           callback={handleJoyrideCallback}

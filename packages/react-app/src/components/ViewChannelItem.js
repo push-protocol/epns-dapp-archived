@@ -29,6 +29,10 @@ function ViewChannelItem({ channelObjectProp }) {
   const themes = useTheme();
   const [darkMode, setDarkMode] = useState(false);
 
+  const {
+    run
+  } = useSelector((state) => state.userJourney);
+
 
   const {
     epnsReadProvider,
@@ -434,7 +438,7 @@ function ViewChannelItem({ channelObjectProp }) {
   // render
   return (
     <ThemeProvider theme={themes}>
-    <Container key={channelObject.addr}>
+    <Container key={channelObject.addr} className={channelObject.addr}>
       <ChannelLogo>
         <ChannelLogoOuter>
           <ChannelLogoInner>
@@ -573,17 +577,17 @@ function ViewChannelItem({ channelObjectProp }) {
                 <ActionTitle hideit={vLoading}>Unverify Channel</ActionTitle>
               </UnsubscribeButton>
             )}
-            {!loading && !subscribed && (
+            {!loading && (!subscribed || run) && (
               <SubscribeButton onClick={subscribe} disabled={txInProgress}>
                 {txInProgress && (
                   <ActionLoader>
                     <Loader type="Oval" color="#FFF" height={16} width={16} />
                   </ActionLoader>
                 )}
-                <ActionTitle hideit={txInProgress}>Opt-In</ActionTitle>
+                <ActionTitle hideit={txInProgress} className={`optin`}>Opt-In</ActionTitle>
               </SubscribeButton>
             )}
-            {!loading && subscribed && (
+            {!loading && subscribed && !run &&(
               <>
                 {isOwner && <OwnerButton disabled>Owner</OwnerButton>}
                 {!isOwner && (
