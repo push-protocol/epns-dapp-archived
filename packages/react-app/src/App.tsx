@@ -94,6 +94,10 @@ export default function App() {
     localStorage.setItem('theme', JSON.stringify(darkMode))
   })
 
+  React.useEffect(()=>{
+    document.body.style.backgroundColor = darkMode ? "#000" : "#fff";
+  },[darkMode])
+
 
   React.useEffect(()=>{
     window?.Olvy?.init({
