@@ -123,10 +123,13 @@ export default function App() {
 });
 
   const steps = [
-  {
+  {//0
     content: (
       <div>
         <h2>Let's begin our journey!</h2>
+        <p>
+          Welcome to the <B>ETHERIUM</B> <B>PUSH</B> <B>NOTIFICATION SERVICE</B>{" "}
+        </p>
         <button onClick={
           () => dispatch(incrementStepIndex())
         }>Next</button>
@@ -135,54 +138,112 @@ export default function App() {
     locale: { next: <strong aria-label="next">NEXT</strong> },
     placement: 'center',
     target: 'body',
-    spotlightClicks: true,
+    // spotlightClicks: true,
     // disableOverlayClose: false,
   },
-  {
-    content: (
-      <div>
-        <h2>Click on Tutorial!</h2>
-        <button onClick={
-          () => dispatch(incrementStepIndex())
-        }>Next</button>
-        </div>
-      ),
-    placement: 'auto',
-    target: '.tutorial',
-    spotlightClicks: true,
-  },
-    {
+    {//1
       content: (
         <div>
           <h2>Click on channels!</h2>
-          <button onClick={
+          {/* <button onClick={
             () => dispatch(incrementStepIndex())
-          }>Next</button>
+          }>Next</button> */}
         </div>
       ),
-      placement: 'auto',
+      placement: 'right-start',
       target: '.channels',
-      spotlightClicks: true,
+      styles:{
+        options: {
+          arrowColor: '#a9a9a9',
+          backgroundColor: '#e6e6e6',
+          beaconSize: '30px',
+          beaconColor: '#fff',
+          beaconBorderColor: '#fff',
+          textColor: '#e675ce',
+          width: '100%',
+          zIndex: 9999,
+        },
+        tooltip: {
+          backgroundColor: '#2596be',
+          color: '#fff',
+          maxWidth: '350px',
+          zIndex: 9999,
+        },
+      },
+      spotlightClicks: true
     },
-    {
-      content: <div></div>,
-      target: 'body',
-    },
-  {
-    content: <h2>Click on Opt-in!</h2>,
+      {//2
+        content: (
+          <div> This is the place where you see all your channels</div>
+        ),
+        placement: 'center',
+        target: 'body',
+      },
+  {//3
+    content: <div>
+      <h2>Click on Opt-in!</h2>
+     <button onClick={
+      () => dispatch(incrementStepIndex())
+    }>Next</button></div>,
     placement: 'auto',
-    target: `.0xB88460Bb2696CAb9D66013A05dFF29a28330689D`,
+    target: `.ksduch`,
+    disableOverlayClose: false,
+    spotlightClicks: true
+  },
+  {//4
+    content: (
+      <div>
+        <h2>Click on Inbox!</h2>
+        {/* <button onClick={
+          () => dispatch(incrementStepIndex())
+        }>Next</button> */}
+        </div>
+      ),
+    placement: 'right-start',
+    target: '.inbox',
+    spotlightClicks: true,
+  },
+  {//5
+    content: <div>
+      <h2>You will get all your messages here.</h2>
+     <button onClick={
+      () => dispatch(incrementStepIndex())
+    }>Next</button></div>,
+    placement: 'left',
+    target: `#scrollstyle-secondary`,
+    // disableOverlayClose: false,
+  },
+  {//6
+    content: <div>
+      <h2>You will get all your spam messages here.</h2>
+     {/* <button onClick={
+      () => dispatch(incrementStepIndex())
+    }>Next</button> */}
+    </div>,
+    placement: 'right-start',
+    target: `.spam`,
+    spotlightClicks: true,
+  },
+  {//7
+    content: <div>
+      <h2>You will Recieve all your notifications here</h2>
+     <button onClick={
+      () => dispatch(incrementStepIndex())
+    }>Next</button></div>,
+    placement: 'right-start',
+    target: `.receive`,
+    spotlightClicks: true
   },
 ];
   
   const handleJoyrideCallback = (data: CallBackProps) => {
     console.log(data);
     // console.log(STATUS);
-    const { action, lifecycle, status } = data;
-    if (action === 'close' || action === 'skip') {
+    const { action, lifecycle, status ,index } = data;
+    if ((action === 'close') || action === 'skip') {
       dispatch(setRun(false));
       dispatch(setIndex(0));
-    }
+    }    
     // else if (action === 'next' && status === 'running') {
     //   dispatch(incrementStepIndex());
     // }
@@ -197,7 +258,7 @@ export default function App() {
           // continuous={true}
           stepIndex={stepIndex}
           // scrollToFirstStep={true}
-          disableOverlayClose={false}
+          // disableOverlayClose={false}
           showProgress={true}
           showSkipButton={true}
           callback={handleJoyrideCallback}

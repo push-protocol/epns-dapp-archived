@@ -11,19 +11,23 @@ import NavigationButton from 'components/NavigationButton';
 import NavigationList from "config/NavigationList";
 
 import { NavigationContext } from "contexts/NavigationContext";
+import { useDispatch, useSelector } from "react-redux";
+import {incrementStepIndex, decrementStepIndex, setRun, setIndex} from "../redux/slices/userJourneySlice";
 
 import GLOBALS from "config/Globals";
+
+
 
 // Create Header
 function Navigation() {
     const [loading, setLoading] = useState(false);
     const [ refresh, setRefresh ] = useState(false);
-
+    const { run, stepIndex } = useSelector((state) => state.userJourney);
     const { navigationSetup, setNavigationSetup } = useContext(NavigationContext)
 
     const theme = useTheme();
     const location = useLocation();
-
+    const dispatch = useDispatch();
     // Similar to componentDidMount and componentDidUpdate:
 
     
@@ -318,7 +322,7 @@ function Navigation() {
                 align="stretch"
                 size={fontSize}
             >
-
+               {/* { (run)?mutateTransformedList(section, true):null } */}
               {
                 (secondaryButton)?
                   (
@@ -337,6 +341,7 @@ function Navigation() {
                       refresh={refresh}
                       margintop="15px"
                       onClick={() => {
+                        console.log(`Clicked secondary button`);
                         mutateTransformedList(section, true)
                       }}      
                       id={data.id}          
@@ -376,6 +381,7 @@ function Navigation() {
                       zIndex={2}
                       refresh={refresh}
                       onClick={() => {
+                        console.log(`Clicked primary button`);
                         mutateTransformedList(section, true)
                       }}                  
                     >
@@ -401,7 +407,7 @@ function Navigation() {
                 
               }
              
-                
+               
 
             </Section>
           )
@@ -452,6 +458,11 @@ function Navigation() {
                   zIndex={1}
                   refresh={refresh}
                   onClick={() => {
+                    if(run && (stepIndex=== 1) || stepIndex === 4 || stepIndex === 5|| stepIndex === 6)
+                    {
+                      dispatch(incrementStepIndex())
+                    }
+                    console.log(`Clicked  button`);
                     // mutateTransformedList(item)
                   }}
                 >
