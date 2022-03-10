@@ -298,6 +298,14 @@ function ViewChannelItem({ channelObjectProp }) {
       });
   };
 
+  // optin placement -sam
+  // scroll -sam
+  //sidebar should open -kolade
+  // no misclicks -sam
+  //card design -design team
+  // welcome message for inbox - nilesh
+  //comming soon page -sam
+
   const subscribeAction = async () => {
     setTxInProgress(true);
     let txToast;
@@ -460,7 +468,7 @@ function ViewChannelItem({ channelObjectProp }) {
   // render
   return (
     <ThemeProvider theme={themes}>
-      <Container key={channelObject.addr} className={channelObject.addr}>
+      <Container key={channelObject.addr} className={channelObject.addr} id={`addr-${channelObject.addr}`}>
         <ChannelLogo>
           <ChannelLogoOuter>
             <ChannelLogoInner>

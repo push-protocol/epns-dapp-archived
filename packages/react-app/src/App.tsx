@@ -170,7 +170,9 @@ export default function App() {
           zIndex: 9999,
         },
       },
-      spotlightClicks: true
+      spotlightClicks: true,
+      disableAnimation: false,
+      disablefloating: false,
     },
       {//2
         content: (
@@ -182,13 +184,17 @@ export default function App() {
   {//3
     content: <div>
       <h2>Click on Opt-in!</h2>
-     <button onClick={
+     {/* <button onClick={
       () => dispatch(incrementStepIndex())
-    }>Next</button></div>,
-    placement: 'auto',
-    target: `.ksduch`,
+    }>Next</button> */}
+    </div>,
+    placement: 'top-center' ,
+    position : 'top-center',
+    target: `#addr-0x0000000000000000000000000000000000000000`,
     disableOverlayClose: false,
-    spotlightClicks: true
+    spotlightClicks: true,
+    offsetTop: '-100px',
+    defaultProps: false,
   },
   {//4
     content: (
@@ -202,6 +208,7 @@ export default function App() {
     placement: 'right-start',
     target: '.inbox',
     spotlightClicks: true,
+    disablefloating: true,
   },
   {//5
     content: <div>
@@ -234,6 +241,24 @@ export default function App() {
     target: `.receive`,
     spotlightClicks: true
   },
+   {//0
+    content: (
+      <div>
+        <h2>Tutorial Complete</h2>
+        <p>
+          <B>THANK YOU</B>{" "}
+        </p>
+        <button onClick={
+          () => dispatch(incrementStepIndex())
+        }>Next</button>
+        </div>
+      ),
+    locale: { next: <strong aria-label="next">NEXT</strong> },
+    placement: 'center',
+    target: 'body',
+    // spotlightClicks: true,
+    // disableOverlayClose: false,
+  },
 ];
   
   const handleJoyrideCallback = (data: CallBackProps) => {
@@ -255,11 +280,13 @@ export default function App() {
         <Joyride
           run={run}
           steps={steps}
-          // continuous={true}
+          continuous={true}
           stepIndex={stepIndex}
+          primaryProps = {false}
           // scrollToFirstStep={true}
           // disableOverlayClose={false}
-          showProgress={true}
+          // showProgress={true}
+          disableFlip = {true}
           showSkipButton={true}
           callback={handleJoyrideCallback}
         />
