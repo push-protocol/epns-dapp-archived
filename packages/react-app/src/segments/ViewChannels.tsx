@@ -44,7 +44,6 @@ function ViewChannels() {
   const [loadingChannel, setLoadingChannel] = React.useState(false);
   const [trialCount, setTrialCount] = React.useState(0);
 
-
   const channelsVisited = page * CHANNELS_PER_PAGE;
 
   // fetch channel data if we are just getting to this pae
@@ -245,8 +244,6 @@ const SearchBar = styled.input`
   padding-right: 50px;
   height: 60px;
   padding-left: 40px;
-  position: fixed;
-
 
   background: ${props => props.theme.viewChannelSearchBg};
   border: 1px solid ${props => props.theme.viewChannelSearchBorder};
