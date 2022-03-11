@@ -134,7 +134,7 @@ const NavigationList = {
         iconFactory: null,
         name: 'Govern',
         title: 'Governance Tab',
-        alt: 'Governance Tab Icon',
+        alt: 'Governance Tab Icon', 
         href: '/govern',
         newTab: false,
         opened: false,

@@ -13,28 +13,32 @@ import NavigationList from "config/NavigationList";
 import { NavigationContext } from "contexts/NavigationContext";
 
 import GLOBALS from "config/Globals";
+import {useSelector} from "react-redux";
 
 // Create Header
 function Navigation() {
+    const { channelDetails } = useSelector((state: any) => state.admin);
+    console.log(channelDetails);
     const [loading, setLoading] = useState(false);
     const [ refresh, setRefresh ] = useState(false);
 
     const { navigationSetup, setNavigationSetup } = useContext(NavigationContext)
-
+    if(navigationSetup !== null && channelDetails!==null){
+      navigationSetup.primary[0].data.drilldown[3].data.name = channelDetails.name;
+    }
     const theme = useTheme();
     const location = useLocation();
 
     // Similar to componentDidMount and componentDidUpdate:
 
-    
-
+  
     useEffect(() => {
       if (!loading) {
           setLoading(true);
 
           // Set Primary List
           const primaryList = returnTransformedList(NavigationList.primary, GLOBALS.CONSTANTS.NAVBAR_SECTIONS.PRIMARY);
-          
+  
           // Set Secondary List
           const secondaryList = returnTransformedList(NavigationList.secondary, GLOBALS.CONSTANTS.NAVBAR_SECTIONS.SECONDARY);
 
@@ -362,41 +366,41 @@ function Navigation() {
                   ):
                   (
                     <Item
-                    padding="10px"
-                    flexBasis="100%"
-                    align="stretch"
-                    direction="row"
-                    overflow="hidden"
-                  >
-                    <SectionInnerGroupContainer
-                      flex="1"
+                      padding="10px"
+                      flexBasis="100%"
                       align="stretch"
-                      bg={theme.leftBarButtonBg}
-                      margintop="-10px"
-                      zIndex={2}
-                      refresh={refresh}
-                      onClick={() => {
-                        mutateTransformedList(section, true)
-                      }}                  
+                      direction="row"
+                      overflow="hidden"
                     >
-                      <NavigationButton
-                        item={section}
-                        data={data}
-                        sectionID={sectionID}
-                        active={section.active}
-                      />
-                    </SectionInnerGroupContainer>
+                        <SectionInnerGroupContainer
+                          flex="1"
+                          align="stretch"
+                          bg={theme.leftBarButtonBg}
+                          margintop="-10px"
+                          zIndex={2}
+                          refresh={refresh}
+                          onClick={() => {
+                            mutateTransformedList(section, true)
+                          }}                  
+                        >
+                        <NavigationButton
+                          item={section}
+                          data={data}
+                          sectionID={sectionID}
+                          active={section.active}
+                        />
+                      </SectionInnerGroupContainer>
                     
-                    { 
-                    section.hasItems 
-                      ? renderChildItems(
-                          data.drilldown, 
-                          section.opened,
-                          GLOBALS.CONSTANTS.NAVBAR_SECTIONS.PRIMARY
-                        )
-                      : null
-                    }
-                  </Item>
+                      { 
+                      section.hasItems 
+                        ? renderChildItems(
+                            data.drilldown, 
+                            section.opened,
+                            GLOBALS.CONSTANTS.NAVBAR_SECTIONS.PRIMARY
+                          )
+                        : null
+                      }
+                    </Item>
                   )
                 
               }

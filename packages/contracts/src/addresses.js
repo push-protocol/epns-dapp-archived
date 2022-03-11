@@ -5,7 +5,7 @@ const addresses = {
   epnscore: "0x66329Fdd4042928BfCAB60b179e1538D56eeeeeE",
   epnsEthComm: "0xb3971BCef2D791bc4027BbfedFb47319A4AAaaAa", // the ropsten core contract
   epnsPolyComm: "0xb3971BCef2D791bc4027BbfedFb47319A4AAaaAa", // the ploygon comm contract
-  
+
   dai: "0x6B175474E89094C44Da98b954EedeAC495271d0F", //address for dai
   aDai: "0xcB1Fe6F440c49E9290c3eb7f158534c2dC374201",
 

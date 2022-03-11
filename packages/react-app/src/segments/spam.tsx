@@ -226,6 +226,7 @@ function SpamBox({ currentTab }) {
                     app={app}
                     icon={icon}
                     image={image}
+                    theme={themes.scheme}
                     subscribeFn={(e) => {
                       e?.stopPropagation();
                       onSubscribeToChannel(channel);

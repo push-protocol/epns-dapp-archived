@@ -5,7 +5,7 @@ import styled, { css } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import Loader from "react-loader-spinner";
 import hex2ascii from "hex2ascii";
-import { addresses, abis } from "@project/contracts";
+import { addresses, abis, envConfig} from "@project/contracts";
 import { useWeb3React } from "@web3-react/core";
 
 import config from "config";
@@ -14,8 +14,8 @@ import NotificationToast from "components/NotificationToast";
 import AliasVerificationodal from "components/AliasVerificationModal";
 import Info from "segments/Info";
 import Feedbox from "segments/Feedbox";
-import Spambox from "pages/Spambox";
-import Channels from "pages/Channels";
+import Spambox from "segments/Spambox";
+import ViewChannels from "segments/ViewChannels";
 import ChannelOwnerDashboard from "segments/ChannelOwnerDashboard";
 import ChannelCreationDashboard from "segments/ChannelCreationDashboard";
 import ChannelsDataStore from "singletons/ChannelsDataStore";
@@ -34,7 +34,7 @@ import {
   setDelegatees,
 } from "redux/slices/adminSlice";
 import { addNewNotification } from "redux/slices/notificationSlice";
-export const ALLOWED_CORE_NETWORK = 1; //chainId of network which we have deployed the core contract on
+export const ALLOWED_CORE_NETWORK = envConfig.coreContractChain; ; //chainId of network which we have deployed the core contract on
 const CHANNEL_TAB = 0; //Default to 1 which is the channel tab
 
 // Create Header
@@ -350,7 +350,7 @@ function InboxPage() {
     <Container>
       <Interface>
         {controlAt == 0 && <Spambox />}
-        {controlAt == 1 && <Channels />}
+        {controlAt == 1 && <ViewChannels />}
         {controlAt == 2 && adminStatusLoaded && <ChannelOwnerDashboard />}
         {controlAt == 3 && <Info />}
         {toast && (
