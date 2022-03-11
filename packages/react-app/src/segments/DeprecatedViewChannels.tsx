@@ -227,12 +227,9 @@ const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-<<<<<<< HEAD:packages/react-app/src/segments/DeprecatedViewChannels.tsx
   position: -webkit-sticky;
   position: sticky;
   background: inherit;
-=======
->>>>>>> mainnet_launch:packages/react-app/src/pages/Channels.tsx
   
   top: 0px;
   z-index: 2;
