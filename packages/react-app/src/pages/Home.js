@@ -123,7 +123,7 @@ function Home() {
               return;
             }
             const { status } = data;
-            setAliasVerified(status || null);
+            setAliasVerified(status || false);
             return data;
           });
         }
@@ -244,10 +244,10 @@ function Home() {
     EPNSCoreHelper.getChannelJsonFromUserAddress(ownerAccount, epnsReadProvider)
       .then(async (response) => {
         // if channel admin, then get if the channel is verified or not, then also fetch more details about the channel
-        const verificationStatus = await epnsWriteProvider.getChannelVerfication(
+        const verificationStatus = await epnsReadProvider.getChannelVerfication(
           ownerAccount
         );
-        const channelJson = await epnsWriteProvider.channels(ownerAccount);
+        const channelJson = await epnsReadProvider.channels(ownerAccount);
         const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(
           ownerAccount
         );
@@ -409,9 +409,10 @@ function Home() {
         )}
         {modalOpen && (
           <AliasVerificationodal
-            onClose={() => setModalOpen(false)}
+            onClose={(val) => setModalOpen(val)}
             onSuccess={() => setAliasVerified(true)}
             verificationStatus={aliasVerified}
+            aliasEthAccount={aliasEthAccount}
           />
         )}
       </Interface>
@@ -460,10 +461,12 @@ const ControlButton = styled.div`
   &:hover {
     opacity: 0.9;
     cursor: pointer;
+    pointer: hand;
   }
   &:active {
     opacity: 0.75;
     cursor: pointer;
+    pointer: hand;
   }
 `;
 
