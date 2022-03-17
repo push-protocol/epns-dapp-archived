@@ -1,151 +1,154 @@
-import React from "react";
-import styled, { css } from "styled-components";
-import { Device } from "assets/Device";
+import React from "react"
+import styled, { css } from "styled-components"
+import { Device } from "assets/Device"
 
-import { toast as toaster } from "react-toastify";
-import "react-toastify/dist/ReactToastify.min.css";
-import Loader from "react-loader-spinner";
-import Skeleton from "@yisheng90/react-loading";
-import { IoMdPeople } from "react-icons/io";
-import { GoVerified } from "react-icons/go";
-import { FaRegAddressCard } from "react-icons/fa";
-import { AiTwotoneCopy } from "react-icons/ai";
-import { useWeb3React } from "@web3-react/core";
-import { useDispatch, useSelector } from "react-redux";
+import { toast as toaster } from "react-toastify"
+import "react-toastify/dist/ReactToastify.min.css"
+import Loader from "react-loader-spinner"
+import Skeleton from "@yisheng90/react-loading"
+import { IoMdPeople } from "react-icons/io"
+import { GoVerified } from "react-icons/go"
+import { FaRegAddressCard } from "react-icons/fa"
+import { AiOutlineShareAlt } from "react-icons/ai"
+import { useWeb3React } from "@web3-react/core"
+import { useDispatch, useSelector } from "react-redux"
 
-import { postReq } from "api";
-import NotificationToast from "components/NotificationToast";
-import ChannelsDataStore from "singletons/ChannelsDataStore";
-import { cacheChannelInfo } from "redux/slices/channelSlice";
+import { postReq } from "api"
+import NotificationToast from "components/NotificationToast"
+import ChannelsDataStore from "singletons/ChannelsDataStore"
+import { cacheChannelInfo } from "redux/slices/channelSlice"
 
 // Create Header
 function ViewChannelItem({ channelObjectProp }) {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
   const {
     epnsReadProvider,
     epnsWriteProvider,
     epnsCommReadProvider,
     pushAdminAddress,
     ZERO_ADDRESS,
-  } = useSelector((state) => state.contracts);
-  const { canVerify } = useSelector((state) => state.admin);
+  } = useSelector(state => state.contracts)
+  const { canVerify } = useSelector(state => state.admin)
   const { channelsCache, CHANNEL_BLACKLIST } = useSelector(
-    (state) => state.channels
-  );
-  const { account, library, chainId } = useWeb3React();
-  const isOwner = channelObjectProp.addr === account;
+    state => state.channels
+  )
+  const { account, library, chainId } = useWeb3React()
+  const isOwner = channelObjectProp.addr === account
 
-  const [channelObject, setChannelObject] = React.useState({});
-  const [channelJson, setChannelJson] = React.useState({});
-  const [subscribed, setSubscribed] = React.useState(true);
-  const [loading, setLoading] = React.useState(true);
-  const [memberCount, setMemberCount] = React.useState(0);
-  const [isPushAdmin, setIsPushAdmin] = React.useState(false);
-  const [isVerified, setIsVerified] = React.useState(false);
-  const [isBlocked, setIsBlocked] = React.useState(false);
-  const [vLoading, setvLoading] = React.useState(false);
-  const [bLoading, setBLoading] = React.useState(false);
-  const [txInProgress, setTxInProgress] = React.useState(false);
-  const [canUnverify, setCanUnverify] = React.useState(false);
-  const [verifierDetails, setVerifierDetails] = React.useState(null);
-  const [copyText, setCopyText] = React.useState(null);
+  const [channelObject, setChannelObject] = React.useState({})
+  const [channelJson, setChannelJson] = React.useState({})
+  const [subscribed, setSubscribed] = React.useState(true)
+  const [loading, setLoading] = React.useState(true)
+  const [memberCount, setMemberCount] = React.useState(0)
+  const [isPushAdmin, setIsPushAdmin] = React.useState(false)
+  const [isVerified, setIsVerified] = React.useState(false)
+  const [isBlocked, setIsBlocked] = React.useState(false)
+  const [vLoading, setvLoading] = React.useState(false)
+  const [bLoading, setBLoading] = React.useState(false)
+  const [txInProgress, setTxInProgress] = React.useState(false)
+  const [canUnverify, setCanUnverify] = React.useState(false)
+  const [verifierDetails, setVerifierDetails] = React.useState(null)
+  const [copyText, setCopyText] = React.useState(null)
 
   // ------ toast related section
-  const isChannelBlacklisted = CHANNEL_BLACKLIST.includes(channelObject.addr);
-  const [toast, showToast] = React.useState(null);
-  const clearToast = () => showToast(null);
+  const isChannelBlacklisted = CHANNEL_BLACKLIST.includes(channelObject.addr)
+  const [toast, showToast] = React.useState(null)
+  const clearToast = () => showToast(null)
 
   //clear toast variable after it is shown
   React.useEffect(() => {
     if (toast) {
-      clearToast();
+      clearToast()
     }
-  }, [toast]);
+  }, [toast])
   // ------ toast related section
 
   React.useEffect(() => {
-    if (!channelObject.addr) return;
+    if (!channelObject.addr) return
     if (channelObject.verifiedBy) {
       // procced as usual
-      fetchChannelJson().catch((err) => alert(err.message));
+      fetchChannelJson().catch(err => alert(err.message))
       setIsBlocked(
         channelObject.channelState === 3 || channelObject.channelState === 2 //dont display channel if blocked //dont display channel if deactivated
-      );
+      )
     } else {
       // if this key (verifiedBy) is not present it means we are searching and should fetch the channel object from chain again
-      epnsReadProvider.channels(channelObject.addr).then((response) => {
-        setChannelObject({ ...response, addr: channelObject.addr });
-        fetchChannelJson();
-      });
+      epnsReadProvider.channels(channelObject.addr).then(response => {
+        setChannelObject({ ...response, addr: channelObject.addr })
+        fetchChannelJson()
+      })
     }
-  }, [account, channelObject, chainId]);
+  }, [account, channelObject, chainId])
 
   React.useEffect(() => {
-    if (!channelObjectProp) return;
-    setChannelObject(channelObjectProp);
-  }, [channelObjectProp]);
+    if (!channelObjectProp) return
+    setChannelObject(channelObjectProp)
+  }, [channelObjectProp])
 
   React.useEffect(() => {
-    if (!isVerified || channelObject?.verifiedBy === ZERO_ADDRESS) return;
+    if (!isVerified || channelObject?.verifiedBy === ZERO_ADDRESS) return
     ChannelsDataStore.instance
       .getChannelJsonAsync(channelObject.verifiedBy)
-      .then((verifierDetails) => {
-        setVerifierDetails(verifierDetails);
+      .then(verifierDetails => {
+        setVerifierDetails(verifierDetails)
       })
-      .catch((err) => {
-        console.log(channelObject.verifiedBy, err);
-      });
-  }, [isVerified, channelObject]);
+      .catch(err => {
+        console.log(channelObject.verifiedBy, err)
+      })
+  }, [isVerified, channelObject])
 
   const EPNS_DOMAIN = {
     name: "EPNS COMM V1",
     chainId: chainId,
     verifyingContract: epnsCommReadProvider.address,
-  };
+  }
   // to fetch channels
   const fetchChannelJson = async () => {
     try {
-      let channelJson = {};
-      setCopyText(channelObject.addr);
+      let channelJson = {}
+      setCopyText(channelObject.addr)
       if (channelsCache[channelObject.addr]) {
-        channelJson = channelsCache[channelObject.addr];
+        channelJson = channelsCache[channelObject.addr]
       } else {
         channelJson = await ChannelsDataStore.instance.getChannelJsonAsync(
           channelObject.addr
-        );
+        )
         dispatch(
           cacheChannelInfo({
             address: channelObject.addr,
             meta: channelJson,
           })
-        );
+        )
       }
-      const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(channelObject.addr);
-      const subscribed = channelSubscribers.find((sub) => {
-        return sub.toLowerCase() === account.toLowerCase();
-      });
+      const channelSubscribers =
+        await ChannelsDataStore.instance.getChannelSubscribers(
+          channelObject.addr
+        )
+      const subscribed = channelSubscribers.find(sub => {
+        return sub.toLowerCase() === account.toLowerCase()
+      })
 
-      setIsPushAdmin(pushAdminAddress === account);
-      setMemberCount(channelSubscribers.length);
-      setSubscribed(subscribed);
-      setChannelJson({ ...channelJson, addr: channelObject.addr });
-      setLoading(false);
+      setIsPushAdmin(pushAdminAddress === account)
+      setMemberCount(channelSubscribers.length)
+      setSubscribed(subscribed)
+      setChannelJson({ ...channelJson, addr: channelObject.addr })
+      setLoading(false)
     } catch (err) {
-      setIsBlocked(true);
+      setIsBlocked(true)
     }
-  };
+  }
 
   React.useEffect(() => {
-    if(!channelObject) return;
+    if (!channelObject) return
     setIsVerified(
       Boolean(
         (channelObject.verifiedBy &&
           channelObject.verifiedBy !== ZERO_ADDRESS) ||
           channelObject.addr === pushAdminAddress
       )
-    );
-    setCanUnverify(channelObject.verifiedBy == account);
-  }, [channelObject]);
+    )
+    setCanUnverify(channelObject.verifiedBy == account)
+  }, [channelObject])
 
   // toast customize
   const LoaderToast = ({ msg, color }) => (
@@ -153,17 +156,17 @@ function ViewChannelItem({ channelObjectProp }) {
       <Loader type="Oval" color={color} height={30} width={30} />
       <ToasterMsg>{msg}</ToasterMsg>
     </Toaster>
-  );
+  )
 
   // to subscribe
   const subscribe = async () => {
-    subscribeAction(false);
-  };
-  const formatAddress = (addressText) => {
+    subscribeAction(false)
+  }
+  const formatAddress = addressText => {
     return addressText.length > 40
       ? `${addressText.slice(0, 4)}....${addressText.slice(36)}`
-      : addressText;
-  };
+      : addressText
+  }
 
   // Toastify
   let notificationToast = () =>
@@ -175,103 +178,103 @@ function ViewChannelItem({ channelObjectProp }) {
       pauseOnHover: true,
       draggable: true,
       progress: undefined,
-    });
+    })
 
   const verifyChannel = () => {
-    setvLoading(true);
+    setvLoading(true)
     // post op
     epnsWriteProvider
       .verifyChannel(channelObject.addr)
-      .then(async (tx) => {
-        console.log(tx);
-        console.log("Transaction Sent!");
+      .then(async tx => {
+        console.log(tx)
+        console.log("Transaction Sent!")
 
         toaster.update(notificationToast(), {
           render: "Transaction sent",
           type: toaster.TYPE.INFO,
           autoClose: 5000,
-        });
+        })
 
-        await tx.wait(1);
-        console.log ("Transaction Mined!");
-        setIsVerified(true);
+        await tx.wait(1)
+        console.log("Transaction Mined!")
+        setIsVerified(true)
       })
-      .catch((err) => {
-        console.log("!!!Error verifyChannel() --> %o", err);
+      .catch(err => {
+        console.log("!!!Error verifyChannel() --> %o", err)
         toaster.update(notificationToast(), {
           render: "Transacion Failed: " + err.error?.message || "Unknown Error",
           type: toaster.TYPE.ERROR,
           autoClose: 5000,
-        });
+        })
       })
       .finally(() => {
-        setvLoading(false);
-      });
-  };
+        setvLoading(false)
+      })
+  }
 
   const unverifyChannel = () => {
-    setvLoading(true);
+    setvLoading(true)
     epnsWriteProvider
       .unverifyChannel(channelObject.addr)
-      .then(async (tx) => {
-        console.log(tx);
-        console.log("Transaction Sent!");
+      .then(async tx => {
+        console.log(tx)
+        console.log("Transaction Sent!")
 
         toaster.update(notificationToast(), {
           render: "Transaction sent",
           type: toaster.TYPE.INFO,
           autoClose: 5000,
-        });
+        })
 
-        await tx.wait(1);
-        console.log("Transaction Mined!");
-        setIsVerified(false);
+        await tx.wait(1)
+        console.log("Transaction Mined!")
+        setIsVerified(false)
       })
-      .catch((err) => {
-        console.log("!!!Error handleSendMessage() --> %o", err);
+      .catch(err => {
+        console.log("!!!Error handleSendMessage() --> %o", err)
         toaster.update(notificationToast(), {
           render: "Transacion Failed: " + err.error?.message || "Unknown Error",
           type: toaster.TYPE.ERROR,
           autoClose: 5000,
-        });
-      });
-    setvLoading(false);
-  };
+        })
+      })
+    setvLoading(false)
+  }
   const blockChannel = () => {
-    setBLoading(true);
+    setBLoading(true)
     epnsWriteProvider
       .blockChannel(channelObject.addr)
-      .then(async (tx) => {
-        console.log(tx);
-        console.log("Transaction Sent!");
+      .then(async tx => {
+        console.log(tx)
+        console.log("Transaction Sent!")
 
         toaster.update(notificationToast(), {
           render: "Transaction Sent",
           type: toaster.TYPE.INFO,
           autoClose: 5000,
-        });
+        })
 
         // await tx.wait(1);
         // console.log ("Transaction Mined!");
       })
-      .catch((err) => {
-        console.log("!!!Error handleSendMessage() --> %o", err);
+      .catch(err => {
+        console.log("!!!Error handleSendMessage() --> %o", err)
         toaster.update(notificationToast(), {
           render: "Transacion Failed: " + err.error.message,
           type: toaster.TYPE.ERROR,
           autoClose: 5000,
-        });
+        })
       })
       .finally(() => {
         // post op
-        setBLoading(false);
-        setIsBlocked(true);
-      });
-  };
+        setBLoading(false)
+        setIsBlocked(true)
+      })
+  }
 
   const subscribeAction = async () => {
-    setTxInProgress(true);
-    let txToast;
+    setTxInProgress(true)
+    let txToast
     try {
       const type = {
         Subscribe: [
@@ -279,16 +282,16 @@ function ViewChannelItem({ channelObjectProp }) {
           { name: "subscriber", type: "address" },
           { name: "action", type: "string" },
         ],
-      };
+      }
       const message = {
         channel: channelObject.addr,
         subscriber: account,
         action: "Subscribe",
-      };
+      }
 
       const signature = await library
         .getSigner(account)
-        ._signTypedData(EPNS_DOMAIN, type, message);
+        ._signTypedData(EPNS_DOMAIN, type, message)
       txToast = toaster.dark(
         <LoaderToast msg="Waiting for Confirmation..." color="#35c5f3" />,
         {
@@ -300,7 +303,7 @@ function ViewChannelItem({ channelObjectProp }) {
           draggable: true,
           progress: undefined,
         }
-      );
+      )
 
       postReq("/channels/subscribe_offchain", {
         signature,
@@ -308,30 +311,36 @@ function ViewChannelItem({ channelObjectProp }) {
         op: "write",
         chainId,
         contractAddress: epnsCommReadProvider.address,
-      }).then((res) => {
-        setSubscribed(true);
-        setMemberCount(memberCount + 1);
+      }).then(res => {
+        setSubscribed(true)
+        setMemberCount(memberCount + 1)
         toaster.update(txToast, {
           render: "Successfully opted into channel !",
           type: toaster.TYPE.SUCCESS,
           autoClose: 5000,
-        });
-        ChannelsDataStore.instance.optInCache(channelObject.addr, account);
-        setTxInProgress(false);
-      });
+        })
+        ChannelsDataStore.instance.optInCache(channelObject.addr, account)
+        setTxInProgress(false)
+      })
     } catch (err) {
       toaster.update(txToast, {
         render: "There was an error opting into channel (" + err.message + ")",
         type: toaster.TYPE.ERROR,
         autoClose: 5000,
-      });
-      console.log(err);
+      })
+      console.log(err)
     } finally {
-      setTxInProgress(false);
+      setTxInProgress(false)
     }
-  };
+  }
 
-  const copyToClipboard = (url) => {
+  const copyToClipboard = (address) => {
+    let hostname = window.location.hostname;
+    // if we are on localhost, attach the port
+    if (hostname === "localhost") {
+      hostname = hostname + ":3000";
+    }
+    const url = `${hostname}/channels?channel=${address}`;
     // fallback for non navigator browser support
     if (navigator && navigator.clipboard) {
       navigator.clipboard.writeText(url);
@@ -343,10 +352,12 @@ function ViewChannelItem({ channelObjectProp }) {
       document.execCommand("copy");
       document.body.removeChild(el);
     }
+
+
   };
 
   const unsubscribeAction = async () => {
-    let txToast;
+    let txToast
     try {
       const type = {
         Unsubscribe: [
@@ -354,15 +365,15 @@ function ViewChannelItem({ channelObjectProp }) {
           { name: "unsubscriber", type: "address" },
           { name: "action", type: "string" },
         ],
-      };
+      }
       const message = {
         channel: channelObject.addr,
         unsubscriber: account,
         action: "Unsubscribe",
-      };
+      }
       const signature = await library
         .getSigner(account)
-        ._signTypedData(EPNS_DOMAIN, type, message);
+        ._signTypedData(EPNS_DOMAIN, type, message)
 
       txToast = toaster.dark(
         <LoaderToast msg="Waiting for Confirmation..." color="#35c5f3" />,
@@ -375,7 +386,7 @@ function ViewChannelItem({ channelObjectProp }) {
           draggable: true,
           progress: undefined,
         }
-      );
+      )
 
       postReq("/channels/unsubscribe_offchain", {
         signature,
@@ -384,36 +395,36 @@ function ViewChannelItem({ channelObjectProp }) {
         chainId,
         contractAddress: epnsCommReadProvider.address,
       })
-        .then((res) => {
-          setSubscribed(false);
-          setMemberCount(memberCount - 1);
-          ChannelsDataStore.instance.optOutCache(channelObject.addr, account);
+        .then(res => {
+          setSubscribed(false)
+          setMemberCount(memberCount - 1)
+          ChannelsDataStore.instance.optOutCache(channelObject.addr, account)
           toaster.update(txToast, {
             render: "Successfully opted out of channel !",
             type: toaster.TYPE.SUCCESS,
             autoClose: 5000,
-          });
-          console.log(res);
+          })
+          console.log(res)
         })
-        .catch((err) => {
+        .catch(err => {
           toaster.update(txToast, {
             render:
               "There was an error opting into channel (" + err.message + ")",
             type: toaster.TYPE.ERROR,
             autoClose: 5000,
-          });
-          console.log(err);
+          })
+          console.log(err)
         })
         .finally(() => {
-          setTxInProgress(false);
-        });
+          setTxInProgress(false)
+        })
     } finally {
-      setTxInProgress(false);
+      setTxInProgress(false)
     }
-  };
+  }
 
-  if (isBlocked) return <></>;
-  if (isChannelBlacklisted) return <></>;
+  if (isBlocked) return <></>
+  if (isChannelBlacklisted) return <></>
 
   // render
   return (
@@ -482,25 +493,27 @@ function ViewChannelItem({ channelObjectProp }) {
               <FlexBox style={{ marginBottom: "10px" }}>
                 <Subscribers>
                   <IoMdPeople size={20} color="#ccc" />
-                  <SubscribersCount>{memberCount?.toLocaleString()}</SubscribersCount>
+                  <SubscribersCount>
+                    {memberCount?.toLocaleString()}
+                  </SubscribersCount>
                 </Subscribers>
 
                 <Subscribers style={{ marginLeft: "10px" }}>
                   <FaRegAddressCard size={20} color="#ccc" />
                   <SubscribersCount
                     onClick={() => {
-                      copyToClipboard(channelJson.addr);
-                      setCopyText("copied");
+                      copyToClipboard(channelJson.addr)
+                      setCopyText("copied")
                     }}
                     onMouseEnter={() => {
-                      setCopyText("click to copy");
+                      setCopyText("click to copy")
                     }}
                     onMouseLeave={() => {
-                      setCopyText(channelJson.addr);
+                      setCopyText(channelJson.addr)
                     }}
                     style={{ cursor: "pointer" }}
                   >
-                    <AiTwotoneCopy />
+                    <AiOutlineShareAlt />
                     {formatAddress(copyText)}
                   </SubscribersCount>
                 </Subscribers>
@@ -595,16 +608,16 @@ function ViewChannelItem({ channelObjectProp }) {
         <NotificationToast notification={toast} clearToast={clearToast} />
       )}
     </Container>
-  );
+  )
 }
 
 const FlexBox = styled.div`
   display: flex;
-`;
+`
 
 const ColumnFlex = styled(FlexBox)`
   flex-direction: column;
-`;
+`
 // css styles
 const Container = styled.div`
   flex: 1;
@@ -618,16 +631,16 @@ const Container = styled.div`
   margin: 15px 0px;
   justify-content: center;
   padding: 20px 10px;
-`;
+`
 
 const SkeletonWrapper = styled.div`
   overflow: hidden;
-  width: ${(props) => props.atW + "%" || "100%"};
-  height: ${(props) => props.atH}px;
-  border-radius: ${(props) => props.borderRadius || 10}px;
-  margin-bottom: ${(props) => props.marginBottom || 5}px;
-  margin-right: ${(props) => props.marginRight || 0}px;
-`;
+  width: ${props => props.atW + "%" || "100%"};
+  height: ${props => props.atH}px;
+  border-radius: ${props => props.borderRadius || 10}px;
+  margin-bottom: ${props => props.marginBottom || 5}px;
+  margin-right: ${props => props.marginRight || 0}px;
+`
 
 const ChannelLogo = styled.div`
   max-width: 100px;
@@ -642,12 +655,12 @@ const ChannelLogo = styled.div`
   flex-direction: column;
   justify-content: center;
   align-self: flex-start;
-`;
+`
 
 const ChannelLogoOuter = styled.div`
   padding-top: 100%;
   position: relative;
-`;
+`
 
 const ChannelLogoInner = styled.div`
   position: absolute;
@@ -660,14 +673,14 @@ const ChannelLogoInner = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`;
+`
 
 const ChannelLogoImg = styled.img`
   object-fit: contain;
   width: 100%;
   border-radius: 20px;
   overflow: hidden;
-`;
+`
 
 const ChannelInfo = styled.div`
   flex: 1;
@@ -676,11 +689,11 @@ const ChannelInfo = styled.div`
   flex-grow: 4;
   flex-direction: column;
   display: flex;
-`;
+`
 
 const ChannelTitle = styled.div`
   margin-bottom: 5px;
-`;
+`
 
 const ChannelTitleLink = styled.a`
   text-decoration: none;
@@ -692,7 +705,7 @@ const ChannelTitleLink = styled.a`
     cursor: pointer;
     pointer: hand;
   }
-`;
+`
 
 const VerifiedBy = styled.span`
   color: #ec008c;
@@ -701,7 +714,7 @@ const VerifiedBy = styled.span`
   letter-spacing: 0.05em;
   font-weight: 600;
   display: inline-block;
-`;
+`
 
 const VerifierIcon = styled.img`
   width: 20px;
@@ -709,13 +722,13 @@ const VerifierIcon = styled.img`
   border-radius: 50%;
   margin-left: 6px;
   margin-right: 4px;
-`;
+`
 const VerifierName = styled.span`
   font-weight: 400;
   color: black;
   font-size: 16px;
   letter-spacing: 0em;
-`;
+`
 
 const ChannelDesc = styled.div`
   flex: 1;
@@ -724,19 +737,19 @@ const ChannelDesc = styled.div`
   color: rgba(0, 0, 0, 0.75);
   font-weight: 400;
   flex-direction: column;
-  margin-bottom: 30px
-`;
+  margin-bottom: 30px;
+`
 
 const ChannelDescLabel = styled.label`
   flex: 1;
-`;
+`
 
 const ChannelMeta = styled.div`
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
   font-size: 13px;
-`;
+`
 
 const ChannelMetaBox = styled.label`
   margin: 0px 5px;
@@ -747,30 +760,30 @@ const ChannelMetaBox = styled.label`
   border-radius: 10px;
   font-size: 11px;
   gap: 3px;
-`;
+`
 
 const Subscribers = styled.div`
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
   align-items: center;
-`;
+`
 
 const SubscribersCount = styled(ChannelMetaBox)`
   background: #35c4f3;
   transition: 300ms;
-`;
+`
 
 const Pool = styled.div`
   margin: 0px 10px;
   display: flex;
   flex-direction: row;
   align-items: center;
-`;
+`
 
 const PoolShare = styled(ChannelMetaBox)`
   background: #674c9f;
-`;
+`
 
 const LineBreak = styled.div`
   display: none;
@@ -780,7 +793,7 @@ const LineBreak = styled.div`
   @media ${Device.tablet} {
     display: block;
   }
-`;
+`
 
 const ChannelActions = styled.div`
   margin: 5px;
@@ -790,7 +803,7 @@ const ChannelActions = styled.div`
   justify-content: flex-end;
   // justify-content: center;
   align-items: center;
-`;
+`
 
 const ChannelActionButton = styled.button`
   border: 0;
@@ -815,7 +828,7 @@ const ChannelActionButton = styled.button`
     cursor: pointer;
     pointer: hand;
   }
-  ${(props) =>
+  ${props =>
     props.disabled &&
     css`
       &:hover {
@@ -829,15 +842,15 @@ const ChannelActionButton = styled.button`
         pointer: default;
       }
     `}
-`;
+`
 
 const ActionTitle = styled.span`
-  ${(props) =>
+  ${props =>
     props.hideit &&
     css`
       visibility: hidden;
     `};
-`;
+`
 
 const ActionLoader = styled.div`
   position: absolute;
@@ -848,7 +861,7 @@ const ActionLoader = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`;
+`
 
 const SkeletonButton = styled.div`
   border: 0;
@@ -860,32 +873,32 @@ const SkeletonButton = styled.div`
   margin: 10px;
   border-radius: 5px;
   flex: 1;
-`;
+`
 
 const SubscribeButton = styled(ChannelActionButton)`
   background: #e20880;
   min-width: 80px;
-`;
+`
 
 const UnsubscribeButton = styled(ChannelActionButton)`
   background: #674c9f;
   min-width: 80px;
-`;
+`
 
 const OwnerButton = styled(ChannelActionButton)`
   background: #35c5f3;
-`;
+`
 
 const Toaster = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
   margin: 0px 10px;
-`;
+`
 
 const ToasterMsg = styled.div`
   margin: 0px 10px;
-`;
+`
 
 // Export Default
-export default ViewChannelItem;
+export default ViewChannelItem

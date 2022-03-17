@@ -1,27 +1,33 @@
-import React from "react"
-import styled from "styled-components"
+import React, { useState } from "react"
+import styled, { useTheme } from "styled-components"
 import Loader from "react-loader-spinner"
 import { Waypoint } from "react-waypoint"
 import { useDispatch, useSelector } from "react-redux"
 import { postReq } from "api"
 import { useWeb3React } from "@web3-react/core"
-import { envConfig } from "@project/contracts"
+import searchIcon from "assets/searchicon.svg"
 
 import DisplayNotice from "components/DisplayNotice"
 import ViewChannelItem from "components/ViewChannelItem"
 import Faucets from "components/Faucets"
 import ChannelsDataStore from "singletons/ChannelsDataStore"
 import { setChannelMeta, incrementPage } from "redux/slices/channelSlice"
+
+import { ThemeProvider } from "styled-components"
+import { themeLight, themeDark } from "config/Themization"
 import queryString from "query-string"
 
-const CHANNELS_PER_PAGE = 30 //pagination parameter which indicates how many channels to return over one iteration
+const CHANNELS_PER_PAGE = 10 //pagination parameter which indicates how many channels to return over one iteration
 const SEARCH_TRIAL_LIMIT = 5 //ONLY TRY SEARCHING 5 TIMES BEFORE GIVING UP
 const DEBOUNCE_TIMEOUT = 500 //time in millisecond which we want to wait for then to finish typing
 const ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/
 const SEARCH_DELAY = 1500
 
 // Create Header
-function ViewChannels() {
+function Channels() {
+  const themes = useTheme()
+  const [darkMode, setDarkMode] = useState(false)
+
   const dispatch = useDispatch()
   const { account, chainId } = useWeb3React()
   const { channels, page, ZERO_ADDRESS } = useSelector(
@@ -36,7 +42,6 @@ function ViewChannels() {
   const [trialCount, setTrialCount] = React.useState(0)
 
   const channelsVisited = page * CHANNELS_PER_PAGE
-  const isMainnet = chainId == 1
 
   // fetch channel data if we are just getting to this pae
   React.useEffect(() => {
@@ -56,11 +61,10 @@ function ViewChannels() {
   // to fetch initial channels and logged in user data
   const fetchInitialsChannelMeta = async () => {
     // fetch the meta of the first `CHANNELS_PER_PAGE` channels
-    const channelsMeta = await ChannelsDataStore.instance.getChannelFromApi(
+    const channelsMeta = await ChannelsDataStore.instance.getChannelsMetaAsync(
       channelsVisited,
       CHANNELS_PER_PAGE
     )
-    dispatch(incrementPage())
     if (!channels.length) {
       dispatch(setChannelMeta(channelsMeta))
     }
@@ -70,7 +74,7 @@ function ViewChannels() {
   // load more channels when we get to the bottom of the page
   const loadMoreChannelMeta = async (newPageNumber: any) => {
     const startingPoint = newPageNumber * CHANNELS_PER_PAGE
-    const moreChannels = await ChannelsDataStore.instance.getChannelFromApi(
+    const moreChannels = await ChannelsDataStore.instance.getChannelsMetaAsync(
       startingPoint,
       CHANNELS_PER_PAGE
     )
@@ -89,6 +93,10 @@ function ViewChannels() {
     if (!channels.length) return
     setChannelToShow(channels)
   }, [channels])
+
+  console.log("\n\n")
+  console.log("\n\n")
+  console.log({ channels })
 
   function searchForChannel() {
     if (loadingChannel) return //if we are already loading, do nothing
@@ -138,7 +146,7 @@ function ViewChannels() {
   }, [])
 
   return (
-    <>
+    <ThemeProvider theme={themes}>
       <Container>
         {!loading && channels.length == 0 ? (
           <ContainerInfo>
@@ -154,8 +162,7 @@ function ViewChannels() {
           >
             {!loading && (
               <Header style={{ minHeight: "140px" }}>
-                {/* if on mainnet then occupy full width*/}
-                <InputWrapper style={{ width: isMainnet ? "100%" : "50%" }}>
+                <InputWrapper>
                   <SearchBar
                     type="text"
                     value={search}
@@ -163,10 +170,8 @@ function ViewChannels() {
                     className="input"
                     placeholder="Search By Name/Address"
                   />
-                  <SearchIconImage src="/searchicon.svg" alt="" />
+                  <SearchIconImage src={searchIcon} alt="" />
                 </InputWrapper>
-                {!isMainnet && <Faucets />}
-                {/* only display faucets on mainnet */}
               </Header>
             )}
 
@@ -180,9 +185,7 @@ function ViewChannels() {
                       <ViewChannelItem channelObjectProp={channel} />
                     </div>
                     {showWayPoint(index) && (
-                      <div style={{ width: "100%", height: "40px" }}>
-                        <Waypoint onEnter={updateCurrentPage} />
-                      </div>
+                      <Waypoint onEnter={updateCurrentPage} />
                     )}
                   </>
                 )
@@ -209,7 +212,7 @@ function ViewChannels() {
           </Items>
         )}
       </Container>
-    </>
+    </ThemeProvider>
   )
 }
 
@@ -222,12 +225,14 @@ const Header = styled.div`
   position: sticky;
   top: 0px;
   z-index: 2;
-  background: #fafafa;
 
   @media (max-width: 600px) {
     flex-direction: column;
   }
 `
+
+//background: red;
+
 const InputWrapper = styled.div`
   width: 50%;
   position: relative;
@@ -301,8 +306,10 @@ const Items = styled.div`
   align-self: stretch;
   padding: 10px 20px;
   overflow-y: scroll;
-  background: #fafafa;
+  background: ${props => props.theme.channelBg};
 `
+
+//background: red;
 
 const SearchIconImage = styled.img`
   position: absolute;
@@ -311,4 +318,4 @@ const SearchIconImage = styled.img`
 `
 
 // Export Default
-export default ViewChannels
+export default Channels
