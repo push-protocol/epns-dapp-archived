@@ -1,9 +1,9 @@
-import React from "react";
+import React, {useState} from "react";
 import { toast } from "react-toastify";
 import Dropdown from "react-dropdown";
 import { FiLink } from "react-icons/fi";
 import Loader from "react-loader-spinner";
-import styled from "styled-components";
+import styled, { css, useTheme } from 'styled-components';
 import { BsFillImageFill } from "react-icons/bs";
 import { useSelector } from "react-redux";
 import { postReq } from "api";
@@ -30,6 +30,12 @@ import { useWeb3React } from "@web3-react/core";
 import { CloseIcon } from "assets/icons";
 import EPNSCoreHelper from "helpers/EPNSCoreHelper";
 import CryptoHelper from "helpers/CryptoHelper";
+
+
+import {ThemeProvider} from "styled-components";
+
+import { themeLight, themeDark } from "config/Themization";
+
 const ethers = require("ethers");
 
 // Set Notification Form Type | 0 is reserved for protocol storage
@@ -54,6 +60,11 @@ function SendNotifications() {
   const { CHANNNEL_DEACTIVATED_STATE } = useSelector(
     (state: any) => state.channels
   );
+
+  //Dark theme
+  const themes = useTheme();
+
+  const [darkMode, setDarkMode] = useState(false);
 
   const [nfProcessing, setNFProcessing] = React.useState(0);
   const [channelAddress, setChannelAddress] = React.useState("");
@@ -593,24 +604,24 @@ function SendNotifications() {
   );
 
   return (
-    <>
+    <ThemeProvider theme={themes}>
       <Section>
         <Content padding="10px 20px 20px">
           <Item align="flex-start">
             <H2 textTransform="uppercase" spacing="0.1em">
-              <Span weight="200">Send </Span>
-              <Span bg="#674c9f" color="#fff" weight="600" padding="0px 8px">
+              <Span weight="200" color={themes.color}>Send </Span>
+              <Span bg="#674c9f" color={themes.color} weight="600" padding="0px 8px">
                 Notification
               </Span>
             </H2>
             {!isChannelDeactivated ? (
-              <H3>
+              <H3 color={themes.color}>
                 EPNS supports three types of notifications (for now!).{" "}
                 <b>Groups</b>, <b>Secrets</b>, and <b>Targetted</b>
                  {/* and{" "} <b>Subsets</b>. */}
               </H3>
             ) : (
-              <H3>This channel has been deactivated, please reactivate it!.</H3>
+              <H3 color={themes.color}>This channel has been deactivated, please reactivate it!.</H3>
             )}
           </Item>
         </Content>
@@ -637,7 +648,7 @@ function SendNotifications() {
                       minWidth="280px"
                     >
                       <DropdownStyledParentWhite>
-                        <DropdownHeader>
+                        <DropdownHeader color={themes.color}>
                           SEND NOTIFICATION ON BEHALF OF
                         </DropdownHeader>
                         <DropdownStyledWhite
@@ -690,7 +701,7 @@ function SendNotifications() {
                   {nfType && (
                     <ItemH
                       margin="0px 15px 15px 15px"
-                      bg="#f1f1f1"
+                      bg={themes.mainBg}
                       flex="1"
                       self="stretch"
                       justify="space-between"
@@ -703,7 +714,7 @@ function SendNotifications() {
                           textTransform="uppercase"
                           size="0.8em"
                           bg="#e20880"
-                          color="#fff"
+                          color={themes.color}
                           padding="5px 15px"
                           radius="30px"
                         >
@@ -725,7 +736,7 @@ function SendNotifications() {
                           textTransform="uppercase"
                           size="0.8em"
                           bg="#e20880"
-                          color="#fff"
+                          color={themes.color}
                           padding="5px 15px"
                           radius="30px"
                         >
@@ -747,7 +758,7 @@ function SendNotifications() {
                           textTransform="uppercase"
                           size="0.8em"
                           bg="#e20880"
-                          color="#fff"
+                          color={themes.color}
                           padding="5px 15px"
                           radius="30px"
                         >
@@ -790,7 +801,7 @@ function SendNotifications() {
                         top="0px"
                         pos="absolute"
                         color="#fff"
-                        bg="#000"
+                        bg={themes.mainBg}
                         size="0.7rem"
                         z="1"
                       >
@@ -840,8 +851,8 @@ function SendNotifications() {
                           right="0px"
                           top="0px"
                           pos="absolute"
-                          color="#fff"
-                          bg="#000"
+                          color={themes.color}
+                          bg={themes.mainBg}
                           size="0.7rem"
                           z="1"
                         >
@@ -878,8 +889,8 @@ function SendNotifications() {
                         right="0px"
                         top="0px"
                         pos="absolute"
-                        color="#fff"
-                        bg="#000"
+                        color={themes.color}
+                        bg={themes.mainBg}
                         size="0.7rem"
                         z="1"
                       >
@@ -922,7 +933,7 @@ function SendNotifications() {
                     align="center"
                   >
                     <Item flex="0" margin="0px 5px 0px 0px">
-                      <BsFillImageFill size={24} color="#000" />
+                      <BsFillImageFill size={24} color={themes.color} />
                     </Item>
                     <Item flex="1" margin="0px 0px 0px 5px" align="stretch">
                       <Input
@@ -932,7 +943,7 @@ function SendNotifications() {
                         border="1px solid #000"
                         radius="4px"
                         weight="400"
-                        bg="#f1f1f1"
+                        bg={themes.mainBg}
                         value={nfMedia}
                         onChange={(e) => {
                           setNFMedia(e.target.value);
@@ -944,8 +955,8 @@ function SendNotifications() {
                           right="0px"
                           top="0px"
                           pos="absolute"
-                          color="#fff"
-                          bg="#000"
+                          color={themes.color}
+                          bg={themes.mainBg}
                           size="0.7rem"
                           z="1"
                         >
@@ -964,7 +975,7 @@ function SendNotifications() {
                     align="center"
                   >
                     <Item flex="0" margin="0px 5px 0px 0px">
-                      <FiLink size={24} color="#000" />
+                      <FiLink size={24} color={themes.color} />
                     </Item>
                     <Item flex="1" margin="0px 0px 0px 5px" align="stretch">
                       <Input
@@ -974,7 +985,7 @@ function SendNotifications() {
                         border="1px solid #000"
                         radius="4px"
                         weight="400"
-                        bg="#f1f1f1"
+                        bg={themes.mainBg}
                         value={nfCTA}
                         onChange={(e) => {
                           setNFCTA(e.target.value);
@@ -986,8 +997,8 @@ function SendNotifications() {
                           right="0px"
                           top="0px"
                           pos="absolute"
-                          color="#fff"
-                          bg="#000"
+                          color={themes.color}
+                          bg={themes.mainBg}
                           size="0.7rem"
                           z="1"
                         >
@@ -1000,13 +1011,13 @@ function SendNotifications() {
 
                 {nfInfo && nfProcessing != 1 && (
                   <Item
-                    color="#fff"
+                    color={themes.color}
                     bg="#e1087f"
                     padding="10px 15px"
                     margin="15px 0px"
                   >
                     <Span
-                      color="#fff"
+                      color={themes.color}
                       textTransform="uppercase"
                       spacing="0.1em"
                       weight="400"
@@ -1026,7 +1037,7 @@ function SendNotifications() {
                   >
                     <Button
                       bg="#e20880"
-                      color="#fff"
+                      color={themes.color}
                       flex="1"
                       radius="0px"
                       padding="20px 10px"
@@ -1035,7 +1046,7 @@ function SendNotifications() {
                       {nfProcessing == 1 && (
                         <Loader
                           type="Oval"
-                          color="#fff"
+                          color={themes.color}
                           height={24}
                           width={24}
                         />
@@ -1044,7 +1055,7 @@ function SendNotifications() {
                         <Input
                           cursor="hand"
                           textTransform="uppercase"
-                          color="#fff"
+                          color={themes.color}
                           weight="400"
                           size="0.8em"
                           spacing="0.2em"
@@ -1060,7 +1071,7 @@ function SendNotifications() {
           </ModifiedContent>
         </Section>
       )}
-    </>
+    </ThemeProvider>
   );
 }
 

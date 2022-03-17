@@ -1,35 +1,47 @@
-import React, {useState} from "react";
-import ReactGA from "react-ga";
+import React, { useState, useContext } from "react"
+import ReactGA from "react-ga"
 
-import { Web3Provider } from "ethers/providers";
-import { useWeb3React } from "@web3-react/core";
-import { AbstractConnector } from "@web3-react/abstract-connector";
-import { useEagerConnect, useInactiveListener } from "hooks";
-import { injected, walletconnect, portis, ledger } from "connectors";
+import { Web3Provider } from "ethers/providers"
+import { useWeb3React } from "@web3-react/core"
+import { AbstractConnector } from "@web3-react/abstract-connector"
+import { useEagerConnect, useInactiveListener } from "hooks"
+import { injected, walletconnect, portis, ledger } from "connectors"
 
-import styled, {ThemeProvider} from "styled-components";
-import { Item, ItemH, Span, H2, B, A } from "components/SharedStyling";
+import styled, { ThemeProvider } from "styled-components"
+import { Item, ItemH, Span, H2, B, A } from "components/SharedStyling"
 
-import Header from "sections/Header";
-import Navigation from "sections/Navigation";
+import Header from "sections/Header"
+import Navigation from "sections/Navigation"
+import { scroller } from "react-scroll"
 
-import Joyride, { ACTIONS, CallBackProps, EVENTS, STATUS, Step } from "react-joyride";
+import Joyride, {
+  ACTIONS,
+  CallBackProps,
+  EVENTS,
+  STATUS,
+  Step,
+} from "react-joyride"
 
-import NavigationContextProvider from "contexts/NavigationContext";
+import NavigationContextProvider from "contexts/NavigationContext"
 
-import Home from "pages/Home";
-import Channels from "pages/Channels";
+import Home from "pages/Home"
+import Channels from "pages/Channels"
 
-import MasterInterfacePage from "pages/MasterInterfacePage";
+import MasterInterfacePage from "pages/MasterInterfacePage"
 
-import {incrementStepIndex, decrementStepIndex, setRun, setIndex} from "redux/slices/userJourneySlice";
+import {
+  incrementStepIndex,
+  decrementStepIndex,
+  setRun,
+  setIndex,
+} from "redux/slices/userJourneySlice"
 
-import { themeLight, themeDark } from "config/Themization";
-import GLOBALS from "config/Globals";
+import { themeLight, themeDark } from "config/Themization"
+import GLOBALS from "config/Globals"
 
-import * as dotenv from "dotenv";
-import { useSelector, useDispatch } from "react-redux";
-dotenv.config();
+import * as dotenv from "dotenv"
+import { useSelector, useDispatch } from "react-redux"
+dotenv.config()
 
 // define the different type of connectors which we use
 const web3Connectors = {
@@ -46,102 +58,156 @@ const web3Connectors = {
   // Trezor: {obj: trezor, logo: './svg/login/trezor.svg', title: 'Trezor'},
   Ledger: { obj: ledger, logo: "./svg/login/ledger.svg", title: "Ledger" },
   Portis: { obj: portis, logo: "./svg/login/portis.svg", title: "Portis" },
-};
+}
 
-
+const NAV_SELECTOR = 'div > section > div'
+const TIMEOUT_DELAY = 300
 
 export default function App() {
-  const dispatch = useDispatch();
-  const { connector, activate, active, error } = useWeb3React<Web3Provider>();
-  const [activatingConnector, setActivatingConnector] = React.useState<
-    AbstractConnector
-  >();
-  const [currentTime, setcurrentTime] = React.useState(0);
-  const {
-    run,
-    stepIndex
-  } = useSelector((state: any) => state.userJourney);
+  const dispatch = useDispatch()
+  const { connector, activate, active, error } = useWeb3React<Web3Provider>()
+  const [activatingConnector, setActivatingConnector] =
+    React.useState<AbstractConnector>()
+  const [currentTime, setcurrentTime] = React.useState(0)
+  const { run, stepIndex } = useSelector((state: any) => state.userJourney)
 
-  React.useEffect(()=>{
-    const now = Date.now()/ 1000;
+  React.useEffect(() => {
+    const now = Date.now() / 1000
     setcurrentTime(now)
-  },[])
+  }, [])
+
   React.useEffect(() => {
     if (activatingConnector && activatingConnector === connector) {
-      setActivatingConnector(undefined);
+      setActivatingConnector(undefined)
     }
-  }, [activatingConnector, connector]);
+  }, [activatingConnector, connector])
 
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
-  const triedEager = useEagerConnect();
+  const triedEager = useEagerConnect()
   // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
-  useInactiveListener(!triedEager || !!activatingConnector);
+  useInactiveListener(!triedEager || !!activatingConnector)
 
   // Initialize GA
-  ReactGA.initialize("UA-165415629-5");
-  ReactGA.pageview("/login");
+  ReactGA.initialize("UA-165415629-5")
+  ReactGA.pageview("/login")
   // Initialize GA
 
   // Initialize Theme
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(false)
 
   const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
+    setDarkMode(!darkMode)
   }
 
 
+
   React.useEffect(() => {
-    const data = localStorage.getItem('theme')
-    if(data){
+    const data = localStorage.getItem("theme")
+    if (data) {
       setDarkMode(JSON.parse(data))
     }
-  },[])
+  }, [])
 
   React.useEffect(() => {
-    localStorage.setItem('theme', JSON.stringify(darkMode))
+    localStorage.setItem("theme", JSON.stringify(darkMode))
   })
 
-
-  React.useEffect(()=>{
+  React.useEffect(() => {
     window?.Olvy?.init({
       organisation: "epns",
-    target: "#olvy-target",
-    type: "sidebar",
-    view: {
-      showSearch: false,
-      compact: false,
-      showHeader: true, // only applies when widget type is embed. you cannot hide header for modal and sidebar widgets
-      showUnreadIndicator: true,
-      unreadIndicatorColor: "#cc1919",
-      unreadIndicatorPosition: "top-right"
-    }
-    });
+      target: "#olvy-target",
+      type: "sidebar",
+      view: {
+        showSearch: false,
+        compact: false,
+        showHeader: true, // only applies when widget type is embed. you cannot hide header for modal and sidebar widgets
+        showUnreadIndicator: true,
+        unreadIndicatorColor: "#cc1919",
+        unreadIndicatorPosition: "top-right",
+      },
+    })
     return function cleanup() {
-      window?.Olvy?.teardown();
-    };
-  
-});
+      window?.Olvy?.teardown()
+    }
+  })
+
+  const [modal, setModal] = useState(false)
+
+  const toggleModal = () => {
+    setModal(!modal)
+  }
+
+  const scrollToSection = () => {
+    scroller.scrollTo(".communicate", {
+      duration: 800,
+      delay: 0,
+      offset: 200,
+      smooth: "easeInOutQuart",
+    })
+  }
 
   const steps = [
-  {//0
-    content: (
-      <div>
-        <h2>Let's begin our journey!</h2>
-        <p>
-          Welcome to the <B>ETHERIUM</B> <B>PUSH</B> <B>NOTIFICATION SERVICE</B>{" "}
-        </p>
-        <button onClick={
-          () => dispatch(incrementStepIndex())
-        }>Next</button>
+    {
+      //0
+      content: (
+        <div>
+          <h2>Let's begin our journey!</h2>
+          <p>
+            Welcome to the <B>ETHERIUM</B> <B>PUSH</B>{" "}
+            <B>NOTIFICATION SERVICE</B>{" "}
+          </p>
+          <button onClick={() => dispatch(incrementStepIndex())}>Next</button>
         </div>
       ),
-    locale: { next: <strong aria-label="next">NEXT</strong> },
-    placement: 'center',
-    target: 'body',
-    // spotlightClicks: true,
-    // disableOverlayClose: false,
-  },
-    {//1
+      locale: { next: <strong aria-label="next">NEXT</strong> },
+      placement: "center",
+      target: "body",
+      // spotlightClicks: true,
+      // disableOverlayClose: false,
+    },
+
+    //set modal to be close on every render
+
+    // *********
+    {
+      //***** */
+      content: (
+        <div>
+          <h2>click on the Communicate tab to view more features</h2>
+          <button onClick={() => dispatch(incrementStepIndex())}>Next</button>
+        </div>
+      ),
+      locale: { next: <strong aria-label="next">NEXT</strong> },
+      placement: "right",
+      target: ".communicate",
+      offsetTop: "-100px",
+      styles: {
+        options: {
+          arrowColor: "#a9a9a9",
+          backgroundColor: "#e6e6e6",
+          beaconSize: "30px",
+          beaconColor: "#fff",
+          beaconBorderColor: "#fff",
+          textColor: "#e675ce",
+          width: "100%",
+          zIndex: 9999,
+        },
+        tooltip: {
+          backgroundColor: "#2596be",
+          color: "#fff",
+          maxWidth: "350px",
+          zIndex: 9999,
+        },
+      },
+      spotlightClicks: true,
+      disableAnimation: false,
+      disablefloating: false,
+    },
+
+    // **************
+
+    {
+      //1
       content: (
         <div>
           <h2>Click on channels!</h2>
@@ -150,23 +216,23 @@ export default function App() {
           }>Next</button> */}
         </div>
       ),
-      placement: 'right-start',
-      target: '.channels',
-      styles:{
+      placement: "right",
+      target: ".channels",
+      styles: {
         options: {
-          arrowColor: '#a9a9a9',
-          backgroundColor: '#e6e6e6',
-          beaconSize: '30px',
-          beaconColor: '#fff',
-          beaconBorderColor: '#fff',
-          textColor: '#e675ce',
-          width: '100%',
+          arrowColor: "#a9a9a9",
+          backgroundColor: "#e6e6e6",
+          beaconSize: "30px",
+          beaconColor: "#fff",
+          beaconBorderColor: "#fff",
+          textColor: "#e675ce",
+          width: "100%",
           zIndex: 9999,
         },
         tooltip: {
-          backgroundColor: '#2596be',
-          color: '#fff',
-          maxWidth: '350px',
+          backgroundColor: "#2596be",
+          color: "#fff",
+          maxWidth: "350px",
           zIndex: 9999,
         },
       },
@@ -174,151 +240,167 @@ export default function App() {
       disableAnimation: false,
       disablefloating: false,
     },
-      {//2
-        content: (
-          <div> This is the place where you see all your channels</div>
-        ),
-        placement: 'center',
-        target: 'body',
-      },
-  {//3
-    content: <div>
-      <h2>Click on Opt-in!</h2>
-     {/* <button onClick={
+    {
+      //2
+      content: <div> This is the place where you see all your channels</div>,
+      placement: "center",
+      target: "body",
+    },
+    {
+      //3
+      content: (
+        <div>
+          <h2>Click on Opt-in!</h2>
+          {/* <button onClick={
       () => dispatch(incrementStepIndex())
     }>Next</button> */}
-    </div>,
-    placement: 'top-center' ,
-    position : 'top-center',
-    target: `#addr-0x0000000000000000000000000000000000000000`,
-    disableOverlayClose: false,
-    spotlightClicks: true,
-    offsetTop: '-100px',
-    defaultProps: false,
-  },
-  {//4
-    content: (
-      <div>
-        <h2>Click on Inbox!</h2>
-        {/* <button onClick={
+        </div>
+      ),
+      placement: "top-center",
+      position: "top-center",
+      target: `#addr-0x0000000000000000000000000000000000000000`,
+      disableOverlayClose: false,
+      spotlightClicks: true,
+      offsetTop: "-100px",
+      defaultProps: false,
+    },
+    {
+      //4
+      content: (
+        <div>
+          <h2>Click on Inbox!</h2>
+          {/* <button onClick={
           () => dispatch(incrementStepIndex())
         }>Next</button> */}
         </div>
       ),
-    placement: 'right-start',
-    target: '.inbox',
-    spotlightClicks: true,
-    disablefloating: true,
-  },
-  {//5
-    content: <div>
-      <h2>You will get all your messages here.</h2>
-     <button onClick={
-      () => dispatch(incrementStepIndex())
-    }>Next</button></div>,
-    placement: 'left',
-    target: `#scrollstyle-secondary`,
-    // disableOverlayClose: false,
-  },
-  {//6
-    content: <div>
-      <h2>You will get all your spam messages here.</h2>
-     {/* <button onClick={
-      () => dispatch(incrementStepIndex())
-    }>Next</button> */}
-    </div>,
-    placement: 'right-start',
-    target: `.spam`,
-    spotlightClicks: true,
-  },
-  {//7
-    content: <div>
-      <h2>You will Recieve all your notifications here</h2>
-     <button onClick={
-      () => dispatch(incrementStepIndex())
-    }>Next</button></div>,
-    placement: 'right-start',
-    target: `.receive`,
-    spotlightClicks: true
-  },
-   {//0
-    content: (
-      <div>
-        <h2>Tutorial Complete</h2>
-        <p>
-          <B>THANK YOU</B>{" "}
-        </p>
-        <button onClick={
-          () => dispatch(incrementStepIndex())
-        }>Next</button>
+      placement: "right-start",
+      target: ".inbox",
+      spotlightClicks: true,
+      disablefloating: true,
+    },
+    {
+      //5
+      content: (
+        <div>
+          <h2>You will get all your messages here.</h2>
+          <button onClick={() => dispatch(incrementStepIndex())}>Next</button>
         </div>
       ),
-    locale: { next: <strong aria-label="next">NEXT</strong> },
-    placement: 'center',
-    target: 'body',
-    // spotlightClicks: true,
-    // disableOverlayClose: false,
-  },
-];
-  
+      placement: "left",
+      target: `#scrollstyle-secondary`,
+      // disableOverlayClose: false,
+    },
+    {
+      //6
+      content: (
+        <div>
+          <h2>You will get all your spam messages here.</h2>
+          {/* <button onClick={
+      () => dispatch(incrementStepIndex())
+    }>Next</button> */}
+        </div>
+      ),
+      placement: "right-start",
+      target: `.spam`,
+      spotlightClicks: true,
+    },
+    {
+      //7
+      content: (
+        <div>
+          <h2>You will Recieve all your notifications here</h2>
+          <button onClick={() => dispatch(incrementStepIndex())}>Next</button>
+        </div>
+      ),
+      placement: "right-start",
+      target: `.receive`,
+      spotlightClicks: true,
+    },
+    {
+      //0
+      content: (
+        <div>
+          <h2>Tutorial Complete</h2>
+          <p>
+            <B>THANK YOU</B>{" "}
+          </p>
+          <button onClick={() => dispatch(incrementStepIndex())}>Next</button>
+        </div>
+      ),
+      locale: { next: <strong aria-label="next">NEXT</strong> },
+      placement: "center",
+      target: "body",
+      // spotlightClicks: true,
+      // disableOverlayClose: false,
+    },
+  ]
+
+  React.useEffect(() => {
+    setTimeout(() => {
+      scrollToSection()
+      // alert("scroll")
+    }, 10000)
+  }, [])
+
   const handleJoyrideCallback = (data: CallBackProps) => {
-    console.log(data);
+    // alert("clicked")
+
+    // scrollToSection()
+    console.log(data)
     // console.log(STATUS);
-    const { action, lifecycle, status ,index } = data;
-    if ((action === 'close') || action === 'skip') {
-      dispatch(setRun(false));
-      dispatch(setIndex(0));
-    }    
+    const { action, lifecycle, status, index, step } = data
+    if (action === "close" || action === "skip") {
+      dispatch(setRun(false))
+      dispatch(setIndex(0))
+    }
+
+    if (lifecycle === "ready") {
+      setTimeout(() => {
+        document.querySelector(NAV_SELECTOR).scrollTop = 0
+      }, TIMEOUT_DELAY)
+    }
+
     // else if (action === 'next' && status === 'running') {
     //   dispatch(incrementStepIndex());
     // }
   }
 
   return (
-    <ThemeProvider theme={darkMode ? themeDark : themeLight }>
+    <ThemeProvider theme={darkMode ? themeDark : themeLight}>
       <NavigationContextProvider>
         <Joyride
           run={run}
           steps={steps}
           continuous={true}
           stepIndex={stepIndex}
-          primaryProps = {false}
+          primaryProps={false}
           // scrollToFirstStep={true}
           // disableOverlayClose={false}
           // showProgress={true}
-          disableFlip = {true}
+          disableFlip={true}
           showSkipButton={true}
           callback={handleJoyrideCallback}
         />
         <HeaderContainer>
-          <Header
-            isDarkMode={darkMode}
-            darkModeToggle={toggleDarkMode}
-          />  
+          <Header isDarkMode={darkMode} darkModeToggle={toggleDarkMode} />
         </HeaderContainer>
 
-        <ParentContainer
-          headerHeight={GLOBALS.CONSTANTS.HEADER_HEIGHT}
-        >
-
-          {(active) && !error && (
+        <ParentContainer headerHeight={GLOBALS.CONSTANTS.HEADER_HEIGHT}>
+          {active && !error && (
             <>
-              <LeftBarContainer
-                leftBarWidth={GLOBALS.CONSTANTS.LEFT_BAR_WIDTH}
-              >
+              <LeftBarContainer leftBarWidth={GLOBALS.CONSTANTS.LEFT_BAR_WIDTH}>
                 <Navigation />
               </LeftBarContainer>
 
-              <ContentContainer
-                leftBarWidth={GLOBALS.CONSTANTS.LEFT_BAR_WIDTH}
-              >
+              <ContentContainer leftBarWidth={GLOBALS.CONSTANTS.LEFT_BAR_WIDTH}>
                 {/* Shared among all pages, load universal things here */}
                 <MasterInterfacePage />
               </ContentContainer>
             </>
           )}
 
-          {(!active) && (
+          {!active && (
             <Item>
               <ProviderLogo
                 src="./epnshomelogo.png"
@@ -331,31 +413,36 @@ export default function App() {
                 radius="12px"
               >
                 <H2 textTransform="uppercase" spacing="0.1em">
-                  <Span bg="#e20880" color="#fff" weight="600" padding="0px 8px">
+                  <Span
+                    bg="#e20880"
+                    color="#fff"
+                    weight="600"
+                    padding="0px 8px"
+                  >
                     Connect
                   </Span>
                   <Span weight="200"> Your Wallet</Span>
                 </H2>
 
                 <ItemH maxWidth="800px" align="stretch">
-                  {Object.keys(web3Connectors).map((name) => {
-                    const currentConnector = web3Connectors[name].obj;
-                    const connected = currentConnector === connector;
+                  {Object.keys(web3Connectors).map(name => {
+                    const currentConnector = web3Connectors[name].obj
+                    const connected = currentConnector === connector
                     const disabled =
                       !triedEager ||
                       !!activatingConnector ||
                       connected ||
-                      !!error;
-                    const image = web3Connectors[name].logo;
-                    const title = web3Connectors[name].title;
+                      !!error
+                    const image = web3Connectors[name].logo
+                    const title = web3Connectors[name].title
 
                     return (
                       <ProviderButton
                         disabled={disabled}
                         key={name}
                         onClick={() => {
-                          setActivatingConnector(currentConnector);
-                          activate(currentConnector);
+                          setActivatingConnector(currentConnector)
+                          activate(currentConnector)
                         }}
                         border="#35c5f3"
                       >
@@ -371,7 +458,7 @@ export default function App() {
                           {title}
                         </Span>
                       </ProviderButton>
-                    );
+                    )
                   })}
                 </ItemH>
               </Item>
@@ -392,7 +479,7 @@ export default function App() {
         </ParentContainer>
       </NavigationContextProvider>
     </ThemeProvider>
-  );
+  )
 }
 
 // CSS STYLES
@@ -403,7 +490,7 @@ const HeaderContainer = styled.header`
   position: fixed;
   top: 0;
   z-index: 999;
-`;
+`
 
 const ParentContainer = styled.div`
   flex-wrap: wrap;
@@ -413,7 +500,7 @@ const ParentContainer = styled.div`
   flex: 1;
   background: ${props => props.theme.mainBg};
   margin: ${props => props.headerHeight}px 0px 0px 0px;
-`;
+`
 
 const LeftBarContainer = styled.div`
   left: 0;
@@ -433,13 +520,12 @@ const ContentContainer = styled.div`
   align-self: center;
   width: 100%;
 
-
   margin: 0px 0px 0px ${props => props.leftBarWidth}px;
 
   @media (max-width: 992px) {
     margin: 0px;
   }
-`;
+`
 
 const ProviderLogo = styled.img`
   width: 15vw;
@@ -447,7 +533,7 @@ const ProviderLogo = styled.img`
   display: flex;
   margin: 10px 20px 20px 20px;
   min-width: 200px;
-`;
+`
 
 const ProviderButton = styled.button`
   flex: 1 1 0;
@@ -473,17 +559,17 @@ const ProviderButton = styled.button`
   &:hover {
     opacity: 0.9;
     cursor: pointer;
-    border: 1px solid ${(props) => props.border};
+    border: 1px solid ${props => props.border};
   }
   &:active {
     opacity: 0.75;
     cursor: pointer;
-    border: 1px solid ${(props) => props.border};
+    border: 1px solid ${props => props.border};
   }
-`;
+`
 
 const ProviderImage = styled.img`
   width: 32px;
   max-height: 32px;
   padding: 10px;
-`;
+`

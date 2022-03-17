@@ -1,7 +1,7 @@
-import React from "react";
+import React, {useState} from "react";
 import { Section, Content, Item } from "components/SharedStyling";
 import { useSelector, useDispatch } from "react-redux";
-import styled, { css } from "styled-components";
+import styled, { css, useTheme } from 'styled-components';
 import { useWeb3React } from "@web3-react/core";
 import { toast as toaster } from "react-toastify";
 import { addresses, abis } from "@project/contracts";
@@ -13,6 +13,10 @@ import RemoveDelegateModal from "./RemoveDelegateModal";
 import ActivateChannelModal from "./ActivateChannelModal";
 import EPNSCoreHelper from "helpers/EPNSCoreHelper";
 import { setUserChannelDetails } from "redux/slices/adminSlice";
+
+import {ThemeProvider} from "styled-components";
+
+import { themeLight, themeDark } from "config/Themization";
 
 import "react-dropdown/style.css";
 import "react-toastify/dist/ReactToastify.min.css";
@@ -35,6 +39,11 @@ function ChannelSettings() {
     CHANNEL_BLOCKED_STATE,
     CHANNEL_ACTIVE_STATE,
   } = useSelector((state: any) => state.channels);
+
+  //Dark theme
+  const themes = useTheme();
+
+  const [darkMode, setDarkMode] = useState(false);
 
   const { channelState } = channelDetails;
   const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
@@ -230,8 +239,8 @@ function ChannelSettings() {
   }
 
   return (
-    <div>
-      <DropdownWrapper>
+    <ThemeProvider theme={themes}>
+      <DropdownWrapper bg={themes.mainBg}>
         <DeactivateButton
           isChannelDeactivated={isChannelDeactivated}
           onClick={toggleChannelActivationState}
@@ -320,7 +329,7 @@ function ChannelSettings() {
           removeDelegate={removeDelegate}
         />
       )}
-    </div>
+    </ThemeProvider>
   );
 }
 
