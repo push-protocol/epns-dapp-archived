@@ -14965,7 +14965,7 @@ prop-types@^15.0.0, prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.7.x:
     object-assign "^4.1.1"
     react-is "^16.8.1"
 
-prop-types@^15.5.10, prop-types@^15.5.6, prop-types@^15.6.0:
+prop-types@^15.5.10, prop-types@^15.5.6, prop-types@^15.6.0, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -15683,12 +15683,12 @@ react-use@^17.3.1:
     ts-easing "^0.2.0"
     tslib "^2.1.0"
 
-react-wavify@^1.5.4:
-  version "1.5.4"
-  resolved "https://registry.yarnpkg.com/react-wavify/-/react-wavify-1.5.4.tgz#99e4491262fccf464e7cd04417a5f335e1e6eda5"
-  integrity sha512-FYpTBpgEaW5fm0Vt7cbICwjP2Uiy9Oj6NGheyJ1tIM8ShcVBZD56ZrAGV2Ad/FyINUNbJxyAr4/yT6MFxwmanQ==
+react-wavify@^1.5.6:
+  version "1.5.6"
+  resolved "https://registry.yarnpkg.com/react-wavify/-/react-wavify-1.5.6.tgz#7a870cdbbfb939706215fe0a3c3421a1ff3ec5e4"
+  integrity sha512-n69xorrgzu1k+ICiWZGxYl8oVQDCwrPWhIHp52bZ63hJ2Iqc+gE7Qtox9BnOMAscgKAiwHo3R+3/6zKXb8qlCA==
   dependencies:
-    prop-types "^15.7.2"
+    prop-types "^15.8.1"
 
 react-waypoint@^9.0.3:
   version "9.0.3"
