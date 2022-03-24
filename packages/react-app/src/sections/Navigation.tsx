@@ -18,7 +18,6 @@ import {useSelector} from "react-redux";
 // Create Header
 function Navigation() {
     const { channelDetails } = useSelector((state: any) => state.admin);
-    console.log(channelDetails);
     const [loading, setLoading] = useState(false);
     const [ refresh, setRefresh ] = useState(false);
 
@@ -517,15 +516,17 @@ function Navigation() {
                 bg={theme.leftBarSocialBg}
               >
                 <Anchor
-                  title="Open Twitter"
-                  href="https://twitter.com/epnsproject"
-                  target="_blank"
-                  bg={theme.leftBarSocialIconBg}
-                  radius="4px"
-                  padding="10px"
-                  margin="5px"
+                title="Open Twitter"
+                href="https://twitter.com/epnsproject"
+                target="_blank"
+                bg={theme.leftBarSocialIconBg}
+                radius="4px"
+                padding="10px"
+                margin="5px"
+                onMouseOver={({ target }) => target.style.color = theme.color}
+                onMouseOut={({target})=>target.style.color = "fff"}
                 >
-                  <FaTwitter size={15} color="#fff"/>
+                  <FaTwitter size={15} color="fff" />
                 </Anchor>
                 <Anchor
                   title="Open Telegram"
@@ -535,6 +536,8 @@ function Navigation() {
                   radius="4px"
                   padding="10px"
                   margin="5px"
+                  onMouseOver={({ target }) => target.style.color = theme.color}
+                  onMouseOut={({target})=>target.style.color = "fff"}
                 >
                   <FaTelegramPlane size={15} color="#fff"/>
                 </Anchor>
@@ -546,6 +549,8 @@ function Navigation() {
                   radius="4px"
                   padding="10px"
                   margin="5px"
+                  onMouseOver={({ target }) => target.style.color = theme.color}
+                  onMouseOut={({target})=>target.style.color = "fff"}
                 >
                   <FaMedium size={15} color="#fff"/>
                 </Anchor>
@@ -557,6 +562,8 @@ function Navigation() {
                   radius="4px"
                   padding="10px"
                   margin="5px"
+                  onMouseOver={({ target }) => target.style.color = theme.color}
+                  onMouseOut={({target})=>target.style.color = "fff"}
                 >
                   <FaDiscord size={15} color="#fff"/>
                 </Anchor>
@@ -568,6 +575,8 @@ function Navigation() {
                   radius="4px"
                   padding="10px"
                   margin="5px"
+                  onMouseOver={({ target }) => target.style.color = theme.color}
+                  onMouseOut={({target})=>target.style.color = "fff"}
                 >
                   <FaGithub size={15} color={"#fff"}/>
                 </Anchor>
@@ -595,6 +604,23 @@ const Primary = styled(Item)`
   justify-content: flex-start;
   background: '#fff';
   overflow-y: scroll;
+  &::-webkit-scrollbar-track {
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-image: -webkit-gradient(linear,
+                       left top,
+                       left bottom,
+                       color-stop(0.44, #35c5f3),
+                       color-stop(0.72, #35b0f3),
+                       color-stop(0.86, #35a1f3));
+  }
   padding: 0px 0px 20px 0px;
 `
 
