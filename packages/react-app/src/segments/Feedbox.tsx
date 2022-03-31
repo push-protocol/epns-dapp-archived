@@ -82,7 +82,7 @@ function Feedbox() {
                 if(
                     ( (Filter.channels === undefined ?  true : (Filter.channels.includes(notif.channel)))&&
                 notif.epoch >= startDate && notif.epoch <= endDate
-                && await notif.message.toLowerCase().match(regex)!==null )
+                && (query === "" || (await notif.message.toLowerCase().match(regex)!==null)) )
                 )
                 filterNotif.push(notif);
             }
