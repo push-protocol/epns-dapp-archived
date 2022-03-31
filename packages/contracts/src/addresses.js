@@ -16,7 +16,14 @@ const addresses = {
   epnsLPToken: "0xaf31fd9c3b0350424bf96e551d2d1264d8466205",
 
   uniswapV2Router02: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
-  WETHAddress: "0xd0A1E359811322d97991E03f863a0C30C2cF029C",
-  USDTAddress: "0x13512979ade267ab5100878e2e0f485b568328a4", 
+
+  WETHAddress: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", // mainnet address
+  USDTAddress: "0xdac17f958d2ee523a2206206994597c13d831ec7", // mainnet address
+
+  rockstar: "0x3f8C2152b79276b78315CAF66cCF951780580A8a", //mainnet address
+  batchMintNFT: "0x6BaeeD93336B277D8949Cb89161269032698f443", //mainnet address
+  NFTRewards: "0xc4708BB6EC3B797344f123126171302e4e3E68E2", //mainnet address
+  distributor: "0x64CfAb2eA55ADAe08c9040fdA247828444fB9D0D", //mainnet address
 };
+
 export default addresses;
