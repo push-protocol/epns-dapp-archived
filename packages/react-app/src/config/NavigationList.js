@@ -142,29 +142,6 @@ const NavigationList = {
               }
             }
           },
-          developerGuide: {
-            uid: GLOBALS.CONSTANTS.NAVBAR_IDENTIFIERS.DEVELOPER_GUIDE,
-            src: "svg/tutorial.svg",
-            iconFactory: null,
-            name: "Developer's Guide",
-            title: "Developer's Guide",
-            alt: "Developer's Guide",
-            href: 'https://docs.epns.io/',
-            newTab: false,
-            isRoute: false,
-            hasMenuLogic: true,
-            headerTag: {
-              title: "Developer's Guide",
-              light: {
-                bg: GLOBALS.COLORS.GRADIENT_SECONDARY,
-                fg: themeLight.headerTagFg,
-              },
-              dark: {
-                bg: themeDark.headerTagBg,
-                fg: themeDark.headerTagFg,
-              }
-            }
-          },
           createTestChannel: {
             uid: GLOBALS.CONSTANTS.NAVBAR_IDENTIFIERS.CREATE_TEST_CHANNEL,
             src: "svg/news.svg",
@@ -178,6 +155,29 @@ const NavigationList = {
             hasMenuLogic: true,
             headerTag: {
               title: 'Create A Test Channel',
+              light: {
+                bg: GLOBALS.COLORS.GRADIENT_SECONDARY,
+                fg: themeLight.headerTagFg,
+              },
+              dark: {
+                bg: themeDark.headerTagBg,
+                fg: themeDark.headerTagFg,
+              }
+            }
+          },
+          developerGuide: {
+            uid: GLOBALS.CONSTANTS.NAVBAR_IDENTIFIERS.DEVELOPER_GUIDE,
+            src: "svg/tutorial.svg",
+            iconFactory: null,
+            name: "Developer's Guide",
+            title: "Developer's Guide",
+            alt: "Developer's Guide",
+            href: 'https://docs.epns.io/',
+            newTab: false,
+            isRoute: false,
+            hasMenuLogic: true,
+            headerTag: {
+              title: "Developer's Guide",
               light: {
                 bg: GLOBALS.COLORS.GRADIENT_SECONDARY,
                 fg: themeLight.headerTagFg,

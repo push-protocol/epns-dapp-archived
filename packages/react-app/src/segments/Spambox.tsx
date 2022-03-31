@@ -149,7 +149,7 @@ const Button = styled.div`
   justify-content: center;
   padding: 8px 15px;
   margin: 10px;
-  color:#fff;
+  color: #fff;
   border-radius: 5px;
   font-size: 14px;
   font-weight: 400;

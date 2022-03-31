@@ -44,10 +44,6 @@ function ChannelDashboardPage() {
 
   const [darkMode, setDarkMode] = useState(false);
 
-  const themes = useTheme();
-
-  const [darkMode, setDarkMode] = useState(false);
-
   const dispatch = useDispatch();
   const { account, library, chainId } = useWeb3React();
   const {
