@@ -1586,7 +1586,7 @@
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.2.5.tgz#8eed982e2ee6f7f4e44c253e12962980791efd46"
   integrity sha512-6U71C2Wp7r5XtFtQzYrW5iKFT67OixrSxjI4MptCHzdSVlgabczzqLe0ZSgnub/5Kp4hSbpDB1tMytZY9pwxxA==
 
-"@epnsproject/frontend-sdk-staging@^1.7.1":
+"@epnsproject/frontend-sdk-staging@1.7.1":
   version "1.7.1"
   resolved "https://registry.yarnpkg.com/@epnsproject/frontend-sdk-staging/-/frontend-sdk-staging-1.7.1.tgz#58e8ebeef76ed464ae0b780a3cb31c1e23e81097"
   integrity sha512-qvn4heEE1nTQap0RT73kDfdSMGU9J1m5uihUinUmALQlwnFN+K55qvm4+a2ycuNBfXgqqsUDIQMWxq8r16thAA==
@@ -15371,7 +15371,16 @@ prompts@^2.0.1:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@^15.0.0, prop-types@^15.5.10, prop-types@^15.5.6, prop-types@^15.6.0, prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.7.x, prop-types@^15.8.1:
+prop-types@^15.0.0, prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.7.x:
+  version "15.7.2"
+  resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
+  integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
+  dependencies:
+    loose-envify "^1.4.0"
+    object-assign "^4.1.1"
+    react-is "^16.8.1"
+
+prop-types@^15.5.10, prop-types@^15.5.6, prop-types@^15.6.0, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -16530,10 +16539,10 @@ react-use@^17.3.1, react-use@^17.3.2:
     ts-easing "^0.2.0"
     tslib "^2.1.0"
 
-react-wavify@^1.5.4:
-  version "1.5.7"
-  resolved "https://registry.yarnpkg.com/react-wavify/-/react-wavify-1.5.7.tgz#6182d23fdb7c3b6efb33f8906d0713337e54f2ca"
-  integrity sha512-sTVZffh4gus5nVhbKGi0InKFLliA4NHxj0ZmgeHbUUKaOxB8HMY+GS7pS7JoUFhyNGdXIU5n6o5br7bAfO74Bw==
+react-wavify@^1.5.6:
+  version "1.5.6"
+  resolved "https://registry.yarnpkg.com/react-wavify/-/react-wavify-1.5.6.tgz#7a870cdbbfb939706215fe0a3c3421a1ff3ec5e4"
+  integrity sha512-n69xorrgzu1k+ICiWZGxYl8oVQDCwrPWhIHp52bZ63hJ2Iqc+gE7Qtox9BnOMAscgKAiwHo3R+3/6zKXb8qlCA==
   dependencies:
     prop-types "^15.8.1"
 
