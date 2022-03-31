@@ -25,7 +25,7 @@ export default function SearchFilter(props)
     var uniqueOptions = [...new Map(options.map((item) => [item["value"], item])).values()];
     const [showFilter,setShowFilter] = useState(false); 
     const [selectedOption, setSelectedOption] = useState(uniqueOptions);
-    console.log(props.notifications);
+    // console.log(props.notifications);
 
     const reset = async () => {
         setStartDate(null);
