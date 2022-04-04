@@ -76,15 +76,19 @@ function Feedbox() {
             }
         }
         else{
-            const regex = new RegExp(`^.*?${query.toLowerCase()}.*?$`);
+            // const regex = new RegExp(`^.*?${query.toLowerCase()}.*?$`);
             let filterNotif = [];
+            // console.log(notifications)
+            // console.log(query);
+            // console.log(notifications[0].message.toLowerCase());
             for(const notif of notifications){
                 if(
                     ( (Filter.channels === undefined ?  true : (Filter.channels.includes(notif.channel)))&&
                 notif.epoch >= startDate && notif.epoch <= endDate
-                && (query === "" || (await notif.message.toLowerCase().match(regex)!==null)) )
+                && (query === "" || notif.message.toLowerCase().includes(query.toLowerCase())) )
                 )
                 filterNotif.push(notif);
+
             }
             setFilteredNotifications(filterNotif);
         }
