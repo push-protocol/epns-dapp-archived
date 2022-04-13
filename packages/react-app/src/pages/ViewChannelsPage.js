@@ -36,7 +36,7 @@ import { addNewNotification } from "redux/slices/notificationSlice";
 
 import GLOBALS from "config/Globals";
 
-export const ALLOWED_CORE_NETWORK = 42; //chainId of network which we have deployed the core contract on
+export const ALLOWED_CORE_NETWORK = 1; //chainId of network which we have deployed the core contract on
 const CHANNEL_TAB = 1; //Default to 1 which is the channel tab
 
 // Create Header
