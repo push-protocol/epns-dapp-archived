@@ -1,6 +1,6 @@
 import EPNSCoreHelper from "helpers/EPNSCoreHelper";
 import { ethers } from "ethers";
-// import { bigNumber } from "ethers/utils";
+import { bigNumber } from "ethers/utils";
 
 import { addresses, abis } from "@project/contracts";
 
@@ -299,7 +299,7 @@ export default class YieldFarmingDataStore {
     // get annual rewards
     const annualRewards = this.calcAnnualEpochReward(genesisEpochAmount, epochId, deprecationPerEpoch)
 
-    const apr = annualRewards.mul(1000000).div(Math.max(totalStaked, 1))
+    const apr = annualRewards.mul(1000000).div(totalStaked)
     const aprFormatted = (parseInt(apr.toString())/10000).toFixed(2)
 
     return aprFormatted
@@ -315,7 +315,7 @@ export default class YieldFarmingDataStore {
     // get annual rewards
     const annualRewards = this.calcAnnualEpochReward(genesisEpochAmount, epochId, deprecationPerEpoch)
 
-    const apr = annualRewards.mul(1000000).div(Math.max(totalStaked, 1))
+    const apr = annualRewards.mul(1000000).div(totalStaked)
     const aprFormatted = (parseInt(apr.toString())/(10000 * poolStats.lpToPushRatio)).toFixed(2)
 
     // console.log(annualRewards.toString(), genesisEpochAmount.toString())
