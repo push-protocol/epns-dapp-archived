@@ -163,9 +163,9 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
       setSubscribed(subscribed);
       setChannelJson({ ...channelJson, addr: channelObject.addr });
       if (
-        // channelObject.addr === "0xB88460Bb2696CAb9D66013A05dFF29a28330689D" && //production
+        // channelObject.addr === "0x2177cFc66474bBEce7Cbf114d780A5cfE78485De" && //development
         run &&
-        channelObject.addr === "0x2177cFc66474bBEce7Cbf114d780A5cfE78485De" && //development
+        channelObject.addr === "0xB88460Bb2696CAb9D66013A05dFF29a28330689D" && //production
         stepIndex === 3
       ) {
         console.log(channelObject.addr);

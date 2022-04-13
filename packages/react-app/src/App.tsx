@@ -64,10 +64,6 @@ export default function App() {
     tutorialContinous,
   } = useSelector((state: any) => state.userJourney);
   
-
-    const themes = useTheme();
-
-
   React.useEffect(()=>{
     const now = Date.now()/ 1000;
     setcurrentTime(now)

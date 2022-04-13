@@ -13,7 +13,6 @@ import navigationList from "config/NavigationList";
 import { NavigationContext } from "contexts/NavigationContext";
 
 import GLOBALS from "config/Globals";
-import {useSelector} from "react-redux";
 
 import { useDispatch, useSelector } from "react-redux";
 import {incrementStepIndex, decrementStepIndex, setRun, setDeveloperOpen , setTutorialContinous , setCommunicateOpen} from "../redux/slices/userJourneySlice";
