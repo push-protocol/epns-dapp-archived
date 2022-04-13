@@ -65,6 +65,9 @@ export default function App() {
   } = useSelector((state: any) => state.userJourney);
   
 
+    const themes = useTheme();
+
+
   React.useEffect(()=>{
     const now = Date.now()/ 1000;
     setcurrentTime(now)
@@ -318,11 +321,9 @@ const StyledItem = styled(Item)`
   line-height: 18px;
   align-items: center;
   width:44rem;
-
   span{
     color: #e20880;
   }
-
   @media(max-width:400px){
     width: auto;
   }

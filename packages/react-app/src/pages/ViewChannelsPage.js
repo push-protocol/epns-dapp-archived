@@ -5,7 +5,7 @@ import styled, { css, useTheme } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import Loader from "react-loader-spinner";
 import hex2ascii from "hex2ascii";
-import { addresses, abis } from "@project/contracts";
+import { addresses, abis, envConfig } from "@project/contracts";
 import { useWeb3React } from "@web3-react/core";
 
 import config from "config";
