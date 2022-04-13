@@ -1,39 +1,106 @@
-import React from "react";
-import styled, { css } from 'styled-components';
-import Blockies from "components/BlockiesIdenticon";
-import {Section, Content, Item, ItemH, ItemBreak, A, B, H1, H2, H3, Image, P, Span, Anchor, Button, Showoff, FormSubmision, Input, TextField} from 'components/SharedStyling';
-import { Device } from 'assets/Device';
+import React from "react"
+import styled, { css } from "styled-components"
+import Blockies from "components/BlockiesIdenticon"
+import {
+  Section,
+  Content,
+  Item,
+  ItemH,
+  ItemBreak,
+  A,
+  B,
+  H1,
+  H2,
+  H3,
+  Image,
+  P,
+  Span,
+  Anchor,
+  Button,
+  Showoff,
+  FormSubmision,
+  Input,
+  TextField,
+} from "components/SharedStyling"
+import { Device } from "assets/Device"
 
-import { ToastContainer, toast } from 'react-toastify';
-import EPNSCoreHelper from "helpers/EPNSCoreHelper";
-import 'react-toastify/dist/ReactToastify.min.css';
-import Loader from 'react-loader-spinner';
+import { ToastContainer, toast } from "react-toastify"
+import EPNSCoreHelper from "helpers/EPNSCoreHelper"
+import "react-toastify/dist/ReactToastify.min.css"
+import Loader from "react-loader-spinner"
 
-import Skeleton from '@yisheng90/react-loading';
-import { FiTwitter } from 'react-icons/fi';
-import { GoVerified } from 'react-icons/go';
-import { IoMdShareAlt } from 'react-icons/io';
+import Skeleton from "@yisheng90/react-loading"
+import { FiTwitter } from "react-icons/fi"
+import { GoVerified } from "react-icons/go"
+import { IoMdShareAlt } from "react-icons/io"
 
-import { addresses, abis } from "@project/contracts";
-import { useWeb3React } from '@web3-react/core';
-import { ethers } from "ethers";
-import { keccak256, arrayify, hashMessage, recoverPublicKey } from 'ethers/utils';
+import { addresses, abis } from "@project/contracts"
+import { useWeb3React } from "@web3-react/core"
+import { ethers } from "ethers"
+import {postReq} from "../api/index"
 
-function ViewDelegateeItem({ delegateeObject, epnsToken, pushBalance, theme }) {
-  const { account, library } = useWeb3React();
-  const [ loading, setLoading ] = React.useState(true);
-  const [ txInProgress, setTxInProgress ] = React.useState(false);
-  const [ isBalance, setIsBalance ] = React.useState(false);
+import {
+  keccak256,
+  arrayify,
+  hashMessage,
+  recoverPublicKey,
+} from "ethers/utils"
+
+import { createTransactionObject } from "../helpers/GaslessHelper"
+import { executeDelegateTx } from "../helpers/WithGasHelper"
+import Web3 from "web3"
+
+export const PUSH_BALANCE_TRESHOLD = 100 //minimum number of push
+export const GAS_LIMIT = 50 //dollars limit of gas;
+export const ERROR_TOAST_DEFAULTS = {
+  type: toast.TYPE.ERROR,
+  autoClose: 5000,
+  hideProgressBar: false,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: true,
+  progress: undefined,
+}
+
+function ViewDelegateeItem({
+  delegateeObject,
+  epnsToken,
+  pushBalance,
+  setGaslessInfo,
+  theme,
+  signerObject
+}) {
+  const { account, library } = useWeb3React()
+  const [loading, setLoading] = React.useState(true)
+  const [txLoading, setTxLoading] = React.useState(false)
+  const [txInProgress, setTxInProgress] = React.useState(false)
+  const [isBalance, setIsBalance] = React.useState(false)
+  const [transactionMode, setTransactionMode] = React.useState("gasless")
+
+  const provider = new Web3.providers.HttpProvider(
+    "https://mainnet.infura.io/v3/4ff53a5254144d988a8318210b56f47a"
+  )
+  var web3 = new Web3(provider)
+  var ens = web3.eth.ens
 
   React.useEffect(() => {
-    setLoading(false);
-    if(pushBalance !== 0){
+    setLoading(false)
+    if (pushBalance !== 0) {
       setIsBalance(true)
     }
-  }, [account, delegateeObject]);
+  }, [account, delegateeObject])
 
-  const delegateAction = async (delegateeAddress) => {
-    setTxInProgress(true);
+  const checkForDelegateError = async gasEstimate => {
+    const gasPrice = await EPNSCoreHelper.getGasPriceInDollars(library)
+    const totalCost = gasPrice * gasEstimate
+    if (totalCost > GAS_LIMIT) {
+      return "Gas Price is too high, Please try again in a while."
+    }
+    return false
+  }
+
+  const delegateAction = async delegateeAddress => {
+    setTxInProgress(true)
     if (!isBalance) {
       toast.dark("No PUSH to Delegate!", {
         position: "bottom-right",
@@ -44,44 +111,46 @@ function ViewDelegateeItem({ delegateeObject, epnsToken, pushBalance, theme }) {
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-      });
+      })
 
-      setTxInProgress(false);
-      return;
+      setTxInProgress(false)
+      return
     }
-    let sendWithTxPromise;
-    sendWithTxPromise = epnsToken.delegate(delegateeAddress);
+    let sendWithTxPromise
+    sendWithTxPromise = epnsToken.delegate(delegateeAddress)
     sendWithTxPromise
       .then(async tx => {
-        let txToast = toast.dark(<LoaderToast msg="Waiting for Confirmation..." color="#35c5f3"/>, {
-          position: "bottom-right",
-          autoClose: false,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+        let txToast = toast.dark(
+          <LoaderToast msg="Waiting for Confirmation..." color="#35c5f3" />,
+          {
+            position: "bottom-right",
+            autoClose: false,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          }
+        )
         try {
-          await library.waitForTransaction(tx.hash);
+          await library.waitForTransaction(tx.hash)
           toast.update(txToast, {
             render: "Transaction Completed!",
             type: toast.TYPE.SUCCESS,
-            autoClose: 5000
-          });
-          setTxInProgress(false);
-        }
-        catch(e) {
+            autoClose: 5000,
+          })
+          setTxInProgress(false)
+        } catch (e) {
           toast.update(txToast, {
             render: "Transaction Failed! (" + e.name + ")",
             type: toast.TYPE.ERROR,
-            autoClose: 5000
-          });
-          setTxInProgress(false);
+            autoClose: 5000,
+          })
+          setTxInProgress(false)
         }
       })
       .catch(err => {
-        toast.dark('Transaction Cancelled!', {
+        toast.dark("Transaction Cancelled!", {
           position: "bottom-right",
           type: toast.TYPE.ERROR,
           autoClose: 5000,
@@ -90,47 +159,99 @@ function ViewDelegateeItem({ delegateeObject, epnsToken, pushBalance, theme }) {
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-        });
-        setTxInProgress(false);
+        })
+        setTxInProgress(false)
       })
+
+    setTxLoading(true)
+    if (transactionMode === "withgas") {
+      await executeDelegateTx(
+        delegateeAddress,
+        epnsToken,
+        toast,
+        setTxLoading,
+        library,
+        LoaderToast
+      )
+      setTxInProgress(false)
+      return
+    }
+
+    if (pushBalance < PUSH_BALANCE_TRESHOLD) {
+      // await  executeDelegateTx(delegateeAddress,epnsToken,toast,setTxLoading,library,LoaderToast)
+      toast.dark("Atleast " + PUSH_BALANCE_TRESHOLD +" PUSH required for gasless delegation!", {
+        position: "bottom-right",
+        type: toast.TYPE.ERROR,
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      setTxLoading(false);
+      setTxInProgress(false);
+      return;
+    }
+
+    if(!web3.utils.isAddress(delegateeAddress))
+    delegateeAddress = await ens.getAddress(delegateeAddress);
+    await createTransactionObject(delegateeAddress,account,epnsToken,addresses,signerObject,library,setTxLoading);
+    setTxInProgress(false);
+    postReq('/gov/prev_delegation',{"walletAddress": account}).then(res=>{
+      console.log("result",res.data.user)
+      setGaslessInfo(res.data.user);
+    }
+    ).catch(e=>{
+      setTxInProgress(false);
+      toast.dark(e, {
+        position: "bottom-right",
+        type: toast.TYPE.ERROR,
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }).finally(()=>{
+      setTxInProgress(false);
+
+    })
   }
 
   // toast customize
   const LoaderToast = ({ msg, color }) => (
     <Toaster>
-      <Loader
-       type="Oval"
-       color={color}
-       height={30}
-       width={30}
-      />
+      <Loader type="Oval" color={color} height={30} width={30} />
       <ToasterMsg>{msg}</ToasterMsg>
     </Toaster>
   )
 
   // render
   return (
-    <Item
-      key={delegateeObject.wallet}
-    >
-      <DelegateeItem
-        theme={theme}
-      >
+    <Item key={delegateeObject.wallet}>
+      <DelegateeItem theme={theme}>
         <DelegateeImageOuter>
           <DelegateeImageInner>
-            {loading &&
-              <Skeleton color="#eee" width="100%" height="100%" />
-            }
-            {!loading && delegateeObject.pic &&
+            {loading && <Skeleton color="#eee" width="100%" height="100%" />}
+            {!loading && delegateeObject.pic && (
               <Image
                 src={`./delegatees/${delegateeObject.pic}.jpg`}
                 srcSet={`./delegatees/${delegateeObject.pic}@2x.jpg 2x, ./delegatees/${delegateeObject.pic}@3x.jpg 3x`}
-                alt= {delegateeObject.name}
+                alt={delegateeObject.name}
               />
-            }
-            {!loading && !delegateeObject.pic &&
-              <Blockies seed={delegateeObject.wallet.toLowerCase()} opts={{seed: delegateeObject.wallet.toLowerCase(), size: 30, scale: 10}}/>
-            }
+            )}
+            {!loading && !delegateeObject.pic && (
+              <Blockies
+                seed={delegateeObject.wallet.toLowerCase()}
+                opts={{
+                  seed: delegateeObject.wallet.toLowerCase(),
+                  size: 30,
+                  scale: 10,
+                }}
+              />
+            )}
           </DelegateeImageInner>
 
           <ItemH
@@ -141,15 +262,26 @@ function ViewDelegateeItem({ delegateeObject, epnsToken, pushBalance, theme }) {
             padding="6px 10px"
             radius="22px"
           >
-            <GoVerified size={12} color="#fff"/>
-            <Span size="12px" color="#fff" padding="0px 0px 0px 10px" spacing="0.2em" weight="600" textAlign="center">{delegateeObject.votingPower.toLocaleString()}</Span>
+            <GoVerified size={12} color="#fff" />
+            <Span
+              size="12px"
+              color="#fff"
+              padding="0px 0px 0px 10px"
+              spacing="0.2em"
+              weight="600"
+              textAlign="center"
+            >
+              {delegateeObject.votingPower.toLocaleString()}
+            </Span>
           </ItemH>
         </DelegateeImageOuter>
 
         <DelegateeProfile>
           <Item>
             <ItemH>
-              <Span weight="400" textAlign="center">{delegateeObject.name}</Span>
+              <Span weight="400" textAlign="center">
+                {delegateeObject.name}
+              </Span>
               <Anchor
                 href={delegateeObject.url}
                 target="_blank"
@@ -163,21 +295,28 @@ function ViewDelegateeItem({ delegateeObject, epnsToken, pushBalance, theme }) {
               </Anchor>
             </ItemH>
 
-            <DelegateeWallet size="0.5em" color="#aaa" spacing="0.2em" weight="600" textAlign="center">{delegateeObject.wallet}</DelegateeWallet>
+            <DelegateeWallet
+              size="0.5em"
+              color="#aaa"
+              spacing="0.2em"
+              weight="600"
+              textAlign="center"
+            >
+              {delegateeObject.wallet}
+            </DelegateeWallet>
           </Item>
           <ItemBreak></ItemBreak>
-          <UnsubscribeButton >
-            <ActionTitle onClick={() => {delegateAction(delegateeObject.wallet)
-            }}
-              >Delegate</ActionTitle>
+          <UnsubscribeButton>
+            <ActionTitle
+              onClick={() => {
+                delegateAction(delegateeObject.wallet)
+              }}
+            >
+              Delegate
+            </ActionTitle>
           </UnsubscribeButton>
 
-          <Item
-            position="absolute"
-            bottom="2px"
-            left="-2px"
-            padding="4px"
-          >
+          <Item position="absolute" bottom="2px" left="-2px" padding="4px">
             <Anchor
               href={delegateeObject.forum}
               target="_blank"
@@ -192,7 +331,7 @@ function ViewDelegateeItem({ delegateeObject, epnsToken, pushBalance, theme }) {
         </DelegateeProfile>
       </DelegateeItem>
     </Item>
-  );
+  )
 }
 
 // css styles
@@ -226,13 +365,16 @@ const DelegateeItem = styled.div`
   position: relative;
 
   &:before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: ${props => props.theme == "nominee" ? "#35c5f3" : "linear-gradient( 283deg, #34c5f2 0%, #e20880 45%, #35c5f3 100%)"};
+    background: ${props =>
+      props.theme == "nominee"
+        ? "#35c5f3"
+        : "linear-gradient( 283deg, #34c5f2 0%, #e20880 45%, #35c5f3 100%)"};
   }
 `
 
@@ -309,24 +451,28 @@ const ChannelActionButton = styled.button`
     cursor: pointer;
     pointer: hand;
   }
-  ${ props => props.disabled && css`
-    &:hover {
-      opacity: 1;
-      cursor: default;
-      pointer: default;
-    }
-    &:active {
-      opacity: 1;
-      cursor: default;
-      pointer: default;
-    }
-  `}
+  ${props =>
+    props.disabled &&
+    css`
+      &:hover {
+        opacity: 1;
+        cursor: default;
+        pointer: default;
+      }
+      &:active {
+        opacity: 1;
+        cursor: default;
+        pointer: default;
+      }
+    `}
 `
 
 const ActionTitle = styled.span`
-  ${ props => props.hideit && css`
-    visibility: hidden;
-  `};
+  ${props =>
+    props.hideit &&
+    css`
+      visibility: hidden;
+    `};
 `
 
 const ActionLoader = styled.div`
@@ -420,7 +566,7 @@ const Blocky = styled.div`
   overflow: hidden;
   transform: scale(0.85);
   outline-width: 2px;
-  outline-color: rgba(225,225,225,1);
+  outline-color: rgba(225, 225, 225, 1);
 `
 // Export Default
-export default ViewDelegateeItem;
+export default ViewDelegateeItem

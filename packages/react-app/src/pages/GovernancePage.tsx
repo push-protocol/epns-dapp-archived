@@ -7,11 +7,14 @@ import Loader from 'react-loader-spinner'
 import { Waypoint } from "react-waypoint";
 import { BsChevronExpand } from 'react-icons/bs';
 import { ToastContainer, toast } from 'react-toastify';
+import InfoTooltip from "components/InfoTooltip"
 
 import { useWeb3React } from '@web3-react/core'
 import { addresses, abis } from "@project/contracts";
 import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
 import { ethers } from "ethers";
+import {postReq} from "../api/index"
+
 
 import Blockies from "components/BlockiesIdenticon";
 
@@ -20,13 +23,19 @@ import {ThemeProvider} from "styled-components";
 
 import { themeLight, themeDark } from "config/Themization";
 
-
+import {
+  GAS_LIMIT,
+  PUSH_BALANCE_TRESHOLD,
+  ERROR_TOAST_DEFAULTS,
+} from "../components/ViewDelegateeItem"
 
 import DisplayNotice from "components/DisplayNotice";
 import ViewDelegateeItem from "components/ViewDelegateeItem";
 
 import ChannelsDataStore, { ChannelEvents } from "singletons/ChannelsDataStore";
 import UsersDataStore, { UserEvents } from "singletons/UsersDataStore";
+import {createTransactionObject} from '../helpers/GaslessHelper';
+import {executeDelegateTx} from '../helpers/WithGasHelper';
 
 const delegateesJSON = require("config/delegatees.json")
 const VOTING_TRESHOLD = 75000; //the treshold for delegates
@@ -68,6 +77,12 @@ function GovernancePage({ epnsReadProvider, epnsWriteProvide }) {
   const [selfVotingPower, setSelfVotingPower ] = React.useState(null);
   const [newDelegateeAddress, setNewDelegateeAddress ] = React.useState("0x");
   const [newDelegateeVotingPower, setNewDelegateeVotingPower ] = React.useState(null);
+  const [gaslessInfo,setGaslessInfo]=useState(null);
+  const [signerObject, setSignerObject] = React.useState(null);
+  const [transactionMode,setTransactionMode] = React.useState('gasless');
+
+
+
 
   const toggleShowAnswer = (id) => {
     let newShowAnswers = [...showAnswers];
@@ -103,6 +118,7 @@ function GovernancePage({ epnsReadProvider, epnsWriteProvide }) {
     console.log(account)
     if (!!(library && account)) {
       let signer = library.getSigner(account);
+      setSignerObject(signer)
       const epnsTokenContract = new ethers.Contract(addresses.epnsToken, abis.epnsToken, signer);
       setEpnsToken(epnsTokenContract);
     }
@@ -211,10 +227,12 @@ function GovernancePage({ epnsReadProvider, epnsWriteProvide }) {
 
     const isAddress = await isValidAddress(newDelegatee)
     console.log(isAddress)
-    if(!isAddress){
+    if (!isAddress) {
       setTxInProgress(false);
       return;
     }
+    console.log("balance",tokenBalance);
+   
     if (tokenBalance == 0) {
       toast.dark("No PUSH to Delegate!", {
         position: "bottom-right",
@@ -229,58 +247,52 @@ function GovernancePage({ epnsReadProvider, epnsWriteProvide }) {
       setTxInProgress(false);
       return;
     }
-
-    let sendWithTxPromise;
-    sendWithTxPromise = epnsToken.delegate(newDelegatee);
-    sendWithTxPromise
-      .then(async tx => {
-
-        let txToast = toast.dark(<LoaderToast msg="Waiting for Confirmation..." color="#35c5f3"/>, {
-          position: "bottom-right",
-          autoClose: false,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-
-        try {
-          await library.waitForTransaction(tx.hash);
-
-          toast.update(txToast, {
-            render: "Transaction Completed!",
-            type: toast.TYPE.SUCCESS,
-            autoClose: 5000
-          });
-
-          setTxInProgress(false);
-          setShowDelegateePrompt(false);
-        }
-        catch(e) {
-          toast.update(txToast, {
-            render: "Transaction Failed! (" + e.name + ")",
-            type: toast.TYPE.ERROR,
-            autoClose: 5000
-          });
-
-          setTxInProgress(false);
-        }
-      })
-      .catch(err => {
-        toast.dark('Transaction Cancelled!', {
-          position: "bottom-right",
-          type: toast.TYPE.ERROR,
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-
-        setTxInProgress(false);
-      })
+    
+    if(transactionMode === 'withgas'){
+      executeDelegateTx(newDelegatee,epnsToken,toast,setTxInProgress,library,LoaderToast)
+      return;
+    }
+    if (tokenBalance < PUSH_BALANCE_TRESHOLD) {
+      toast.dark("Atleast " + PUSH_BALANCE_TRESHOLD +" PUSH required for gasless delegation!", {
+        position: "bottom-right",
+        type: toast.TYPE.ERROR,
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      setTxInProgress(false);
+      return;
+    }
+    await createTransactionObject(newDelegatee,account,epnsToken,addresses,signerObject,library,setTxInProgress);
+    postReq('/gov/prev_delegation',{"walletAddress": account}).then(res=>{
+      console.log("result",res.data.user)
+      setGaslessInfo(res.data.user);
+      // toast.dark("Successfully Fetched Prev Delegation Data", {
+      //   position: "bottom-right",
+      //   type: toast.TYPE.SUCCESS,
+      //   autoClose: 5000,
+      //   hideProgressBar: false,
+      //   closeOnClick: true,
+      //   pauseOnHover: true,
+      //   draggable: true,
+      //   progress: undefined,
+      // });
+    }
+    ).catch(e=>{
+      toast.dark(e, {
+        position: "bottom-right",
+        type: toast.TYPE.ERROR,
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    })
   }
 
 
@@ -363,6 +375,134 @@ function GovernancePage({ epnsReadProvider, epnsWriteProvide }) {
                         <CurvedSpan bg="#35c5f3" color="#fff" weight="600" padding="4px 8px" textTransform="uppercase">{selfVotingPower}</CurvedSpan>
                       </ItemH>
 
+                      <Item self="stretch" align="flex-end">
+                    <ItemH>
+                      <RadioGroup>
+                        <div style={{ marginRight: "0px" }}>
+                          <input
+                            type="radio"
+                            id="gasless"
+                            checked={transactionMode == "gasless"}
+                            name="gasless"
+                            value="gasless"
+                            onChange={e => setTransactionMode(e.target.value)}
+                          />{" "}
+                          <br />
+                          <Label>
+                            <div style={{ width: "2rem" }}>
+                              {" "}
+                              Gasless{" "}
+                              <InfoTooltip
+                                Infocolor={"gray"}
+                                title={
+                                  "Delegate your PUSH votes without paying gas fee.   " +
+                                  "Conditions: " +
+                                  "Wallet address must hold at least 100 PUSH." +
+                                  "Gasless delegation is enabled only when the gas fee is less than $50" +
+                                  "Once delegated, the same wallet address could do gasless delegation again only after 7 days"
+                                }
+                              />{" "}
+                            </div>
+                          </Label>
+                          <br />
+                        </div>
+                        <div style={{ width: "8rem" }}>
+                          <input
+                            type="radio"
+                            id="withgas"
+                            checked={transactionMode == "withgas"}
+                            name="gas"
+                            value="withgas"
+                            onChange={e => setTransactionMode(e.target.value)}
+                          />
+                          <Label>
+                            {" "}
+                            <div style={{ width: "5rem" }}>
+                              {" "}
+                              With Gas{" "}
+                              <InfoTooltip
+                                Infocolor={"gray"}
+                                title={
+                                  "Delegate you PUSH votes by paying gas fee"
+                                }
+                              />{" "}
+                            </div>
+                          </Label>
+                          <br />
+                        </div>
+                      </RadioGroup>
+                      {!txInProgress && (
+                        <ButtonAlt
+                          bg={txInProgress ? "#999" : "#e20880"}
+                          disabled={txInProgress ? true : false}
+                          onClick={() => {
+                            if (showDelegateePrompt) {
+                              delegateAction(newDelegateeAddress)
+                            } else {
+                              setShowDelegateePrompt(true)
+                            }
+                          }}
+                        >
+                          <Span color="#fff" weight="400">
+                            Delegate to Others
+                          </Span>
+                        </ButtonAlt>
+                      )}
+                      {!showDelegateePrompt && !txInProgress && (
+                        <ButtonAlt
+                          bg={txInProgress ? "#999" : "#51CAF3"}
+                          disabled={txInProgress ? true : false}
+                          onClick={() => {
+                            delegateAction(account)
+                          }}
+                        >
+                          <Span color="#fff" weight="400">
+                            Delegate to Myself
+                          </Span>
+                        </ButtonAlt>
+                      )}
+
+                      <ButtonAlt
+                        bg={"#000"}
+                        onClick={() => {
+                          if (showDelegateePrompt) {
+                            getVotingPower(newDelegateeAddress)
+                          } else {
+                            setShowDelegateePrompt(true)
+                          }
+                        }}
+                      >
+                        {txInProgress ? (
+                          <ActionTitle>
+                            <Loader
+                              type="Oval"
+                              color="#35c5f3"
+                              height={20}
+                              width={20}
+                            />
+                          </ActionTitle>
+                        ) : (
+                          <Span color="#fff" weight="400">
+                            Query Voting Power
+                          </Span>
+                        )}
+                      </ButtonAlt>
+
+                      {showDelegateePrompt && (
+                        <ButtonAlt
+                          bg="#000"
+                          onClick={() => {
+                            setShowDelegateePrompt(false)
+                          }}
+                        >
+                          <Span color="#fff" weight="400">
+                            Close
+                          </Span>
+                        </ButtonAlt>
+                      )}
+                    </ItemH>
+                  </Item>
+
                       {delegatee !== "0x0000000000000000000000000000000000000000" &&
                         <ItemH flex="initial" padding="5px">
                           <Span padding="0px 8px 0px 0px">Delegated To: </Span>
@@ -403,7 +543,7 @@ function GovernancePage({ epnsReadProvider, epnsWriteProvide }) {
                     </Item>
                   }
 
-                  <Item self="stretch" align="flex-end">
+                  {/* <Item self="stretch" align="flex-end">
                     <ItemH>
 
                       <ButtonAlt
@@ -457,7 +597,7 @@ function GovernancePage({ epnsReadProvider, epnsWriteProvide }) {
                       }
                     </ItemH>
 
-                  </Item>
+                  </Item> */}
                 </StatsContent>
                 <StatsPreview color="#e20880">MY INFO</StatsPreview>
               </StatsCard>
@@ -493,6 +633,8 @@ function GovernancePage({ epnsReadProvider, epnsWriteProvide }) {
                             delegateeObject={onePushNominee}
                             epnsToken={epnsToken}
                             pushBalance={tokenBalance}
+                            signerObject={signerObject}
+                            setGaslessInfo={setGaslessInfo}
                             theme="nominee"
                           />
                         )
@@ -547,6 +689,8 @@ function GovernancePage({ epnsReadProvider, epnsWriteProvide }) {
                       delegateeObject={oneDelegatee}
                       epnsToken={epnsToken}
                       pushBalance={tokenBalance}
+                      signerObject={signerObject}
+                      setGaslessInfo={setGaslessInfo}
                       theme="delegate"
                     />
                     </>
@@ -1070,6 +1214,22 @@ const Wallet = styled.span`
     cursor: pointer;
     pointer: hand;
   }
+`
+const RadioGroup = styled.div`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 300px;
+  margin: 0px 20px;
+  div {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100px;
+  }
+`
+const Label = styled.label`
+  margin: "10px";
 `
 
 // Export Default
