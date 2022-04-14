@@ -1,4 +1,6 @@
 import React, {useState} from "react";
+import { envConfig } from "@project/contracts";
+
 import ReactGA from "react-ga";
 
 import { Web3Provider } from "ethers/providers";
@@ -80,7 +82,7 @@ export default function App() {
   useInactiveListener(!triedEager || !!activatingConnector);
 
   // Initialize GA
-  ReactGA.initialize("UA-165415629-5");
+  ReactGA.initialize(envConfig.googleAnalyticsId);
   ReactGA.pageview("/login");
   // Initialize GA
 
