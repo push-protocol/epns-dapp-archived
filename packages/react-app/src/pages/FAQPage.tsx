@@ -188,7 +188,7 @@ function ComingSoonPage(props) {
 
             <Item align="stretch" justify="flex-start" margin="0px 0px 0px 0px">
               <H2 textTransform="uppercase" spacing="0.1em" margin="30px 0px 20px 0px" size="1.6rem">
-                <Span weight="600" padding="0px 8px" bg="#E20880" color="#fff">For Channels</Span>
+                <Span weight="600" padding="0px 8px" bg="#E20880" color="#fff">For Developers</Span>
               </H2>
             </Item>
 
