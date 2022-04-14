@@ -421,6 +421,28 @@ const NavigationList = {
               }
             }
           }, 
+          quickGuide: {
+            src: "svg/tutorial.svg",
+            iconFactory: null,
+            name: "Quick Guide",
+            title: "Quick Guide",
+            alt: "Quick Guide",
+            href: 'https://getstarted.epns.io/',
+            newTab: false,
+            isRoute: false,
+            hasMenuLogic: false,
+            headerTag: {
+              title: "Quick Guide",
+              light: {
+                bg: GLOBALS.COLORS.GRADIENT_SECONDARY,
+                fg: themeLight.headerTagFg,
+              },
+              dark: {
+                bg: themeDark.headerTagBg,
+                fg: themeDark.headerTagFg,
+              }
+            }
+          },
         }
         
       }
