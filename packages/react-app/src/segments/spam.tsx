@@ -34,6 +34,8 @@ function SpamBox({ currentTab }) {
 
   const [darkMode, setDarkMode] = useState(false);
 
+  const { run } = useSelector((state: any) => state.userJourney);
+
   const { notifications, page, finishedFetching } = useSelector((state: any) => state.spam);
   const { toggle } = useSelector(
     (state: any) => state.notifications
@@ -110,7 +112,7 @@ function SpamBox({ currentTab }) {
 }
 
   const loadNotifications = async () => {
-    if (loading || finishedFetching) return;
+    if (loading || finishedFetching  || run) return;
     setLoading(true);
     try {
       const { count, results } = await api.fetchSpamNotifications(
@@ -148,7 +150,7 @@ function SpamBox({ currentTab }) {
   };
 
   const fetchLatestNotifications = async () => {
-    if (loading || bgUpdateLoading) return;
+    if (loading || bgUpdateLoading  || run) return;
     setBgUpdateLoading(true);
     setLoading(true);
 
@@ -225,8 +227,10 @@ function SpamBox({ currentTab }) {
           return { ...elem };
         });
       parsedResponse = await Promise.all(parsedResponsePromise);
+
       let res = parsedResponse.filter( notif => !isSubscribedFn(notif.subscribers));
       setNotif(res);
+
 
     } catch (err) {
       console.log(err);
@@ -313,7 +317,7 @@ function SpamBox({ currentTab }) {
         )}
         {notifications && (
           <Items id="scrollstyle-secondary">
-            {(filter? filteredNotifications : notifications).map((oneNotification, index) => {
+            {(filter && !run ? filteredNotifications : notifications).map((oneNotification, index) => {
               const {
                 cta,
                 title,
@@ -325,6 +329,7 @@ function SpamBox({ currentTab }) {
                 subscribers,
               } = oneNotification;
               // render the notification item
+              // console.log(app , index);
               return (
                 <div key={index}>
                   {showWayPoint(index) && !loading && (

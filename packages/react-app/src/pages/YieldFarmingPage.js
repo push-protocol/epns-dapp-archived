@@ -337,12 +337,9 @@ const Container = styled.div`
 const StatsCard = styled(Item)`
   overflow: hidden;
   min-width: 180px;
-
   border-radius: 12px;
   border: 1px solid rgb(225, 225, 225);
-
   margin: 0px 15px;
-
   &:hover {
     opacity: 0.9;
   }
