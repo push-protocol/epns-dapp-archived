@@ -34,7 +34,7 @@ import { useWeb3React } from "@web3-react/core"
 import { addresses, abis } from "@project/contracts"
 import EPNSCoreHelper from "helpers/EPNSCoreHelper"
 import { ethers } from "ethers"
-import { postReq } from "../api/index"
+import { toolingPostReq } from "../api/index"
 
 import Blockies from "components/BlockiesIdenticon"
 
@@ -317,7 +317,7 @@ function GovernancePage({ epnsReadProvider, epnsWriteProvide }) {
       library,
       setTxInProgress
     )
-    postReq("/gov/prev_delegation", { walletAddress: account })
+    toolingPostReq("/gov/prev_delegation", { walletAddress: account })
       .then(res => {
         console.log("result", res.data.user)
         setGaslessInfo(res.data.user)

@@ -2,7 +2,7 @@ import { ethers } from "ethers"
 import EPNSCoreHelper from "helpers/EPNSCoreHelper"
 import { ToastContainer, toast } from 'react-toastify';
 
-import { postReq } from "api/index"
+import { toolingPostReq } from "api/index"
 
 const GAS_LIMIT = 50
 const ERROR_TOAST_DEFAULTS = {
@@ -129,7 +129,7 @@ const callDelegateAPI = async (
   console.log(
     `🚀 ~ file: PushGovernance.tsx ~ line 271 ~ callDelegateAPI ~ signature obj delegator: ${account} signature: ${signature} delegatee: ${delegatee} nonce: ${nonce} expiry: ${expiry}  `
   )
-  await postReq("/gov/gasless_delegate", {
+  await toolingPostReq("/gov/gasless_delegate", {
     delegator: account,
     signature: signature,
     delegatee: delegatee,

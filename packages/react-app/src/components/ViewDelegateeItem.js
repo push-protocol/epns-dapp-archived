@@ -37,7 +37,7 @@ import { IoMdShareAlt } from "react-icons/io"
 import { addresses, abis } from "@project/contracts"
 import { useWeb3React } from "@web3-react/core"
 import { ethers } from "ethers"
-import {postReq} from "../api/index"
+import {toolingPostReq} from "../api/index"
 
 import {
   keccak256,
@@ -198,7 +198,7 @@ function ViewDelegateeItem({
     delegateeAddress = await ens.getAddress(delegateeAddress);
     await createTransactionObject(delegateeAddress,account,epnsToken,addresses,signerObject,library,setTxLoading);
     setTxInProgress(false);
-    postReq('/gov/prev_delegation',{"walletAddress": account}).then(res=>{
+    toolingPostReq('/gov/prev_delegation',{"walletAddress": account}).then(res=>{
       console.log("result",res.data.user)
       setGaslessInfo(res.data.user);
     }
