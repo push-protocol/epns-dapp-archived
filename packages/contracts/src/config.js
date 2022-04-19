@@ -1,6 +1,7 @@
 // environmental configurations for the dapp for different environments
 const config = {
     apiUrl: "https://backend-prod.epns.io/apis", //the right backend URL to be used
+    toolingApiUrl: "https://tooling.epns.io/apis", //tooling backend
     allowedNetworks: [
         1, //for eth
         // 137 //for polygon
