@@ -128,7 +128,7 @@ export default function App() {
     };
   });
 
-  const steps = UserJourneySteps();
+  const steps = UserJourneySteps({darkMode});
 
   const handleJoyrideCallback = (data: CallBackProps) => {
     // console.log(data)
