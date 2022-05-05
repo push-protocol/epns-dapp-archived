@@ -33,7 +33,7 @@ import Loader from "react-loader-spinner";
 
 import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
 
-import {ThemeProvider} from "styled-components";
+import { ThemeProvider } from "styled-components";
 
 import { themeLight, themeDark } from "config/Themization";
 
@@ -67,10 +67,28 @@ function CreateChannel() {
   const [channelURL, setChannelURL] = React.useState("");
   const [channelFile, setChannelFile] = React.useState(undefined);
   const [channelStakeFees, setChannelStakeFees] = React.useState(minStakeFees);
-
+  const [daiAmountVal, setDaiAmountVal] = useState("");
   const [stepFlow, setStepFlow] = React.useState(1);
 
-  React.useEffect(() => {});
+  //checking DAI for user
+  React.useEffect(() => {
+    const checkDaiFunc = async () => {
+      let checkDaiAmount = new ethers.Contract(
+        addresses.dai,
+        abis.dai,
+        library
+      );
+
+      let value = await checkDaiAmount.allowance(account, addresses.epnscore);
+      value = value?.toString();
+      const convertedVal = ethers.utils.formatEther(value);
+      setDaiAmountVal(convertedVal);
+      if (convertedVal >= 50.0) {
+        setChannelStakeFees(convertedVal);
+      }
+    };
+    checkDaiFunc();
+  }, []);
 
   // called every time a file's `status` changes
   const handleChangeStatus = ({ meta, file }, status) => {
@@ -215,15 +233,19 @@ function CreateChannel() {
 
     // Pick between 50 DAI AND 25K DAI
     const fees = ethers.utils.parseUnits(channelStakeFees.toString(), 18);
+    if (daiAmountVal < 50.0) {
+      var sendTransactionPromise = daiContract.approve(
+        addresses.epnscore,
+        fees
+      );
+      const tx = await sendTransactionPromise;
 
-    var sendTransactionPromise = daiContract.approve(addresses.epnscore, fees);
-    const tx = await sendTransactionPromise;
+      console.log(tx);
+      console.log("waiting for tx to finish");
+      setProcessingInfo("Waiting for Approval TX to finish...");
 
-    console.log(tx);
-    console.log("waiting for tx to finish");
-    setProcessingInfo("Waiting for Approval TX to finish...");
-
-    await library.waitForTransaction(tx.hash);
+      await library.waitForTransaction(tx.hash);
+    }
 
     let contract = new ethers.Contract(
       addresses.epnscore,
@@ -240,29 +262,29 @@ function CreateChannel() {
       identityBytes,
       fees,
       {
-        gasLimit: 1000000
+        gasLimit: 1000000,
       }
     );
 
     setProcessingInfo("Creating Channel TX in progress");
     anotherSendTxPromise
-    .then(async function (tx) {
-      console.log(tx);
-      console.log("Check: " + account);
-      await library.waitForTransaction(tx.hash);
-      setProcessing(3);
-      setProcessingInfo("Channel Created! Reloading...");
+      .then(async function(tx) {
+        console.log(tx);
+        console.log("Check: " + account);
+        await library.waitForTransaction(tx.hash);
+        setProcessing(3);
+        setProcessingInfo("Channel Created! Reloading...");
 
-      setTimeout(() => {
+        setTimeout(() => {
           window.location.reload();
-      }, 2000);
-  })
+        }, 2000);
+      })
       .catch((err) => {
         console.log("Error --> %o", err);
         console.log({ err });
         setProcessing(3);
         setProcessingInfo(
-          "!!!PRODUCTION ENV!!! Contact support@epns.io to whitelist your wallet"
+          "There was an error creating your channel, please refer to our how-to guides for more information."
         );
       });
   };
@@ -307,14 +329,19 @@ function CreateChannel() {
           <Item align="flex-start">
             <H2 textTransform="uppercase" spacing="0.1em">
               <Span bg="#674c9f" color="#fff" weight="600" padding="0px 8px">
-                Create
+                Createe
               </Span>
-              <Span weight="200" color={themes.color}> Your Channel!</Span>
+              <Span weight="200" color={themes.color}>
+                {" "}
+                Your Channel!
+              </Span>
             </H2>
             <H3 color={themes.createColor}>
-              <b color={themes.createColor}>Ethereum Push Notification Service</b> (EPNS) makes it
-              extremely easy to open and maintain a genuine channel of
-              communication with your users.
+              <b color={themes.createColor}>
+                Ethereum Push Notification Service
+              </b>{" "}
+              (EPNS) makes it extremely easy to open and maintain a genuine
+              channel of communication with your users.
             </H3>
           </Item>
         </Content>
@@ -364,8 +391,7 @@ function CreateChannel() {
                 accept="image/jpeg,image/png"
               />
             </Item>
-            {
-              chainId != 1 ? (
+            {chainId != 1 ? (
               <Item align="flex-end">
                 <Minter
                   onClick={() => {
@@ -378,8 +404,9 @@ function CreateChannel() {
                   </Pool>
                 </Minter>
               </Item>
-              ): <></>
-            }
+            ) : (
+              <></>
+            )}
           </Content>
         </Section>
       )}
@@ -785,6 +812,16 @@ const Pool = styled.div`
 const PoolShare = styled(ChannelMetaBox)`
   background: #e20880;
   // background: #674c9f;
+  transition: 300ms;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.7;
+  }
+
+  &:active {
+    opacity: 0.85;
+  }
 `;
 
 // Export Default
