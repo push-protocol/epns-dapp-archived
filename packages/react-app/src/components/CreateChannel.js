@@ -329,7 +329,7 @@ function CreateChannel() {
           <Item align="flex-start">
             <H2 textTransform="uppercase" spacing="0.1em">
               <Span bg="#674c9f" color="#fff" weight="600" padding="0px 8px">
-                Createe
+                Create
               </Span>
               <Span weight="200" color={themes.color}>
                 {" "}
