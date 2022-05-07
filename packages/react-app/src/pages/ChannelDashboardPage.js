@@ -7,7 +7,7 @@ import Loader from "react-loader-spinner";
 import hex2ascii from "hex2ascii";
 import { addresses, abis } from "@project/contracts";
 import { useWeb3React } from "@web3-react/core";
-
+import { envConfig } from "@project/contracts";
 import config from "config";
 import EPNSCoreHelper from "helpers/EPNSCoreHelper";
 import NotificationToast from "components/NotificationToast";
@@ -33,7 +33,7 @@ import {
   setDelegatees,
 } from "redux/slices/adminSlice";
 import { addNewNotification } from "redux/slices/notificationSlice";
-export const ALLOWED_CORE_NETWORK = 42; //chainId of network which we have deployed the core contract on
+export const ALLOWED_CORE_NETWORK = envConfig.coreContractChain;  //chainId of network which we have deployed the core contract on
 const CHANNEL_TAB = 2; //Default to 1 which is the channel tab
 
 // Create Header
@@ -352,10 +352,16 @@ function ChannelDashboardPage() {
   return (
     <Container>
       <Interface>
-        {controlAt == 0 && <Feedbox />}
-        {controlAt == 1 && <ViewChannels />}
-        {controlAt == 2 && adminStatusLoaded && <ChannelOwnerDashboard />}
-        {controlAt == 3 && <Info />}
+        {controlAt === 0 && <Feedbox />}
+        {controlAt === 1 && <ViewChannels />}
+        {controlAt === 2 && adminStatusLoaded ? 
+            <ChannelOwnerDashboard /> 
+          : 
+            <ChannelLoadingMessage>
+              Channel details are being loaded, please wait…
+            </ChannelLoadingMessage>
+        }
+        {controlAt === 3 && <Info />}
         {toast && (
           <NotificationToast notification={toast} clearToast={clearToast} />
         )}
@@ -372,6 +378,15 @@ function ChannelDashboardPage() {
 }
 
 // css style
+const ChannelLoadingMessage = styled.div`
+width: 100%;
+padding: 40px;
+font-size: 1.5em;
+font-weight: 300;
+text-align: center;
+color: ${props => props.theme.color};
+`
+
 const Container = styled.div`
   flex: 1;
   display: block;
@@ -392,22 +407,17 @@ const ControlButton = styled.div`
   height: 120px;
   min-width: 200px;
   background: #fff;
-
   box-shadow: 0px 15px 20px -5px rgba(0, 0, 0, 0.1);
   border-radius: 15px;
   border: 1px solid rgb(225, 225, 225);
-
   border-bottom: 10px solid rgb(180, 180, 180);
   margin: 20px;
   overflow: hidden;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   border-bottom: 10px solid
     ${(props) => (props.active ? props.border : "rgb(180,180,180)")};
-
   &:hover {
     opacity: 0.9;
     cursor: pointer;
@@ -425,7 +435,6 @@ const ControlImage = styled.img`
   margin-right: 15px;
   filter: ${(props) => (props.active ? "brightness(1)" : "brightness(0)")};
   opacity: ${(props) => (props.active ? "1" : "0.25")};
-
   transition: transform 0.2s ease-out;
   ${(props) =>
     props.active &&
@@ -439,7 +448,6 @@ const ControlText = styled.label`
   font-size: 16px;
   font-weight: 200;
   opacity: ${(props) => (props.active ? "1" : "0.75")};
-
   transition: transform 0.2s ease-out;
   ${(props) =>
     props.active &&
@@ -487,7 +495,6 @@ const ControlChannelText = styled.label`
 const Interface = styled.div`
   flex: 1;
   display: flex;
-
   margin-bottom: 15px;
   overflow: hidden;
 `;
