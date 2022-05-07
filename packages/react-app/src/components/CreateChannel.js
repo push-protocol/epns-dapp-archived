@@ -33,7 +33,7 @@ import Loader from "react-loader-spinner";
 
 import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
 
-import {ThemeProvider} from "styled-components";
+import { ThemeProvider } from "styled-components";
 
 import { themeLight, themeDark } from "config/Themization";
 
@@ -73,22 +73,19 @@ function CreateChannel() {
   //checking DAI for user
   React.useEffect(() => {
     const checkDaiFunc = async () => {
-        let checkDaiAmount = new ethers.Contract(
-            addresses.dai,
-            abis.dai,
-            library
-        );
+      let checkDaiAmount = new ethers.Contract(
+        addresses.dai,
+        abis.dai,
+        library
+      );
 
-        let value = await checkDaiAmount.allowance(
-            account,
-            addresses.epnscore
-        );
-        value = value?.toString();
-        const convertedVal = ethers.utils.formatEther(value);
-        setDaiAmountVal(convertedVal);
-        if (convertedVal >= 50.0) {
-            setChannelStakeFees(convertedVal);
-        }
+      let value = await checkDaiAmount.allowance(account, addresses.epnscore);
+      value = value?.toString();
+      const convertedVal = ethers.utils.formatEther(value);
+      setDaiAmountVal(convertedVal);
+      if (convertedVal >= 50.0) {
+        setChannelStakeFees(convertedVal);
+      }
     };
     checkDaiFunc();
   }, []);
@@ -99,6 +96,15 @@ function CreateChannel() {
   };
 
   const onDropHandler = (files) => {
+    //   var file = files[0]
+    //   const reader = new FileReader();
+    //   reader.onload = (event) => {
+    //     console.log(event.target.result);
+    //   };
+    //   reader.readAsDataURL(file);
+    // setChannelFile(file);
+    // console.log("Drop Handler");
+    // console.log(file);
   };
 
   // receives array of files that are done uploading when submit button is clicked
@@ -227,18 +233,19 @@ function CreateChannel() {
 
     // Pick between 50 DAI AND 25K DAI
     const fees = ethers.utils.parseUnits(channelStakeFees.toString(), 18);
-
-    if(daiAmountVal < 50.0){
-      var sendTransactionPromise = daiContract.approve(addresses.epnscore, fees);
+    if (daiAmountVal < 50.0) {
+      var sendTransactionPromise = daiContract.approve(
+        addresses.epnscore,
+        fees
+      );
       const tx = await sendTransactionPromise;
-  
+
       console.log(tx);
       console.log("waiting for tx to finish");
       setProcessingInfo("Waiting for Approval TX to finish...");
+
       await library.waitForTransaction(tx.hash);
     }
-
-
 
     let contract = new ethers.Contract(
       addresses.epnscore,
@@ -255,29 +262,29 @@ function CreateChannel() {
       identityBytes,
       fees,
       {
-        gasLimit: 1000000
+        gasLimit: 1000000,
       }
     );
 
     setProcessingInfo("Creating Channel TX in progress");
     anotherSendTxPromise
-    .then(async function (tx) {
-      console.log(tx);
-      console.log("Check: " + account);
-      await library.waitForTransaction(tx.hash);
-      setProcessing(3);
-      setProcessingInfo("Channel Created! Reloading...");
+      .then(async function(tx) {
+        console.log(tx);
+        console.log("Check: " + account);
+        await library.waitForTransaction(tx.hash);
+        setProcessing(3);
+        setProcessingInfo("Channel Created! Reloading...");
 
-      setTimeout(() => {
+        setTimeout(() => {
           window.location.reload();
-      }, 2000);
-  })
+        }, 2000);
+      })
       .catch((err) => {
         console.log("Error --> %o", err);
         console.log({ err });
         setProcessing(3);
         setProcessingInfo(
-          "!!!PRODUCTION ENV!!! Contact support@epns.io to whitelist your wallet"
+          "There was an error creating your channel, please refer to our how-to guides for more information."
         );
       });
   };
@@ -324,12 +331,17 @@ function CreateChannel() {
               <Span bg="#674c9f" color="#fff" weight="600" padding="0px 8px">
                 Create
               </Span>
-              <Span weight="200" color={themes.color}> Your Channel!</Span>
+              <Span weight="200" color={themes.color}>
+                {" "}
+                Your Channel!
+              </Span>
             </H2>
             <H3 color={themes.createColor}>
-              <b color={themes.createColor}>Ethereum Push Notification Service</b> (EPNS) makes it
-              extremely easy to open and maintain a genuine channel of
-              communication with your users.
+              <b color={themes.createColor}>
+                Ethereum Push Notification Service
+              </b>{" "}
+              (EPNS) makes it extremely easy to open and maintain a genuine
+              channel of communication with your users.
             </H3>
           </Item>
         </Content>
@@ -379,8 +391,7 @@ function CreateChannel() {
                 accept="image/jpeg,image/png"
               />
             </Item>
-            {
-              chainId != 1 ? (
+            {chainId != 1 ? (
               <Item align="flex-end">
                 <Minter
                   onClick={() => {
@@ -393,8 +404,9 @@ function CreateChannel() {
                   </Pool>
                 </Minter>
               </Item>
-              ): <></>
-            }
+            ) : (
+              <></>
+            )}
           </Content>
         </Section>
       )}
@@ -559,9 +571,9 @@ function CreateChannel() {
               >
                 <TextField
                   required
-                  placeholder="Your Channel's Short Description (200 Characters)"
+                  placeholder="Your Channel's Short Description (250 Characters)"
                   rows="4"
-                  maxlength="200"
+                  maxlength="250"
                   radius="4px"
                   padding="12px"
                   weight="400"
@@ -569,10 +581,14 @@ function CreateChannel() {
                   bg="#fff"
                   value={channelInfo}
                   onChange={(e) => {
-                    setChannelInfo(e.target.value);
+                    setChannelInfo(e.target.value.slice(0,250));
                   }}
                   autocomplete="off"
                 />
+                
+                <SpanR>
+                  {250-channelInfo.length} characters remains
+                </SpanR>
               </Item>
 
               <ItemH
@@ -685,6 +701,15 @@ function CreateChannel() {
 }
 
 // css styles
+const SpanR = styled.div`
+color: #e20880;
+opacity: 0.7;
+position: absolute;
+bottom: 0px;
+right: 0.8rem;
+z-index: 1;
+`;
+
 const Step = styled.div`
   height: 12px;
   width: 12px;
@@ -800,6 +825,16 @@ const Pool = styled.div`
 const PoolShare = styled(ChannelMetaBox)`
   background: #e20880;
   // background: #674c9f;
+  transition: 300ms;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.7;
+  }
+
+  &:active {
+    opacity: 0.85;
+  }
 `;
 
 // Export Default
