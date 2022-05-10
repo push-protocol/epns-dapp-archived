@@ -485,6 +485,8 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
       setTxInProgress(false);
     }
   };
+  const BR_CHANNEL_ADDRESS = "0xb1676B5Ab63F01F154bb9938F5e8999d9Da5444B";
+  const BR_URL = "https://boardroom.io/";
 
   if (isBlocked) return <></>;
   if (isChannelBlacklisted) return <></>;
@@ -510,7 +512,7 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
             <Skeleton color={themes.interfaceSkeleton} width="50%" height={24} />
           ) : (
             <ChannelTitleLink
-              href={channelJson.url}
+              href={channelObject.addr === BR_CHANNEL_ADDRESS ? BR_URL :channelJson.url}
               target="_blank"
               rel="nofollow"
             >
