@@ -387,26 +387,22 @@ const QnAItem = styled(Item)`
   border-radius: 10px;
   box-shadow: 0px 5px 20px -10px rgb(0 0 0 / 0.20);
   overflow: hidden;
-
   & ${Question} {
     background: ${props => props.theme.qnaBg};
     justify-content: flex-start;
     text-transform: uppercase;
-    
     & ${Span} {
       font-weight: 400;
       letter-spacing: 0.2em;
       margin-left: 10px;
       flex: 1;
     }
-
     &:hover {
       & ${Span} {
         color: #fff;
       }
     }
   }
-
   & ${Answer} {
     border: 1px solid #e6e6e6;
     border-top: 1px solid #e6e6e6;
@@ -415,7 +411,6 @@ const QnAItem = styled(Item)`
     padding: 10px 15px;
     align-items: flex-start;
     background: #fff;
-
     & ${Span} {
       line-height: 1.5em;
       margin: 10px;

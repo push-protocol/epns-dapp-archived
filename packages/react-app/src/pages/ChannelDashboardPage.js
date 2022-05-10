@@ -5,9 +5,9 @@ import styled, { css, useTheme } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import Loader from "react-loader-spinner";
 import hex2ascii from "hex2ascii";
-import { addresses, abis } from "@project/contracts";
+import { addresses, abis , envConfig } from "@project/contracts";
 import { useWeb3React } from "@web3-react/core";
-import { envConfig } from "@project/contracts";
+
 import config from "config";
 import EPNSCoreHelper from "helpers/EPNSCoreHelper";
 import NotificationToast from "components/NotificationToast";
@@ -33,7 +33,7 @@ import {
   setDelegatees,
 } from "redux/slices/adminSlice";
 import { addNewNotification } from "redux/slices/notificationSlice";
-export const ALLOWED_CORE_NETWORK = envConfig.coreContractChain;  //chainId of network which we have deployed the core contract on
+export const ALLOWED_CORE_NETWORK = envConfig.coreContractChain; //chainId of network which we have deployed the core contract on
 const CHANNEL_TAB = 2; //Default to 1 which is the channel tab
 
 // Create Header
@@ -52,7 +52,8 @@ function ChannelDashboardPage() {
     epnsCommReadProvider,
   } = useSelector((state) => state.contracts);
 
-  const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
+  const CORE_CHAIN_ID = envConfig.coreContractChain;
+  const onCoreNetwork = CORE_CHAIN_ID === chainId;
   const INITIAL_OPEN_TAB = CHANNEL_TAB; //if they are not on a core network.redirect then to the notifications page
 
   const [controlAt, setControlAt] = React.useState(0);
@@ -161,9 +162,7 @@ function ChannelDashboardPage() {
     (async function init() {
       const coreProvider = onCoreNetwork
         ? library
-        : ethers.getDefaultProvider(ALLOWED_CORE_NETWORK, {
-            etherscan: config.etherscanToken,
-          });
+        : new ethers.providers.JsonRpcProvider(envConfig.coreRPC)
       // if we are not on the core network then check for if this account is an alias for another channel
       if (!onCoreNetwork) {
         // get the eth address of the alias address, in order to properly render information about the channel
@@ -185,12 +184,13 @@ function ChannelDashboardPage() {
             op: "read",
           }).then(({ data }) => {
             // if it returns undefined then we need to let them know to verify their channel
+            console.log(data);
             if (!data) {
-              setAliasVerified(false);
+              setAliasVerified(null);
               return;
             }
             const { status } = data;
-            setAliasVerified(status || null);
+            setAliasVerified(status);
             return data;
           });
         }
@@ -216,10 +216,12 @@ function ChannelDashboardPage() {
       // initialise the read contract for the communicator function
       if (!!(library && account)) {
         let signer = library.getSigner(account);
+        let coreSigner = coreProvider.getSigner(account);
+
         const coreSignerInstance = new ethers.Contract(
           addresses.epnscore,
           abis.epnscore,
-          signer
+          coreSigner
         );
         const communicatorSignerInstance = new ethers.Contract(
           commAddress,
@@ -236,8 +238,8 @@ function ChannelDashboardPage() {
    * When we instantiate the contract instances, fetch basic information about the user
    * Corresponding channel owned.
    */
-  React.useEffect(() => {
-    if (!epnsReadProvider || !epnsCommReadProvider) return;
+  React.useEffect(async () => {
+    if (!epnsReadProvider || !epnsCommReadProvider || !epnsWriteProvider) return;
     // Reset when account refreshes
     setChannelAdmin(false);
     dispatch(setUserChannelDetails(null));
@@ -264,13 +266,16 @@ function ChannelDashboardPage() {
       ChannelsDataStore.instance.init(
         account,
         epnsReadProvider,
-        epnsCommReadProvider
+        epnsCommReadProvider,
+        chainId
       );
-      checkUserForChannelOwnership();
+      
+      await checkUserForAlias();
+      await checkUserForChannelOwnership();
       listenFornewNotifications();
       fetchDelegators();
     }
-  }, [epnsReadProvider, epnsCommReadProvider]);
+  }, [epnsReadProvider, epnsCommReadProvider, epnsWriteProvider]);
 
   // handle user action at control center
   const userClickedAt = (controlIndex) => {
@@ -313,12 +318,13 @@ function ChannelDashboardPage() {
   const checkUserForChannelOwnership = async () => {
     // Check if account is admin or not and handle accordingly
     const ownerAccount = !onCoreNetwork ? aliasEthAccount : account;
+    console.log(ownerAccount);
     EPNSCoreHelper.getChannelJsonFromUserAddress(ownerAccount, epnsReadProvider)
       .then(async (response) => {
         // if channel admin, then get if the channel is verified or not, then also fetch more details about the channel
         const verificationStatus = await epnsWriteProvider.getChannelVerfication(
-          ownerAccount
-        );
+            ownerAccount
+          );
         const channelJson = await epnsWriteProvider.channels(ownerAccount);
         const channelSubscribers = await ChannelsDataStore.instance.getChannelSubscribers(
           ownerAccount
@@ -348,20 +354,56 @@ function ChannelDashboardPage() {
       });
   };
 
+  // Check if a user is a channel or not
+  const checkUserForAlias = async () => {
+    // Check if account is admin or not and handle accordingly
+    const aliasEth = await postReq("/channels/get_eth_address", {
+          aliasAddress: account,
+          op: "read",
+        }).then(({ data }) => {
+          console.log({ data });
+          const ethAccount = data;
+          if (ethAccount) {
+            setAliasEthAccount(ethAccount.ethAddress);
+          }
+          return data;
+        });
+    if (aliasEth) {
+      // if an alias exists, check if its verified.
+      await postReq("/channels/get_alias_verification_status", {
+        aliasAddress: account,
+        op: "read",
+      }).then(({ data }) => {
+        // if it returns undefined then we need to let them know to verify their channel
+        console.log(data);
+        if (!data) {
+          setAliasVerified(null);
+          return;
+        }
+        const { status } = data;
+        setAliasVerified(status);
+        return data;
+      });
+    }
+  };
+
   // Render
   return (
     <Container>
       <Interface>
-        {controlAt === 0 && <Feedbox />}
-        {controlAt === 1 && <ViewChannels />}
-        {controlAt === 2 && adminStatusLoaded ? 
+        {controlAt == 0 && <Feedbox />}
+        {controlAt == 1 && <ViewChannels />}
+        {controlAt == 2 && adminStatusLoaded ? 
             <ChannelOwnerDashboard /> 
+            // <ChannelLoadingMessage>
+            //   Channel details are being loaded, please wait…
+            // </ChannelLoadingMessage>
           : 
             <ChannelLoadingMessage>
               Channel details are being loaded, please wait…
             </ChannelLoadingMessage>
         }
-        {controlAt === 3 && <Info />}
+        {controlAt == 3 && <Info />}
         {toast && (
           <NotificationToast notification={toast} clearToast={clearToast} />
         )}
@@ -380,6 +422,7 @@ function ChannelDashboardPage() {
 // css style
 const ChannelLoadingMessage = styled.div`
 width: 100%;
+/* background-color: red; */
 padding: 40px;
 font-size: 1.5em;
 font-weight: 300;
@@ -407,17 +450,22 @@ const ControlButton = styled.div`
   height: 120px;
   min-width: 200px;
   background: #fff;
+
   box-shadow: 0px 15px 20px -5px rgba(0, 0, 0, 0.1);
   border-radius: 15px;
   border: 1px solid rgb(225, 225, 225);
+
   border-bottom: 10px solid rgb(180, 180, 180);
   margin: 20px;
   overflow: hidden;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   border-bottom: 10px solid
     ${(props) => (props.active ? props.border : "rgb(180,180,180)")};
+
   &:hover {
     opacity: 0.9;
     cursor: pointer;
@@ -435,6 +483,7 @@ const ControlImage = styled.img`
   margin-right: 15px;
   filter: ${(props) => (props.active ? "brightness(1)" : "brightness(0)")};
   opacity: ${(props) => (props.active ? "1" : "0.25")};
+
   transition: transform 0.2s ease-out;
   ${(props) =>
     props.active &&
@@ -448,6 +497,7 @@ const ControlText = styled.label`
   font-size: 16px;
   font-weight: 200;
   opacity: ${(props) => (props.active ? "1" : "0.75")};
+
   transition: transform 0.2s ease-out;
   ${(props) =>
     props.active &&
@@ -495,6 +545,7 @@ const ControlChannelText = styled.label`
 const Interface = styled.div`
   flex: 1;
   display: flex;
+
   margin-bottom: 15px;
   overflow: hidden;
 `;

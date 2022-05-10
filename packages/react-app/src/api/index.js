@@ -1,10 +1,8 @@
 import axios from "axios";
 import { envConfig } from "@project/contracts";
 
-
-// const BASE_URL = "https://backend-staging.epns.io/apis";
-const BASE_URL = envConfig.apiUrl// "https://backend-kovan.epns.io/apis";
-// const BASE_URL = "http://localhost:4000/apis"; //for local push node
+const BASE_URL = envConfig.apiUrl
+const TOOLING_BASE_URL = envConfig.toolingApiUrl
 
 /**
  * A function used to make get requests throughout the entire application
@@ -36,5 +34,19 @@ export const postReq = async (path, obj) => {
     return response;
   } catch (error) {
     throw error;
+  }
+};
+
+export const toolingPostReq = async (path, obj) => {
+  try {
+    const response = await axios.post(TOOLING_BASE_URL + path, obj, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error(error.response.data);
+    throw error.response.data;
   }
 };

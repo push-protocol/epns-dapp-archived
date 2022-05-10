@@ -5,6 +5,7 @@ import { Waypoint } from "react-waypoint";
 import { useDispatch, useSelector } from "react-redux";
 import { postReq } from "api";
 import { useWeb3React } from "@web3-react/core";
+import { envConfig } from "@project/contracts";
 
 import { Item, ItemH } from "components/SharedStyling";
 import { AiOutlineSearch } from "react-icons/ai";
@@ -16,6 +17,7 @@ import ViewChannelItem from "components/ViewChannelItem";
 import Faucets from "components/Faucets";
 import ChannelsDataStore from "singletons/ChannelsDataStore";
 import { setChannelMeta, incrementPage } from "redux/slices/channelSlice";
+import { incrementStepIndex } from "redux/slices/userJourneySlice";
 
 import {ThemeProvider} from "styled-components";
 
@@ -32,6 +34,10 @@ function ViewChannels({ loadTeaser, playTeaser }) {
   const dispatch = useDispatch();
   const { account, chainId } = useWeb3React();
   const { channels, page, ZERO_ADDRESS } = useSelector((state: any) => state.channels);
+  const {
+    run,
+    stepIndex
+  } = useSelector((state: any) => state.userJourney);
 
   const [loading, setLoading] = React.useState(false);
   const [moreLoading, setMoreLoading] = React.useState(false);
@@ -68,6 +74,16 @@ function ViewChannels({ loadTeaser, playTeaser }) {
     if (!channels.length) {
       dispatch(setChannelMeta(channelsMeta));
     }
+
+    // increases the step once the channel are loaded
+    if (
+        run &&
+        stepIndex === 3
+      ) {
+      dispatch(incrementStepIndex());
+      dispatch(incrementStepIndex());
+    }
+
     setLoading(false);
   };
 
@@ -99,12 +115,21 @@ function ViewChannels({ loadTeaser, playTeaser }) {
     if (search) {
       setLoadingChannel(true); //begin loading here
       setChannelToShow([]); //maybe remove later
-      postReq("/channels/search", {
-        query: search,
-        op: "read",
-        page : 1,
-        pageSize : 1000
-      })
+      let payloadToSearchApiObj;
+      if (envConfig.coreContractChain === 42) {
+        payloadToSearchApiObj = {
+          query: search,
+          op: "read",
+          page: 1,
+          pageSize: 1000
+        };
+      } else {
+        payloadToSearchApiObj = {
+          query: search,
+          op: "read",
+        };
+      }
+      postReq("/channels/search", payloadToSearchApiObj)
         .then((data) => {
           setChannelToShow(data.data.channels || []);
           setLoadingChannel(false);
@@ -176,7 +201,7 @@ function ViewChannels({ loadTeaser, playTeaser }) {
               </SearchContainer>
 
               {!UtilityHelper.isMainnet(chainId) && 
-                <Faucets /> 
+                <Faucets chainId={chainId} /> 
               }
               
             </ItemH>
@@ -333,4 +358,4 @@ const SearchContainer = styled(Item)`
 `;
 
 // Export Default
-export default ViewChannels;
+export default ViewChannels; 

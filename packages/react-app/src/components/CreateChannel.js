@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Select from "react-select";
 import styled, { css, useTheme } from "styled-components";
 import {
@@ -20,30 +20,30 @@ import {
   Input,
   TextField,
 } from "components/SharedStyling";
-
 import { FiLink } from "react-icons/fi";
-
 import "react-dropzone-uploader/dist/styles.css";
 import Dropzone from "react-dropzone-uploader";
-
 import { makeStyles } from "@material-ui/core/styles";
 import Slider from "@material-ui/core/Slider";
-
 import Loader from "react-loader-spinner";
 
+import { envConfig } from "@project/contracts";
+
 import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
-
 import { ThemeProvider } from "styled-components";
-
 import { themeLight, themeDark } from "config/Themization";
-
 import { addresses, abis } from "@project/contracts";
+import ImageClipper from "./ImageClipper";
+import { ReactComponent as ImageIcon } from "../assets/Image.svg";
+
 const ethers = require("ethers");
 
 const ipfs = require("ipfs-api")();
 
 const minStakeFees = 50;
 const ALIAS_CHAINS = [{ value: "POLYGON_TEST_MUMBAI:80001", label: "Polygon" }];
+
+const CORE_CHAIN_ID = envConfig.coreContractChain;
 
 // Create Header
 function CreateChannel() {
@@ -52,6 +52,7 @@ function CreateChannel() {
   const themes = useTheme();
 
   const [darkMode, setDarkMode] = useState(false);
+  const onCoreNetwork = CORE_CHAIN_ID === chainId;
 
   const [processing, setProcessing] = React.useState(0);
   const [processingInfo, setProcessingInfo] = React.useState("");
@@ -68,24 +69,35 @@ function CreateChannel() {
   const [channelFile, setChannelFile] = React.useState(undefined);
   const [channelStakeFees, setChannelStakeFees] = React.useState(minStakeFees);
   const [daiAmountVal, setDaiAmountVal] = useState("");
+
+  //image upload states
+  const childRef = useRef();
+  const [view, setView] = useState(false);
+  const [final, setFinal] = useState(false);
+  const [imageSrc, setImageSrc] = useState(undefined);
+  const [croppedImage, setCroppedImage] = useState(undefined);
+
   const [stepFlow, setStepFlow] = React.useState(1);
 
   //checking DAI for user
   React.useEffect(() => {
     const checkDaiFunc = async () => {
-      let checkDaiAmount = new ethers.Contract(
-        addresses.dai,
-        abis.dai,
-        library
-      );
+        let checkDaiAmount = new ethers.Contract(
+            addresses.dai,
+            abis.dai,
+            library
+        );
 
-      let value = await checkDaiAmount.allowance(account, addresses.epnscore);
-      value = value?.toString();
-      const convertedVal = ethers.utils.formatEther(value);
-      setDaiAmountVal(convertedVal);
-      if (convertedVal >= 50.0) {
-        setChannelStakeFees(convertedVal);
-      }
+        let value = await checkDaiAmount.allowance(
+            account,
+            addresses.epnscore
+        );
+        value = value?.toString();
+        const convertedVal = ethers.utils.formatEther(value);
+        setDaiAmountVal(convertedVal);
+        if (convertedVal >= 50.0) {
+            setChannelStakeFees(convertedVal);
+        }
     };
     checkDaiFunc();
   }, []);
@@ -96,15 +108,6 @@ function CreateChannel() {
   };
 
   const onDropHandler = (files) => {
-    //   var file = files[0]
-    //   const reader = new FileReader();
-    //   reader.onload = (event) => {
-    //     console.log(event.target.result);
-    //   };
-    //   reader.readAsDataURL(file);
-    // setChannelFile(file);
-    // console.log("Drop Handler");
-    // console.log(file);
   };
 
   // receives array of files that are done uploading when submit button is clicked
@@ -130,6 +133,13 @@ function CreateChannel() {
         }
       };
     });
+  };
+
+  const proceed = () => {
+    setStepFlow(2);
+    setProcessing(0);
+    setUploadDone(true);
+    console.log(channelFile);
   };
 
   const handleLogoSizeLimitation = (base64) => {
@@ -233,17 +243,14 @@ function CreateChannel() {
 
     // Pick between 50 DAI AND 25K DAI
     const fees = ethers.utils.parseUnits(channelStakeFees.toString(), 18);
-    if (daiAmountVal < 50.0) {
-      var sendTransactionPromise = daiContract.approve(
-        addresses.epnscore,
-        fees
-      );
-      const tx = await sendTransactionPromise;
 
+    if(daiAmountVal < 50.0){
+      var sendTransactionPromise = daiContract.approve(addresses.epnscore, fees);
+      const tx = await sendTransactionPromise;
+  
       console.log(tx);
       console.log("waiting for tx to finish");
       setProcessingInfo("Waiting for Approval TX to finish...");
-
       await library.waitForTransaction(tx.hash);
     }
 
@@ -262,7 +269,7 @@ function CreateChannel() {
       identityBytes,
       fees,
       {
-        gasLimit: 1000000,
+        gasLimit: 1000000
       }
     );
 
@@ -284,7 +291,7 @@ function CreateChannel() {
         console.log({ err });
         setProcessing(3);
         setProcessingInfo(
-          "There was an error creating your channel, please refer to our how-to guides for more information."
+          "!!!PRODUCTION ENV!!! Contact support@epns.io to whitelist your wallet"
         );
       });
   };
@@ -322,6 +329,63 @@ function CreateChannel() {
     }
   };
 
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleOnDrop = (e) => {
+    //prevent the browser from opening the image
+    e.preventDefault();
+    e.stopPropagation();
+    //let's grab the image file
+    handleFile(e.dataTransfer, "transfer");
+  };
+
+  const handleFile = async (file, path) => {
+    setCroppedImage(undefined);
+    setView(true);
+    setFinal(false);
+
+    //you can carry out any file validations here...
+    if (file?.files[0]) {
+      var reader = new FileReader();
+      reader.readAsDataURL(file?.files[0]);
+
+      reader.onloadend = function(e) {
+        setImageSrc(reader.result);
+      };
+    } else {
+      return "Nothing....";
+    }
+  };
+
+  useEffect(() => {
+    if (croppedImage) {
+      toDataURL(croppedImage, function(dataUrl) {
+        const response = handleLogoSizeLimitation(dataUrl);
+        if (response.success) {
+          setChannelFile(croppedImage);
+        }
+      });
+    } else {
+      return "Nothing";
+    }
+  }, [croppedImage]);
+
+  function toDataURL(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function() {
+      var reader = new FileReader();
+      reader.onloadend = function() {
+        callback(reader.result);
+      };
+      reader.readAsDataURL(xhr.response);
+    };
+    xhr.open("GET", url);
+    xhr.responseType = "blob";
+    xhr.send();
+  }
+
   return (
     <ThemeProvider theme={themes}>
       <Section>
@@ -347,6 +411,20 @@ function CreateChannel() {
         </Content>
       </Section>
 
+      {!onCoreNetwork ? 
+      <>
+        <Section>
+          <Content padding="50px 20px 20px">
+            <Item align="flex-start">
+                <H3 color="#e20880" weight={700}>
+                You can't Create Channel on Alias Chains. Please switch to Ethereum Kovan Network to create a channel.
+              </H3>
+              </Item>
+          </Content>
+        </Section>
+      </>
+      :
+      <>
       <Section>
         <Content padding="0px 20px 20px">
           <ItemH justify="space-between">
@@ -375,13 +453,92 @@ function CreateChannel() {
         <Section>
           <Content padding="50px 20px 20px">
             <Item align="flex-start">
-              <H3 color="#e20880">
-                Upload Channel Logo to start the process. Make sure image is
-                128x128px.
+              <H3 color="#e20880" margin="0px 0px">
+                Upload Channel Logo to start the process. Clip image to resize
+                to 128x128px.
               </H3>
             </Item>
 
-            <Item margin="-10px 0px 20px 0px">
+            <Space className="">
+              <div>
+                <div
+                  onDragOver={(e) => handleDragOver(e)}
+                  onDrop={(e) => handleOnDrop(e)}
+                  className="bordered"
+                >
+                  <div className="inner">
+                    {view ? (
+                      <div className="crop-div">
+                        {croppedImage ? (
+                          <div>
+                            <img
+                              alt="Cropped Img"
+                              src={croppedImage}
+                              className="croppedImage"
+                            />
+                          </div>
+                        ) : (
+                          <ImageClipper
+                            className="cropper"
+                            imageSrc={imageSrc}
+                            onImageCropped={(croppedImage) =>
+                              setCroppedImage(croppedImage)
+                            }
+                            ref={childRef}
+                          />
+                        )}
+                      </div>
+                    ) : (
+                      <ImageIcon />
+                    )}
+
+                    <ButtonSpace>
+                      <div className="crop-button">
+                        {view &&
+                          (!croppedImage ? (
+                            <Button
+                              bg="#1C4ED8"
+                              onClick={() => {
+                                childRef.current.showCroppedImage();
+                              }}
+                            >
+                              Clip Image
+                            </Button>
+                          ) : (
+                            <div className="crop-button">
+                              <Button bg="#1C4ED8" onClick={() => proceed()}>
+                                Next
+                              </Button>
+                            </div>
+                          ))}
+                      </div>
+                    </ButtonSpace>
+
+                    <div className="text-div">
+                      <label htmlFor="file-upload" className="labeled">
+                        <div>Upload a file</div>
+                        <input
+                          id="file-upload"
+                          accept="image/*"
+                          name="file-upload"
+                          hidden
+                          onChange={(e) => handleFile(e.target, "target")}
+                          type="file"
+                          className="sr-only"
+                          readOnly
+                        />
+                      </label>
+                      <div className="">- or drag and drop</div>
+                    </div>
+                    <p className="text-below">
+                      PNG, JPG.Proceed to clip and submit final
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Space>
+
+            {/* <Item margin="-10px 0px 20px 0px">
               <Dropzone
                 onChangeStatus={handleChangeStatus}
                 onSubmit={handleLogoSubmit}
@@ -390,7 +547,7 @@ function CreateChannel() {
                 multiple={false}
                 accept="image/jpeg,image/png"
               />
-            </Item>
+            </Item> */}
             {chainId != 1 ? (
               <Item align="flex-end">
                 <Minter
@@ -695,7 +852,9 @@ function CreateChannel() {
             </Item>
           </Content>
         </Section>
-      )}
+        )}
+        </>
+      }
     </ThemeProvider>
   );
 }
@@ -709,7 +868,6 @@ bottom: 0px;
 right: 0.8rem;
 z-index: 1;
 `;
-
 const Step = styled.div`
   height: 12px;
   width: 12px;
@@ -825,16 +983,136 @@ const Pool = styled.div`
 const PoolShare = styled(ChannelMetaBox)`
   background: #e20880;
   // background: #674c9f;
-  transition: 300ms;
-  cursor: pointer;
+`;
 
-  &:hover {
-    opacity: 0.7;
-  }
+const ButtonSpace = styled.div`
+  width: 40%;
+  align-items: center;
+  margin: 1rem auto;
+`;
 
-  &:active {
-    opacity: 0.85;
+const Space = styled.div`
+  width: 100%;
+  margin-bottom: 2rem;
+  .bordered {
+    display: flex;
+    justify-content: center;
+    border: 4px dotted #ccc;
+    border-radius: 10px;
+    padding: 6px;
+    margin-top: 10px;
+    .inner {
+      margin-top: 0.25rem;
+      text-align: center;
+      padding: 10px;
+      width: 100%;
+      .crop-div {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        @media (max-width: 768px) {
+          flex-direction: column;
+        }
+        justify-content: space-evenly;
+        align-items: center;
+        margin-right: auto;
+        div {
+          .croppedImage {
+            @media (max-width: 768px) {
+              margin-top: 1rem;
+            }
+          }
+        }
+        .cropper {
+          width: 250px;
+          height: 250px;
+        }
+      }
+      .check-space {
+        .croppedImage {
+          width: auto;
+          height: auto;
+          border-radius: 5px;
+        }
+        .button-space {
+          margin-top: 1rem;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+        }
+      }
+      .crop-button {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        @media (max-width: 768px) {
+          margin-top: 1rem;
+        }
+      }
+      .svg {
+        margin: 0px auto;
+        height: 3rem;
+        width: 3rem;
+        color: #ccc;
+      }
+      .text-div {
+        display: flex;
+        font-size: 1rem;
+        line-height: 1rem;
+        margin-top: 0.2rem;
+        color: #ccc;
+        justify-content: center;
+        .labeled {
+          position: relative;
+          cursor: pointer;
+          background-color: white;
+          border-radius: 4px;
+          color: #60a5fa;
+        }
+      }
+      .text-below {
+        font-size: 1rem;
+        line-height: 1rem;
+        color: #ccc;
+        margin-top: 0.3rem;
+      }
+    }
   }
+  .image-error {
+    font-size: 1rem;
+    line-height: 1rem;
+    color: red;
+    margin-top: 0.5rem;
+  }
+  .image {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: row;
+    .item {
+      width: 4rem;
+      height: auto;
+      border-radius: 4px;
+    }
+    .image-border {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      margin-left: 2rem;
+      .text {
+        font-size: 1rem;
+        line-height: 1rem;
+        color: #ccc;
+        margin-top: 1rem;
+      }
+    }
+  }
+`;
+
+const Field = styled.div`
+  margin: 20px 0px 5px 0px;
+  color: #4b5563;
+  font-size: small;
+  text-transform: uppercase;
 `;
 
 // Export Default
