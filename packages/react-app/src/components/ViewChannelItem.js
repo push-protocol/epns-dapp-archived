@@ -485,8 +485,11 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
       setTxInProgress(false);
     }
   };
-  const BR_CHANNEL_ADDRESS = "0xb1676B5Ab63F01F154bb9938F5e8999d9Da5444B";
-  const BR_URL = "https://boardroom.io/";
+
+  const CTA_OVERRIDE_CACHE = {
+    "0xb1676B5Ab63F01F154bb9938F5e8999d9Da5444B": "https://boardroom.io/",
+    "0x7DA9A33d15413F499299687cC9d81DE84684E28E": "https://rmm.realtoken.network/dashboard"
+  }
 
   if (isBlocked) return <></>;
   if (isChannelBlacklisted) return <></>;
@@ -512,7 +515,7 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
             <Skeleton color={themes.interfaceSkeleton} width="50%" height={24} />
           ) : (
             <ChannelTitleLink
-              href={channelObject.addr === BR_CHANNEL_ADDRESS ? BR_URL :channelJson.url}
+              href={CTA_OVERRIDE_CACHE[channelObject.addr] || channelJson.url}
               target="_blank"
               rel="nofollow"
             >
