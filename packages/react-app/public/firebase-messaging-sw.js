@@ -29,10 +29,29 @@ messaging.onBackgroundMessage(function(payload) {
 
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
+    title: payload.data.app,
     body: payload.notification.body,
+    image: payload.data.aimg,
+    icon: payload?.data?.icon,
+    data: {
+      url: payload?.data?.acta || payload?.data?.url,
+    },
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// ##
+
+self.addEventListener('notificationclick', function(e) {
+  var notification = e.notification;
+  const cta = notification.data.url;
+  var action = e.action;
+  console.log('Notification Clicked');
+
+  if (action === 'close') {
+    notification.close();
+  } else {
+    clients.openWindow(cta);
+    notification.close();
+  }
+});
