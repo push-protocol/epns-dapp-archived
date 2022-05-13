@@ -6,11 +6,11 @@ import { useWeb3React } from "@web3-react/core";
 import { AbstractConnector } from "@web3-react/abstract-connector";
 import { useEagerConnect, useInactiveListener } from "hooks";
 import { injected, walletconnect, portis, ledger } from "connectors";
-import { envConfig } from "@project/contracts";
 import Joyride, { ACTIONS, CallBackProps, EVENTS, STATUS, Step } from "react-joyride";
-
+import { ToastContainer, toast } from "react-toastify";
 import styled, {useTheme} from "styled-components";
-import { Item, ItemH, Span, H2, H3, B, A, C, Button } from "components/SharedStyling";
+import { Item, ItemH, Span, H2, B, A, C } from "components/SharedStyling";
+
 import Header from "sections/Header";
 import Navigation from "sections/Navigation";
 
@@ -25,10 +25,13 @@ import GLOBALS from "config/Globals";
 import {setRun, setIndex, setWelcomeNotifsEmpty} from "./redux/slices/userJourneySlice";
 import { useSelector, useDispatch } from "react-redux";
 import UserJourneySteps from "segments/userJourneySteps.jsx";
+import { getPushToken, onMessageListener } from "./firebase";
 
 import * as dotenv from "dotenv";
+import { postReq } from "api";
 dotenv.config();
 
+const CACHEPREFIX = "PUSH_TOKEN_";
 // define the different type of connectors which we use
 const web3Connectors = {
   Injected: {
@@ -50,7 +53,8 @@ export default function App() {
 
   const dispatch = useDispatch();
 
-  const { connector, activate, active, error } = useWeb3React<Web3Provider>();
+  const { connector, activate, active, error, account } = useWeb3React<Web3Provider>();
+  const [info, setInfo] = useState("");
   const [activatingConnector, setActivatingConnector] = React.useState<
     AbstractConnector
   >();
@@ -63,9 +67,38 @@ export default function App() {
     stepIndex,
     tutorialContinous,
   } = useSelector((state: any) => state.userJourney);
-  
 
-  React.useEffect(()=>{
+  React.useEffect(() => {
+    if(!account) return;
+    (async function(){
+      const tokenKey = `${CACHEPREFIX}${account}`;
+      const tokenExists = localStorage.getItem(tokenKey);
+      if(!tokenExists){
+        const response = await getPushToken();
+        const object = {
+          op: 'register',
+          wallet: account.toLowerCase(),
+          device_token: response,
+          platform: 'web',
+        };
+        await postReq('/pushtokens/register_no_auth',object);
+        localStorage.setItem(tokenKey, response);
+      }
+    })();
+  }, [account]);
+
+  React.useEffect(() => {
+    onMessageListener().then(payload => {
+      toast.dark(`${payload.notification.body} from: ${payload.notification.title}`,{
+        type: toast.TYPE.DARK,
+        autoClose: 5000,
+        position: "top-right"
+      });
+    }).catch(err => console.log('failed: ', err));
+  }, []);
+
+
+  React.useEffect(() => {
     const now = Date.now()/ 1000;
     setcurrentTime(now)
   },[])
@@ -81,7 +114,7 @@ export default function App() {
   useInactiveListener(!triedEager || !!activatingConnector);
 
   // Initialize GA
-  ReactGA.initialize(envConfig.googleAnalyticsId);
+  ReactGA.initialize("UA-165415629-5");
   ReactGA.pageview("/login");
   // Initialize GA
 
@@ -149,6 +182,15 @@ export default function App() {
     //   dispatch(incrementStepIndex());
     // }
   }
+
+  // toast customize
+  // const LoaderToast = ({ msg, color }) => (
+  //   <Toaster>
+  //     <Loader type="Oval" color={color} height={30} width={30} />
+  //     <ToasterMsg>{msg}</ToasterMsg>
+  //   </Toaster>
+  // );
+
 
   return (
     <ThemeProvider theme={darkMode ? themeDark : themeLight }>
@@ -286,6 +328,7 @@ export default function App() {
                 </A>
                 .
               </Span>
+              
               <Item
                 flex="initial"
                 padding="30px 15px"
@@ -448,4 +491,15 @@ const BeaconExamplePulse = styled.span`
   opacity: 0.9;
   position: absolute;
   transform-origin: center center;
+`;
+
+const Toaster = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0px 10px;
+`;
+
+const ToasterMsg = styled.div`
+  margin: 0px 10px;
 `;
