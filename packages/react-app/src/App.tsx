@@ -72,28 +72,46 @@ export default function App() {
     if(!account) return;
     (async function(){
       const tokenKey = `${CACHEPREFIX}${account}`;
-      const tokenExists = localStorage.getItem(tokenKey);
+      const tokenExists = localStorage.getItem(tokenKey) || localStorage.getItem(CACHEPREFIX); //temp to prevent more than 1 account to register
       if(!tokenExists){
         const response = await getPushToken();
         const object = {
           op: 'register',
           wallet: account.toLowerCase(),
           device_token: response,
-          platform: 'web',
+          platform: 'dapp',
         };
         await postReq('/pushtokens/register_no_auth',object);
         localStorage.setItem(tokenKey, response);
+        localStorage.setItem(CACHEPREFIX, 'response'); //temp to prevent more than 1 account to register
       }
     })();
   }, [account]);
 
   React.useEffect(() => {
     onMessageListener().then(payload => {
-      toast.dark(`${payload.notification.body} from: ${payload.notification.title}`,{
-        type: toast.TYPE.DARK,
-        autoClose: 5000,
-        position: "top-right"
-      });
+      if (!("Notification" in window)) {
+        toast.dark(`${payload.notification.body} from: ${payload.notification.title}`,{
+          type: toast.TYPE.DARK,
+          autoClose: 5000,
+          position: "top-right"
+        });
+      }else{
+        console.log('\n\n\n\n\n')
+        console.log("revieced push notification")
+        console.log('\n\n\n\n\n')
+        const notificationTitle = payload.notification.title;
+        const notificationOptions = {
+          title: payload.data.app,
+          body: payload.notification.body,
+          image: payload.data.aimg,
+          icon: payload?.data?.icon,
+          data: {
+            url: payload?.data?.acta || payload?.data?.url,
+          },
+        };
+        var notification = new Notification(notificationTitle,notificationOptions );
+      }
     }).catch(err => console.log('failed: ', err));
   }, []);
 

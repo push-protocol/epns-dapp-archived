@@ -1,5 +1,6 @@
 // Scripts for firebase and firebase messaging
 // Scripts for firebase and firebase messaging
+// @ 18th of may 202222
 importScripts(
   "https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"
 );
