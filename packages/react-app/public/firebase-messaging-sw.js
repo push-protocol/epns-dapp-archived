@@ -22,6 +22,7 @@ var firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
+
 // Retrieve firebase messaging
 const messaging = firebase.messaging();
 

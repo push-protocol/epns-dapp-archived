@@ -59,7 +59,7 @@ export default function App() {
     AbstractConnector
   >();
   const [currentTime, setcurrentTime] = React.useState(0);
-
+  const [triggerNotification, setTriggerNotification] = React.useState(false);
   const themes = useTheme();
 
   const {
@@ -112,8 +112,9 @@ export default function App() {
         };
         var notification = new Notification(notificationTitle,notificationOptions );
       }
-    }).catch(err => console.log('failed: ', err));
-  }, []);
+    }).catch(err => console.log('failed: ', err))
+    .finally(() => setTriggerNotification(!triggerNotification)); //retrigger the listener after it has been used once
+  }, [triggerNotification]);
 
 
   React.useEffect(() => {
