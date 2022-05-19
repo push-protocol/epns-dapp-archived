@@ -59,7 +59,6 @@ export default function App() {
     AbstractConnector
   >();
   const [currentTime, setcurrentTime] = React.useState(0);
-  const [triggerNotification, setTriggerNotification] = React.useState(false);
   const themes = useTheme();
 
   const {
@@ -67,7 +66,7 @@ export default function App() {
     stepIndex,
     tutorialContinous,
   } = useSelector((state: any) => state.userJourney);
-
+  const [triggerNotification, setTriggerNotification] = React.useState(false);
   React.useEffect(() => {
     if(!account) return;
     (async function(){
@@ -88,7 +87,7 @@ export default function App() {
     })();
   }, [account]);
 
-  React.useEffect(() => {
+  // React.useEffect(() => {
     onMessageListener().then(payload => {
       if (!("Notification" in window)) {
         toast.dark(`${payload.notification.body} from: ${payload.notification.title}`,{
@@ -114,7 +113,7 @@ export default function App() {
       }
     }).catch(err => console.log('failed: ', err))
     .finally(() => setTriggerNotification(!triggerNotification)); //retrigger the listener after it has been used once
-  }, [triggerNotification]);
+  // }, [triggerNotification]);
 
 
   React.useEffect(() => {
