@@ -6,11 +6,11 @@ import { useWeb3React } from "@web3-react/core";
 import { AbstractConnector } from "@web3-react/abstract-connector";
 import { useEagerConnect, useInactiveListener } from "hooks";
 import { injected, walletconnect, portis, ledger } from "connectors";
-import { envConfig } from "@project/contracts";
 import Joyride, { ACTIONS, CallBackProps, EVENTS, STATUS, Step } from "react-joyride";
-
+import { ToastContainer, toast } from "react-toastify";
 import styled, {useTheme} from "styled-components";
-import { Item, ItemH, Span, H2, H3, B, A, C, Button } from "components/SharedStyling";
+import { Item, ItemH, Span, H2, B, A, C } from "components/SharedStyling";
+
 import Header from "sections/Header";
 import Navigation from "sections/Navigation";
 
@@ -25,10 +25,13 @@ import GLOBALS from "config/Globals";
 import {setRun, setIndex, setWelcomeNotifsEmpty} from "./redux/slices/userJourneySlice";
 import { useSelector, useDispatch } from "react-redux";
 import UserJourneySteps from "segments/userJourneySteps.jsx";
+import { getPushToken, onMessageListener } from "./firebase";
 
 import * as dotenv from "dotenv";
+import { postReq } from "api";
 dotenv.config();
 
+const CACHEPREFIX = "PUSH_TOKEN_";
 // define the different type of connectors which we use
 const web3Connectors = {
   Injected: {
@@ -50,12 +53,12 @@ export default function App() {
 
   const dispatch = useDispatch();
 
-  const { connector, activate, active, error } = useWeb3React<Web3Provider>();
+  const { connector, activate, active, error, account } = useWeb3React<Web3Provider>();
+  const [info, setInfo] = useState("");
   const [activatingConnector, setActivatingConnector] = React.useState<
     AbstractConnector
   >();
   const [currentTime, setcurrentTime] = React.useState(0);
-
   const themes = useTheme();
 
   const {
@@ -63,9 +66,57 @@ export default function App() {
     stepIndex,
     tutorialContinous,
   } = useSelector((state: any) => state.userJourney);
-  
+  const [triggerNotification, setTriggerNotification] = React.useState(false);
+  React.useEffect(() => {
+    if(!account) return;
+    (async function(){
+      const tokenKey = `${CACHEPREFIX}${account}`;
+      const tokenExists = localStorage.getItem(tokenKey) || localStorage.getItem(CACHEPREFIX); //temp to prevent more than 1 account to register
+      if(!tokenExists){
+        const response = await getPushToken();
+        const object = {
+          op: 'register',
+          wallet: account.toLowerCase(),
+          device_token: response,
+          platform: 'dapp',
+        };
+        await postReq('/pushtokens/register_no_auth',object);
+        localStorage.setItem(tokenKey, response);
+        localStorage.setItem(CACHEPREFIX, 'response'); //temp to prevent more than 1 account to register
+      }
+    })();
+  }, [account]);
 
-  React.useEffect(()=>{
+  // React.useEffect(() => {
+    onMessageListener().then(payload => {
+      if (!("Notification" in window)) {
+        toast.dark(`${payload.notification.body} from: ${payload.notification.title}`,{
+          type: toast.TYPE.DARK,
+          autoClose: 5000,
+          position: "top-right"
+        });
+      }else{
+        console.log('\n\n\n\n\n')
+        console.log("revieced push notification")
+        console.log('\n\n\n\n\n')
+        const notificationTitle = payload.notification.title;
+        const notificationOptions = {
+          title: payload.data.app,
+          body: payload.notification.body,
+          image: payload.data.aimg,
+          icon: payload?.data?.icon,
+          data: {
+            url: payload?.data?.acta || payload?.data?.url,
+          },
+        };
+        var notification = new Notification(notificationTitle,notificationOptions );
+      }
+    }).catch(err => console.log('failed: ', err))
+    .finally(() => setTriggerNotification(!triggerNotification)); //retrigger the listener after it has been used once
+  // }, [triggerNotification]);
+
+
+  React.useEffect(() => {
     const now = Date.now()/ 1000;
     setcurrentTime(now)
   },[])
@@ -81,7 +132,7 @@ export default function App() {
   useInactiveListener(!triedEager || !!activatingConnector);
 
   // Initialize GA
-  ReactGA.initialize(envConfig.googleAnalyticsId);
+  ReactGA.initialize("UA-165415629-5");
   ReactGA.pageview("/login");
   // Initialize GA
 
@@ -149,6 +200,15 @@ export default function App() {
     //   dispatch(incrementStepIndex());
     // }
   }
+
+  // toast customize
+  // const LoaderToast = ({ msg, color }) => (
+  //   <Toaster>
+  //     <Loader type="Oval" color={color} height={30} width={30} />
+  //     <ToasterMsg>{msg}</ToasterMsg>
+  //   </Toaster>
+  // );
+
 
   return (
     <ThemeProvider theme={darkMode ? themeDark : themeLight }>
@@ -286,6 +346,7 @@ export default function App() {
                 </A>
                 .
               </Span>
+              
               <Item
                 flex="initial"
                 padding="30px 15px"
@@ -448,4 +509,15 @@ const BeaconExamplePulse = styled.span`
   opacity: 0.9;
   position: absolute;
   transform-origin: center center;
+`;
+
+const Toaster = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0px 10px;
+`;
+
+const ToasterMsg = styled.div`
+  margin: 0px 10px;
 `;
