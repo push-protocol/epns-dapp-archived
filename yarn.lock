@@ -1578,10 +1578,10 @@
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.2.5.tgz#8eed982e2ee6f7f4e44c253e12962980791efd46"
   integrity sha512-6U71C2Wp7r5XtFtQzYrW5iKFT67OixrSxjI4MptCHzdSVlgabczzqLe0ZSgnub/5Kp4hSbpDB1tMytZY9pwxxA==
 
-"@epnsproject/frontend-sdk-staging@^1.7.8":
-  version "1.7.8"
-  resolved "https://registry.yarnpkg.com/@epnsproject/frontend-sdk-staging/-/frontend-sdk-staging-1.7.8.tgz#01c36e3fd7a0241862337fe8ba9824345b81676d"
-  integrity sha512-Q9yMtA18vXN1PGM6/tVlKRpvKzhKo9JN5HEL1jx8zahJ5uG6mvF+ITKVmgSWvvfFy4wcz3MxTGBYEi4FUh/Z9w==
+"@epnsproject/frontend-sdk-staging@^1.8.3":
+  version "1.8.3"
+  resolved "https://registry.yarnpkg.com/@epnsproject/frontend-sdk-staging/-/frontend-sdk-staging-1.8.3.tgz#7abc42ec4261251b00a17bf593a3e8e7d911d3bb"
+  integrity sha512-/lP25MLL2qq2wkCLra4KU/29F/TOy4xxFq4xlyLQGuFWpZm6aSJgM3ZqHVfAgBd+iqua3XzGzey7nvDWV16png==
   dependencies:
     "@rollup/plugin-commonjs" "^20.0.0"
     ansi-regex "^2.1.1"
@@ -1617,7 +1617,6 @@
     find-cache-dir "^3.3.1"
     find-up "^4.1.0"
     fs-extra "^8.1.0"
-    fsevents "^2.3.2"
     function-bind "^1.1.1"
     glob-parent "^5.1.2"
     globals "^9.18.0"
@@ -1687,6 +1686,8 @@
     trim-right "^1.0.1"
     tslib "^2.1.0"
     universalify "^0.1.2"
+  optionalDependencies:
+    fsevents "^2.3.2"
 
 "@ethersproject/abi@5.0.0-beta.153":
   version "5.0.0-beta.153"
