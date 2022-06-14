@@ -20,7 +20,7 @@ import {
   resetState,
   updateTopNotifications,
 } from "redux/slices/notificationSlice";
-import { fetchSpamNotifications } from "@epnsproject/sdk-restapi";
+import * as EPNSAPI from "@epnsproject/sdk-restapi";
 
 const NOTIFICATIONS_PER_PAGE = 10;
 // Create Header
@@ -40,7 +40,7 @@ function Feedbox() {
     if (loading || finishedFetching) return;
     setLoading(true);
     try {
-      const { count, results } = await fetchSpamNotifications({user: account,
+      const { count, results } = await EPNSAPI.fetchSpamNotifications({user: account,
         pageSize: NOTIFICATIONS_PER_PAGE,
         page,
         chainId
@@ -61,7 +61,7 @@ function Feedbox() {
     setBgUpdateLoading(true);
     setLoading(true);
     try {
-      const { count, results } = await fetchSpamNotifications({user: account,
+      const { count, results } = await EPNSAPI.fetchSpamNotifications({user: account,
         pageSize: NOTIFICATIONS_PER_PAGE,
         page: 1,
         chainId
