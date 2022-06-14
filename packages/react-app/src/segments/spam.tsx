@@ -20,6 +20,7 @@ import {
 import { postReq } from "api";
 import DisplayNotice from "components/DisplayNotice";
 import {ThemeProvider} from "styled-components";
+import { fetchSpamNotifications } from "@epnsproject/sdk-restapi";
 
 const NOTIFICATIONS_PER_PAGE = 10;
 // Create Header
@@ -115,12 +116,14 @@ function SpamBox({ currentTab }) {
     if (loading || finishedFetching  || run) return;
     setLoading(true);
     try {
-      const { count, results } = await api.fetchSpamNotifications(
-        account,
-        NOTIFICATIONS_PER_PAGE,
+      
+      const { count, results } = await fetchSpamNotifications({
+        user:account,
+        pageSize: NOTIFICATIONS_PER_PAGE,
         page,
-        envConfig.apiUrl
-      );
+        chainId,
+        
+      });
         let parsedResponse = utils.parseApiResponse(results);
           parsedResponse.forEach( (each,i) => {
               each.date = results[i].epoch;
@@ -155,12 +158,14 @@ function SpamBox({ currentTab }) {
     setLoading(true);
 
     try {
-      const { count, results } = await api.fetchSpamNotifications(
-        account,
-        NOTIFICATIONS_PER_PAGE,
-        1,
-        envConfig.apiUrl
-      );
+      
+      const { count, results } = await fetchSpamNotifications({
+        user:account,
+        pageSize: NOTIFICATIONS_PER_PAGE,
+        page: 1,
+        chainId,
+        
+      });
       if (!notifications.length) {
         dispatch(incrementPage());
       }
@@ -201,12 +206,14 @@ function SpamBox({ currentTab }) {
   const fetchAllNotif = async () => {
     setLoadFilter(true);
     try {
-      const { count, results } = await api.fetchSpamNotifications(
-        account,
-        100000,
-        1,
-        envConfig.apiUrl
-      );
+      const { count, results } = await fetchSpamNotifications({
+        user:account,
+        pageSize: 100000,
+        page: 1,
+        chainId,
+        
+      });
+      
       if (!notifications.length) {
         dispatch(incrementPage());
       }
