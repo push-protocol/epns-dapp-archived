@@ -181,26 +181,27 @@ function NFTPage({ epnsReadProvider, epnsWriteProvide }) {
         <Content padding="0px 20px 20px" bg="#eee">
           <Item align="flex-start" margin="0px 20px 0px 20px">
             <Controls>
-              {/* <SubscribeButton
-                index={0}
-                active={controlAt == 0 ? 1 : 0}
-                onClick={() => {
-                  userClickedAt(0);
-                }}
-              >
-                <ActionTitle>My NFTs</ActionTitle>
-              </SubscribeButton>
               <SubscribeButton
-                index={1}
+                className="v2"
+                index={0}
                 active={controlAt == 1 ? 1 : 0}
                 onClick={() => {
                   userClickedAt(1);
                 }}
               >
-                <ActionTitle>All NFTs</ActionTitle>
-              </SubscribeButton> */}
-              {/* <RockButton>Rockstar V2</RockButton>
-              <RockButton>Rockstar V1</RockButton> */}
+                <ActionTitle>ROCKSTAR V2</ActionTitle>
+              </SubscribeButton>
+
+              <SubscribeButton
+                className="v1"
+                index={1}
+                active={controlAt == 2 ? 1 : 0}
+                onClick={() => {
+                  userClickedAt(2);
+                }}
+              >
+                <ActionTitle>ROCKSTAR V1</ActionTitle>
+              </SubscribeButton> 
 
               <CheckSpace>
                 <input
@@ -387,7 +388,15 @@ const ChannelRockstarButton = styled.button`
 `;
 
 const SubscribeButton = styled(ChannelActionButton)`
-  background: #e20880;
+  &.v1 {
+    background-color: #adb5bd;
+  }
+  &.v2 {
+    background-color: #35c5f3;
+  }
+  border-radius: 0px;
+  font-size: 1rem;
+  letter-spacing: 0.1rem;
 `;
 
 const RockButton = styled(ChannelRockstarButton)`
