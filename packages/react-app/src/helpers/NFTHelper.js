@@ -48,7 +48,7 @@ const NFTHelper = {
       contract.tokenURI(index)
         .then(response => {
           if (enableLogs) console.log("getTokenURIByIndex() --> %o", response);
-          resolve(response.toNumber());
+          resolve(response);
         })
         .catch(err => {
           console.log("!!!Error, getTokenURIByIndex() --> %o", err);

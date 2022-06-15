@@ -38,15 +38,16 @@ import ViewNFTItem from "components/ViewNFTItem";
 
 const { scaleDown } = transitions;
 
+const provider = new ethers.providers.JsonRpcProvider("https://kovan.infura.io/v3/4ff53a5254144d988a8318210b56f47a");
+
 // Create Header
 function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
   const { account } = useWeb3React();
-  const provider = new ethers.providers.JsonRpcProvider("https://kovan.infura.io/v3/4ff53a5254144d988a8318210b56f47a")
 
   const [nftReadProvider, setNftReadProvider] = React.useState(null);
-  const [nftWriteProvider, setNftWriteProvider] = React.useState(null);
-  const [NFTRewardsContract, setNFTRewardsContract] = React.useState(null);
-  const [NFTObjects, setNFTObjects] = React.useState([]);
+  // const [nftWriteProvider, setNftWriteProvider] = React.useState(null);
+  // const [NFTRewardsContract, setNFTRewardsContract] = React.useState(null);
+  // const [NFTObjects, setNFTObjects] = React.useState([]);
 
   const [loading, setLoading] = React.useState(true);
 
@@ -74,34 +75,28 @@ function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
     }
   }, [account, provider]);
 
-
-  
-
   React.useEffect(() => {
-    if (nftReadProvider && NFTRewardsContract) {
+    if (nftReadProvider) {
       fetchNFTDetails();
     }
-  }, [account, nftReadProvider, nftWriteProvider, NFTRewardsContract]);
+  }, [account, nftReadProvider]);
 
   // to fetch all minted NFT Details
   const fetchNFTDetails = async () => {
     // let totalSupply = await NFTHelper.getTotalSupply(nftReadProvider);
-    let totalSupply = 1;
+    let totalSupply = 20;
     setLoading(false);
-    for (let i = 0; i < totalSupply; i++) {
-      let tokenId = await NFTHelper.getTokenURIByIndex(i, nftReadProvider);
+    for (let i = 1; i < totalSupply; i++) {
+      let tokenURI = await NFTHelper.getTokenURIByIndex(i, nftReadProvider);
     //   let NFTObject = await NFTHelper.getTokenData(
     //     tokenId,
     //     nftReadProvider,
     //     NFTRewardsContract
     //   );
     //   await setNFTObjects((prev) => [...prev, NFTObject]);
-  console.log(provider,nftReadProvider,nftWriteProvider)
-
+      console.log(tokenURI);
     }
   };
-
-
 
   return (
     <Section align="center">
@@ -122,7 +117,7 @@ function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
         </ContainerInfo>
       } */}
 
-      {!loading && NFTObjects.length != 0 && (
+      {/* {!loading && NFTObjects.length != 0 && (
         <ItemH id="scrollstyle-secondary">
           {Object.keys(NFTObjects).map((index) => {
             if (NFTObjects) {
@@ -142,7 +137,7 @@ function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
             }
           })}
         </ItemH>
-      )}
+      )} */}
     </Section>
   );
 }
