@@ -40,7 +40,7 @@ function Feedbox() {
     if (loading || finishedFetching) return;
     setLoading(true);
     try {
-      const { count, results } = await EPNSAPI.fetchSpamNotifications({user: account,
+      const { count, results } = await EPNSAPI.fetchNotifications({user: account,
         pageSize: NOTIFICATIONS_PER_PAGE,
         page,
         chainId
@@ -61,7 +61,7 @@ function Feedbox() {
     setBgUpdateLoading(true);
     setLoading(true);
     try {
-      const { count, results } = await EPNSAPI.fetchSpamNotifications({user: account,
+      const { count, results } = await EPNSAPI.fetchNotifications({user: account,
         pageSize: NOTIFICATIONS_PER_PAGE,
         page: 1,
         chainId
