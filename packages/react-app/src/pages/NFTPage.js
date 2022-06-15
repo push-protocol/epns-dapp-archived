@@ -219,7 +219,18 @@ function NFTPage({ epnsReadProvider, epnsWriteProvide }) {
                 setTokenId={setTokenId}
               />
             )}
+            
+            {/* NFTs version 1 */}
             {controlAt === 1 && (
+              <AllNFTs
+                controlAt={controlAt}
+                setControlAt={setControlAt}
+                setTokenId={setTokenId}
+              />
+            )}
+
+            {/* NFTs version 2 */}
+             {controlAt === 1 && (
               <AllNFTsV2
                 controlAt={controlAt}
                 setControlAt={setControlAt}

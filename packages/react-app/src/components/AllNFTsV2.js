@@ -34,7 +34,7 @@ import NFTHelper from "helpers/NFTHelper";
 import { ethers } from "ethers";
 
 import DisplayNotice from "components/DisplayNotice";
-import ViewNFTItem from "components/ViewNFTItem";
+import ViewNFTV2Item from "components/ViewNFTsV2Item";
 
 const { scaleDown } = transitions;
 
@@ -47,7 +47,7 @@ function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
   const [nftReadProvider, setNftReadProvider] = React.useState(null);
   // const [nftWriteProvider, setNftWriteProvider] = React.useState(null);
   // const [NFTRewardsContract, setNFTRewardsContract] = React.useState(null);
-  // const [NFTObjects, setNFTObjects] = React.useState([]);
+  const [NFTObjects, setNFTObjects] = React.useState([]);
 
   const [loading, setLoading] = React.useState(true);
 
@@ -93,8 +93,11 @@ function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
     //     nftReadProvider,
     //     NFTRewardsContract
     //   );
-    //   await setNFTObjects((prev) => [...prev, NFTObject]);
-      console.log(tokenURI);
+      let response = await fetch(tokenURI);
+      let data = await response.json()
+      await setNFTObjects((prev) => [...prev, data]);
+      console.log(data);
+
     }
   };
 
@@ -117,17 +120,17 @@ function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
         </ContainerInfo>
       } */}
 
-      {/* {!loading && NFTObjects.length != 0 && (
+      {!loading && NFTObjects.length != 0 && (
         <ItemH id="scrollstyle-secondary">
           {Object.keys(NFTObjects).map((index) => {
             if (NFTObjects) {
               return (
                 <>
-                  <ViewNFTItem
+                  <ViewNFTV2Item
                     key={NFTObjects[index].id}
                     NFTObject={NFTObjects[index]}
                     nftReadProvider={nftReadProvider}
-                    nftWriteProvider={nftWriteProvider}
+                    // nftWriteProvider={nftWriteProvider}
                     controlAt={controlAt}
                     setControlAt={setControlAt}
                     setTokenId={setTokenId}
@@ -137,7 +140,7 @@ function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
             }
           })}
         </ItemH>
-      )} */}
+      )}
     </Section>
   );
 }
