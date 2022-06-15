@@ -11,6 +11,7 @@ import NFTRewards from "./abis/NFTRewards.json";
 import epnsCommAbi from "./abis/epnsCommunicator.json";
 import MerkleDistributorAbi from "./abis/MerkleDistributor.json";
 import UniswapV2Router02Abi from "./abis/UniswapV2Router02.json";
+import rockstarV2Abi from "./abis/RockstarV2.json"
 
 export const abis = {
   erc20: erc20Abi,
@@ -27,6 +28,7 @@ export const abis = {
   NFTRewards: NFTRewards,
   distributor: MerkleDistributorAbi,
   uniswapV2Router02: UniswapV2Router02Abi,
+  rockstarV2: rockstarV2Abi
 };
 
 export { default as envConfig } from "./config";
