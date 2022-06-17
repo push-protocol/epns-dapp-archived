@@ -100,6 +100,10 @@ function ViewNFTV2Item({ NFTObject, nftReadProvider, nftWriteProvider, controlAt
     </Toaster>
   )
 
+  let newIp = (NFTObject.animation_url).replace('https://epns.mypinata.cloud/ipfs/','https://ipfs.io/ipfs/')
+  // https://gateway.pinata.cloud/ipfs/QmdNo8rGFc1F84dcLvACvDYXTHSKfh7yqbGbLahnnkNk9T
+  // https://ipfs.io/ipfs/QmS1zUjqSRbzZkp5jABzAGCuds5mHkVohqvb5wWbxpVLRX
+
   // render
   return (
     <Item
@@ -120,24 +124,24 @@ function ViewNFTV2Item({ NFTObject, nftReadProvider, nftWriteProvider, controlAt
               <Skeleton color="#eee" width="100%" height="100%" />
             }
             {!loading &&
-              <ReactPlayer url={`${NFTObject.animation_url}`} controls={true} playing={false} loop={true}/>
+              <ReactPlayer url={`${newIp}`} controls={true} playing={false} loop={true}/>
             }
-            {/* {!!account && !!library && NFTObject.owner != 0xFbA7Df351ADD4E79099f63E33b2679EDFDD5e2aB &&
+            {!!account && !!library && NFTObject.owner != 0xFbA7Df351ADD4E79099f63E33b2679EDFDD5e2aB &&
               <NFTStatus>
                 <IoIosGift size={20} color="#fff"/>
                 <NFTStatusTitle>
                   Gifted
                 </NFTStatusTitle>
               </NFTStatus>
-            } */}
+            }
 
-            {/* {!!account && !!library && NFTObject.claimable &&
+            {!!account && !!library && NFTObject.claimable &&
               <NFTClaim>
                 <NFTClaimTitle>
                   2400 $PUSH
                 </NFTClaimTitle>
               </NFTClaim>
-            } */}
+            }
           </ChannelLogoInner>
         </ChannelLogoOuter>
 

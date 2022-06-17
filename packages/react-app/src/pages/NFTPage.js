@@ -38,6 +38,7 @@ import { ethers } from "ethers";
 import DisplayNotice from "components/DisplayNotice";
 import ViewNFTItem from "components/ViewNFTItem";
 import MyNFTs from "components/MyNFTs";
+import MyNFTsV2 from "components/MyNFTsV2";
 import AllNFTs from "components/AllNFTs";
 import AllNFTsV2 from "components/AllNFTsV2"
 import TransferNFT from "components/TransferNFT";
@@ -59,6 +60,7 @@ function NFTPage({ epnsReadProvider, epnsWriteProvide }) {
 
   const [tokenId, setTokenId] = React.useState(null);
   const [controlAt, setControlAt] = React.useState(1);
+  const [version, setVersion] = React.useState(2);
   const [loading, setLoading] = React.useState(true);
 
   const [showAnswers, setShowAnswers] = React.useState([]);
@@ -71,12 +73,12 @@ function NFTPage({ epnsReadProvider, epnsWriteProvide }) {
   };
 
   React.useEffect(() => {
-    userClickedAt(1);
+    userClickedAt(2);
   }, [account]);
 
   // handle user action at control center
   const userClickedAt = (controlIndex) => {
-    setControlAt(controlIndex);
+    setVersion(controlIndex);
   };
 
   const handleChange = (e) => {
@@ -86,6 +88,7 @@ function NFTPage({ epnsReadProvider, epnsWriteProvide }) {
       setControlAt(1);
     }
   };
+
 
   return (
     <ThemeProvider theme={themes}>
@@ -182,22 +185,22 @@ function NFTPage({ epnsReadProvider, epnsWriteProvide }) {
           <Item align="flex-start" margin="0px 20px 0px 20px">
             <Controls>
               <SubscribeButton
-                className="v2"
-                index={0}
-                active={controlAt == 1 ? 1 : 0}
+                className={version === 2 ? "v2" : "v1"}
+                // index={2}
+                // active={version == 0 ? 1 : 0}
                 onClick={() => {
-                  userClickedAt(1);
+                  userClickedAt(2);
                 }}
               >
                 <ActionTitle>ROCKSTAR V2</ActionTitle>
               </SubscribeButton>
 
               <SubscribeButton
-                className="v1"
-                index={1}
-                active={controlAt == 2 ? 1 : 0}
+                className={version === 1 ? "v2" : "v1"}
+                // index={1}
+                // active={version == 1 ? 1 : 0}
                 onClick={() => {
-                  userClickedAt(2);
+                  userClickedAt(1);
                 }}
               >
                 <ActionTitle>ROCKSTAR V1</ActionTitle>
@@ -213,8 +216,16 @@ function NFTPage({ epnsReadProvider, epnsWriteProvide }) {
               </CheckSpace>
             </Controls>
 
-            {controlAt === 0 && (
+            {controlAt === 0 && version === 1 && (
               <MyNFTs
+                controlAt={controlAt}
+                setControlAt={setControlAt}
+                setTokenId={setTokenId}
+              />
+            )}
+
+            {controlAt === 0 && version === 2 && (
+              <MyNFTsV2
                 controlAt={controlAt}
                 setControlAt={setControlAt}
                 setTokenId={setTokenId}
@@ -222,7 +233,7 @@ function NFTPage({ epnsReadProvider, epnsWriteProvide }) {
             )}
             
             {/* NFTs version 1 */}
-            {controlAt === 1 && (
+            {controlAt === 1 && version === 1 && (
               <AllNFTs
                 controlAt={controlAt}
                 setControlAt={setControlAt}
@@ -231,7 +242,7 @@ function NFTPage({ epnsReadProvider, epnsWriteProvide }) {
             )}
 
             {/* NFTs version 2 */}
-             {controlAt === 1 && (
+             {controlAt === 1 && version === 2 && (
               <AllNFTsV2
                 controlAt={controlAt}
                 setControlAt={setControlAt}

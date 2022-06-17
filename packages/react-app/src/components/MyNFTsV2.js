@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState} from "react";
 import styled, { css } from 'styled-components';
 import Loader from 'react-loader-spinner'
 import { Waypoint } from "react-waypoint";
@@ -9,49 +9,74 @@ import NFTHelper from 'helpers/NFTHelper';
 import { ethers } from "ethers";
 
 import DisplayNotice from "components/DisplayNotice";
-import ViewNFTItem from "components/ViewNFTItem";
+import ViewNFTV2Item from "components/ViewNFTsV2Item";
+import { ItemH } from "./SharedStyling";
+// import ViewNFTItemV2 from "components/ViewNFTsItemV2";
+// import ViewNFTV2Item from "./ViewNFTsV2Item";
 
+const provider = new ethers.providers.JsonRpcProvider("https://kovan.infura.io/v3/4ff53a5254144d988a8318210b56f47a");
 
 // Create Header
 function MyNFTs({controlAt, setControlAt, setTokenId}) {
-  const { account, library } = useWeb3React();
+  const { account } = useWeb3React();
 
   const [nftReadProvider, setNftReadProvider] = React.useState(null);
-  const [nftWriteProvider, setNftWriteProvider] = React.useState(null);
-  const [NFTRewardsContract, setNFTRewardsContract] = React.useState(null);
-  const [NFTObjects, setNFTObjects] = React.useState([]);
+  // const [NFTRewardsContract, setNFTRewardsContract] = React.useState(null);
+  const [NFTObjects, setNFTObjects] = useState([]);
 
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-
-    if (!!(library && account)) {
-      const contractInstance = new ethers.Contract(addresses.rockstar, abis.rockstar, library);
+    if (!!(provider && account)) {
+      const contractInstance = new ethers.Contract(
+        addresses.rockstarV2,
+        abis.rockstarV2,
+        provider
+      );
       setNftReadProvider(contractInstance);
-      let signer = library.getSigner(account);
-      const signerInstance = new ethers.Contract(addresses.rockstar, abis.rockstar, signer);
-      setNftWriteProvider(signerInstance);
-      const NFTRewardsInstance = new ethers.Contract(addresses.NFTRewards, abis.NFTRewards, signer);
-      setNFTRewardsContract(NFTRewardsInstance);
+    //   let signer = provider.getSigner(account);
+    //   const signerInstance = new ethers.Contract(
+    //     addresses.rockstarV2,
+    //     abis.rockstarV2,
+    //     signer
+    //   );
+    //   setNftWriteProvider(signerInstance);
+    //   const NFTRewardsInstance = new ethers.Contract(
+    //     addresses.NFTRewards,
+    //     abis.NFTRewards,
+    //     signer
+    //   );
+    //   setNFTRewardsContract(NFTRewardsInstance);
     }
-  }, [account,library]);
+  }, [account, provider]);
 
   React.useEffect(() => {
-    if(nftReadProvider && NFTRewardsContract){
+    if (nftReadProvider) {
       fetchNFTDetails();
     }
-  }, [account, nftReadProvider, nftWriteProvider, NFTRewardsContract]);
+  }, [account, nftReadProvider]);
+
 
   // to fetch NFT Details
   const fetchNFTDetails = async () => {
     let balance = await NFTHelper.getNFTBalance(account, nftReadProvider);
     setLoading(false);
-    for(let i=0; i<balance; i++){
+    for(let i= 0; i<balance; i++){
       let tokenId = await NFTHelper.getTokenOfOwnerByIndex(account, i, nftReadProvider)
-      let NFTObject = await NFTHelper.getTokenData(tokenId, nftReadProvider, NFTRewardsContract)
-      console.log(tokenId)
-      await setNFTObjects(prev => [...prev, NFTObject])
+      let tokenURI = await NFTHelper.getTokenURIByIndex(tokenId, nftReadProvider);
+      // let NFTObject = await NFTHelper.getTokenData(tokenId, nftReadProvider,NFTRewardsContract)
+      let url = await callFunction(tokenURI)
+      setNFTObjects((prev) => [...prev, url]);
+      console.log(NFTObjects)
     }
+  }
+
+
+  const callFunction =  async (tokenURI) => {
+      let tokenUrl = tokenURI.replace('ipfs://','https://ipfs.io/ipfs/')
+      let response = await fetch(`${tokenUrl}`);
+      let data = await response.json()
+      return data
   }
 
   return (
@@ -78,16 +103,16 @@ function MyNFTs({controlAt, setControlAt, setTokenId}) {
 
 
       {!loading && NFTObjects.length != 0 &&
-        <Items id="scrollstyle-secondary">
+        <ItemH id="scrollstyle-secondary">
 
           {Object.keys(NFTObjects).map(index => {
-            if (NFTObjects[index].id) {
+            if (NFTObjects) {
               return (
-                <ViewNFTItem
+                <ViewNFTV2Item
                   key={NFTObjects[index].id}
                   NFTObject={NFTObjects[index]}
                   nftReadProvider={nftReadProvider}
-                  nftWriteProvider={nftWriteProvider}
+                  // nftWriteProvider={nftWriteProvider}
                   controlAt={controlAt}
                   setControlAt={setControlAt}
                   setTokenId={setTokenId}
@@ -96,7 +121,7 @@ function MyNFTs({controlAt, setControlAt, setTokenId}) {
             }
 
           })}
-        </Items>
+        </ItemH>
       }
     </>
   );

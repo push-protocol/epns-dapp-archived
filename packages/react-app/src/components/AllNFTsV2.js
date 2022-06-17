@@ -84,19 +84,21 @@ function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
   // to fetch all minted NFT Details
   const fetchNFTDetails = async () => {
     // let totalSupply = await NFTHelper.getTotalSupply(nftReadProvider);
-    let totalSupply = 20;
+    let totalSupply = 11;
     setLoading(false);
     for (let i = 1; i < totalSupply; i++) {
       let tokenURI = await NFTHelper.getTokenURIByIndex(i, nftReadProvider);
+      // let tokenId = await NFTHelper.getTokenOfOwnerByIndex(account, i, nftReadProvider)
     //   let NFTObject = await NFTHelper.getTokenData(
     //     tokenId,
     //     nftReadProvider,
     //     NFTRewardsContract
     //   );
-      let response = await fetch(tokenURI);
+    let tokenUrl = tokenURI.replace('ipfs://','https://ipfs.io/ipfs/')
+      let response = await fetch(`${tokenUrl}`);
       let data = await response.json()
+      // console.log(data)
       await setNFTObjects((prev) => [...prev, data]);
-      console.log(data);
 
     }
   };
@@ -127,13 +129,13 @@ function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
               return (
                 <>
                   <ViewNFTV2Item
-                    key={NFTObjects[index].id}
+                    key={NFTObjects[index]}
                     NFTObject={NFTObjects[index]}
                     nftReadProvider={nftReadProvider}
                     // nftWriteProvider={nftWriteProvider}
                     controlAt={controlAt}
                     setControlAt={setControlAt}
-                    setTokenId={setTokenId}
+                    // setTokenId={setTokenId}
                   />
                 </>
               );

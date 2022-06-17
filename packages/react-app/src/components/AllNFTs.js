@@ -120,7 +120,7 @@ function AllNFTs({ controlAt, setControlAt, setTokenId }) {
               return (
                 <>
                   <ViewNFTItem
-                    key={NFTObjects[index].id}
+                    key={NFTObjects[index]?.id}
                     NFTObject={NFTObjects[index]}
                     nftReadProvider={nftReadProvider}
                     nftWriteProvider={nftWriteProvider}
