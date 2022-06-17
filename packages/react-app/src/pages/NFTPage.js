@@ -212,6 +212,7 @@ function NFTPage({ epnsReadProvider, epnsWriteProvide }) {
                   className="checkbox"
                   onChange={handleChange}
                 />
+                {/* <span className=""></span> */}
                 Show mine
               </CheckSpace>
             </Controls>
@@ -293,14 +294,19 @@ const CheckSpace = styled.div`
   padding: 0px 5px;
   color: white;
   input.checkbox {
-    width: 12px;
-    height: 12px;
+    width: 11px;
+    height: 11px;
     margin-right: 5px;
-    border: 1px solid #adb5bd;
+    border: 1px solid transparent;
     // -webkit-appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -o-appearance: none;
+    appearance: none;
     background-color: white;
-    &.checked {
-      background-color: #2196f3;
+    &:checked {
+      background-color: #E10780;
+      border: 1px solid transparent;
     }
   }
 `;
