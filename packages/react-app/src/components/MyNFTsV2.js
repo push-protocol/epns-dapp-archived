@@ -60,14 +60,13 @@ function MyNFTs({controlAt, setControlAt, setTokenId}) {
   // to fetch NFT Details
   const fetchNFTDetails = async () => {
     let balance = await NFTHelper.getNFTBalance(account, nftReadProvider);
-    setLoading(false);
     for(let i= 0; i<balance; i++){
       let tokenId = await NFTHelper.getTokenOfOwnerByIndex(account, i, nftReadProvider)
       let tokenURI = await NFTHelper.getTokenURIByIndex(tokenId, nftReadProvider);
       // let NFTObject = await NFTHelper.getTokenData(tokenId, nftReadProvider,NFTRewardsContract)
       let url = await callFunction(tokenURI)
       setNFTObjects((prev) => [...prev, url]);
-      console.log(NFTObjects)
+      setLoading(false);
     }
   }
 
