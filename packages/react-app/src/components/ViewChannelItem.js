@@ -488,7 +488,8 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
 
   const CTA_OVERRIDE_CACHE = {
     "0xb1676B5Ab63F01F154bb9938F5e8999d9Da5444B": "https://boardroom.io/",
-    "0x7DA9A33d15413F499299687cC9d81DE84684E28E": "https://rmm.realtoken.network/dashboard"
+    "0x7DA9A33d15413F499299687cC9d81DE84684E28E": "https://rmm.realtoken.network/dashboard",
+    "0x90A48D5CF7343B08dA12E067680B4C6dbfE551Be": "https://shapeshift.com"
   }
 
   if (isBlocked) return <></>;
