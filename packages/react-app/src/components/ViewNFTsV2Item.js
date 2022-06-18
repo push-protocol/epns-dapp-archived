@@ -118,7 +118,7 @@ function ViewNFTV2Item({ NFTObject, nftReadProvider, nftWriteProvider, controlAt
         theme={
           !!account && !!library && account == NFTObject.owner ?
             "#e20880" :
-            !!account && !!library && NFTObject.owner != 0xFbA7Df351ADD4E79099f63E33b2679EDFDD5e2aB ?
+            !!account && !!library && NFTObject.owner != 0x452FD5f851c10C66FC66AeC1f6caE7B8131B8fca ?
               "#eee" :
               "#fff"
         }
@@ -131,14 +131,14 @@ function ViewNFTV2Item({ NFTObject, nftReadProvider, nftWriteProvider, controlAt
             {!loading &&
               <ReactPlayer url={`${newIp}`} controls={true} playing={false} loop={true}/>
             }
-            {/* {!!account && !!library && NFTObject.owner != 0xFbA7Df351ADD4E79099f63E33b2679EDFDD5e2aB &&
+            {!!account && !!library && NFTObject.owner != 0x452FD5f851c10C66FC66AeC1f6caE7B8131B8fca &&
               <NFTStatus>
                 <IoIosGift size={20} color="#fff"/>
                 <NFTStatusTitle>
                   Gifted
                 </NFTStatusTitle>
               </NFTStatus>
-            } */}
+            }
 
             {!!account && !!library && NFTObject.claimable &&
               <NFTClaim>
