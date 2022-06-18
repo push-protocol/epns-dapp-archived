@@ -38,6 +38,7 @@ import ViewNFTV2Item from "components/ViewNFTsV2Item";
 
 const { scaleDown } = transitions;
 
+//Note: KOVAN PROVIDER -> remove after ROCKSTAR V2 mainnet deployment
 const provider = new ethers.providers.JsonRpcProvider("https://kovan.infura.io/v3/4ff53a5254144d988a8318210b56f47a");
 
 // Create Header
@@ -45,33 +46,36 @@ function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
   const { account } = useWeb3React();
 
   const [nftReadProvider, setNftReadProvider] = React.useState(null);
-  // const [nftWriteProvider, setNftWriteProvider] = React.useState(null);
-  // const [NFTRewardsContract, setNFTRewardsContract] = React.useState(null);
+  const [nftWriteProvider, setNftWriteProvider] = React.useState(null);
+  const [NFTRewardsV2Contract, setNFTRewardsV2Contract] = React.useState(null);
   const [NFTObjects, setNFTObjects] = React.useState([]);
 
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
+    //Note: replace 'provider' with 'library' after ROCKSTAR V2 mainnet deployment
     if (!!(provider && account)) {
+      //Note: KOVAN PROVIDER -> replace 'provider' with 'library' after ROCKSTAR V2 mainnet deployment
       const contractInstance = new ethers.Contract(
         addresses.rockstarV2,
         abis.rockstarV2,
         provider
       );
       setNftReadProvider(contractInstance);
-    //   let signer = provider.getSigner(account);
-    //   const signerInstance = new ethers.Contract(
-    //     addresses.rockstarV2,
-    //     abis.rockstarV2,
-    //     signer
-    //   );
-    //   setNftWriteProvider(signerInstance);
-    //   const NFTRewardsInstance = new ethers.Contract(
-    //     addresses.NFTRewards,
-    //     abis.NFTRewards,
-    //     signer
-    //   );
-    //   setNFTRewardsContract(NFTRewardsInstance);
+      let signer = provider.getSigner(account);
+      const signerInstance = new ethers.Contract(
+        addresses.rockstarV2,
+        abis.rockstarV2,
+        signer
+      );
+      setNftWriteProvider(signerInstance);
+      //Note: KOVAN PROVIDER -> replace 'provider' with 'library' after ROCKSTAR V2 mainnet deployment
+      const NFTRewardsV2Instance = new ethers.Contract(
+        addresses.NFTRewardsV2,
+        abis.NFTRewardsV2,
+        provider
+      );
+      setNFTRewardsV2Contract(NFTRewardsV2Instance);
     }
   }, [account, provider]);
 
@@ -83,22 +87,22 @@ function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
 
   // to fetch all minted NFT Details
   const fetchNFTDetails = async () => {
-    // let totalSupply = await NFTHelper.getTotalSupply(nftReadProvider);
-    let totalSupply = 11;
+    let totalSupply = await NFTHelper.getTotalSupply(nftReadProvider);
     setLoading(false);
-    for (let i = 1; i < totalSupply; i++) {
-      let tokenURI = await NFTHelper.getTokenURIByIndex(i, nftReadProvider);
-      // let tokenId = await NFTHelper.getTokenOfOwnerByIndex(account, i, nftReadProvider)
-    //   let NFTObject = await NFTHelper.getTokenData(
-    //     tokenId,
-    //     nftReadProvider,
-    //     NFTRewardsContract
-    //   );
-    let tokenUrl = tokenURI.replace('ipfs://','https://ipfs.io/ipfs/')
+    for (let i = 0; i < totalSupply; i++) {
+      let tokenId = await NFTHelper.getTokenByIndex(i, nftReadProvider)
+      // let tokenURI = await NFTHelper.getTokenURIByIndex(tokenId, nftReadProvider);
+      let NFTObject = await NFTHelper.getTokenData(
+        tokenId,
+        nftReadProvider,
+        NFTRewardsV2Contract
+      );
+    let tokenUrl = NFTObject.metadata.replace('ipfs://','https://ipfs.io/ipfs/')
       let response = await fetch(`${tokenUrl}`);
       let data = await response.json()
       // console.log(data)
-      await setNFTObjects((prev) => [...prev, data]);
+      NFTObject['nftInfo'] = data
+      await setNFTObjects((prev) => [...prev, NFTObject]);
 
     }
   };
@@ -132,10 +136,10 @@ function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
                     key={NFTObjects[index]}
                     NFTObject={NFTObjects[index]}
                     nftReadProvider={nftReadProvider}
-                    // nftWriteProvider={nftWriteProvider}
+                    nftWriteProvider={nftWriteProvider}
                     controlAt={controlAt}
                     setControlAt={setControlAt}
-                    // setTokenId={setTokenId}
+                    setTokenId={setTokenId}
                   />
                 </>
               );

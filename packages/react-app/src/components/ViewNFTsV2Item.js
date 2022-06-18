@@ -22,19 +22,24 @@ import ReactPlayer from 'react-player';
 
 import NFTHelper from 'helpers/NFTHelper';
 
+//Note: KOVAN PROVIDER -> remove after NFTRewardsV2 mainnet deployment
+const provider = new ethers.providers.JsonRpcProvider("https://kovan.infura.io/v3/4ff53a5254144d988a8318210b56f47a");
+
 // Create Header
 function ViewNFTV2Item({ NFTObject, nftReadProvider, nftWriteProvider, controlAt, setControlAt, setTokenId}) {
   const { account, library } = useWeb3React();
 
-  const [NFTRewardsContract, setNFTRewardsContract] = React.useState(null);
+  const [NFTRewardsV2Contract, setNFTRewardsV2Contract] = React.useState(null);
   const [ loading, setLoading ] = React.useState(true);
   const [ txInProgress, setTxInProgress ] = React.useState(false);
 
   React.useEffect(() => {
     if (!!(library && account)) {
       let signer = library.getSigner(account);
-      const NFTRewardsInstance = new ethers.Contract(addresses.NFTRewards, abis.NFTRewards, signer);
-      setNFTRewardsContract(NFTRewardsInstance);
+    
+      //Note: KOVAN PROVIDER -> replace 'provider' with 'library' after NFTRewardsV2 mainnet deployment
+      const NFTRewardsV2Instance = new ethers.Contract(addresses.NFTRewardsV2, abis.NFTRewardsV2, provider);
+      setNFTRewardsV2Contract(NFTRewardsV2Instance);
     }
   }, [account,library]);
 
@@ -46,10 +51,10 @@ function ViewNFTV2Item({ NFTObject, nftReadProvider, nftWriteProvider, controlAt
 
   // to claim
   const handleClaim = async (tokenId) => {
-    if(NFTRewardsContract){
+    if(NFTRewardsV2Contract){
       setTxInProgress(true)
       let sendWithTxPromise
-      sendWithTxPromise = await NFTRewardsContract.claimReward(tokenId)
+      sendWithTxPromise = await NFTRewardsV2Contract.claimReward(tokenId)
       const tx = await sendWithTxPromise;
 
       console.log(tx);
@@ -100,7 +105,7 @@ function ViewNFTV2Item({ NFTObject, nftReadProvider, nftWriteProvider, controlAt
     </Toaster>
   )
 
-  let newIp = (NFTObject.animation_url).replace('https://epns.mypinata.cloud/ipfs/','https://ipfs.io/ipfs/')
+  let newIp = (NFTObject.nftInfo.animation_url).replace('https://epns.mypinata.cloud/ipfs/','https://ipfs.io/ipfs/')
   // https://gateway.pinata.cloud/ipfs/QmdNo8rGFc1F84dcLvACvDYXTHSKfh7yqbGbLahnnkNk9T
   // https://ipfs.io/ipfs/QmS1zUjqSRbzZkp5jABzAGCuds5mHkVohqvb5wWbxpVLRX
 
@@ -126,19 +131,19 @@ function ViewNFTV2Item({ NFTObject, nftReadProvider, nftWriteProvider, controlAt
             {!loading &&
               <ReactPlayer url={`${newIp}`} controls={true} playing={false} loop={true}/>
             }
-            {!!account && !!library && NFTObject.owner != 0xFbA7Df351ADD4E79099f63E33b2679EDFDD5e2aB &&
+            {/* {!!account && !!library && NFTObject.owner != 0xFbA7Df351ADD4E79099f63E33b2679EDFDD5e2aB &&
               <NFTStatus>
                 <IoIosGift size={20} color="#fff"/>
                 <NFTStatusTitle>
                   Gifted
                 </NFTStatusTitle>
               </NFTStatus>
-            }
+            } */}
 
             {!!account && !!library && NFTObject.claimable &&
               <NFTClaim>
                 <NFTClaimTitle>
-                  2400 $PUSH
+                  900 $PUSH
                 </NFTClaimTitle>
               </NFTClaim>
             }
@@ -154,16 +159,16 @@ function ViewNFTV2Item({ NFTObject, nftReadProvider, nftWriteProvider, controlAt
                 <Skeleton />
               </SkeletonButton>
             }
-            {/* {!!account && !!library && account == NFTObject.owner && !loading &&
+            {!!account && !!library && account == NFTObject.owner && !loading &&
               <UnsubscribeButton >
                 <ActionTitle onClick={() => {
                   setTokenId(NFTObject.id)
-                  setControlAt(2)
+                  setControlAt(3)
                 }}
                   >Transfer</ActionTitle>
               </UnsubscribeButton>
-            } */}
-            {/* {!!account && !!library && account == NFTObject.owner && !loading &&
+            }
+            {!!account && !!library && account == NFTObject.owner && !loading &&
                 <UnsubscribeButton disabled = {!NFTObject.claimable}>
                   {txInProgress &&
                     <ActionLoader>
@@ -182,7 +187,7 @@ function ViewNFTV2Item({ NFTObject, nftReadProvider, nftWriteProvider, controlAt
                     <ActionTitle hideit={txInProgress} >Rewards Claimed</ActionTitle>
                   }
                 </UnsubscribeButton>
-            } */}
+            }
           </ChannelActions>
         </ItemH>
       }
