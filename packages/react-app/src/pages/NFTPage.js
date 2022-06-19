@@ -42,6 +42,7 @@ import MyNFTsV2 from "components/MyNFTsV2";
 import AllNFTs from "components/AllNFTs";
 import AllNFTsV2 from "components/AllNFTsV2"
 import TransferNFT from "components/TransferNFT";
+import TransferNFTv2 from "components/TransferNFTv2";
 
 import { ThemeProvider } from "styled-components";
 
@@ -251,6 +252,7 @@ function NFTPage({ epnsReadProvider, epnsWriteProvide }) {
               />
             )}
             {controlAt === 2 && tokenId && <TransferNFT tokenId={tokenId} />}
+            {controlAt === 3 && tokenId && <TransferNFTv2 tokenId={tokenId} />}
           </Item>
         </Content>
       </Section>

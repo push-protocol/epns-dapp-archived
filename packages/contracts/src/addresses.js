@@ -21,10 +21,11 @@ const addresses = {
   USDTAddress: "0xdac17f958d2ee523a2206206994597c13d831ec7", // mainnet address
 
   rockstar: "0x3f8C2152b79276b78315CAF66cCF951780580A8a", //mainnet address
-  rockstarV2:"0x20776990a8643Ad0729ba612Df576695FbAf5958",//kovan address
   batchMintNFT: "0x6BaeeD93336B277D8949Cb89161269032698f443", //mainnet address
   NFTRewards: "0xc4708BB6EC3B797344f123126171302e4e3E68E2", //mainnet address
   distributor: "0x64CfAb2eA55ADAe08c9040fdA247828444fB9D0D", //mainnet address
+  rockstarV2:"0x20776990a8643Ad0729ba612Df576695FbAf5958",//kovan address
+  NFTRewardsV2: "0xdc0AB37352fe601C0A7eE5210e73D8450A602c30", //kovan address
 };
 
 export default addresses;
