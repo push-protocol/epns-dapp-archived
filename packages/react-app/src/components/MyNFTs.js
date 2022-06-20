@@ -49,7 +49,6 @@ function MyNFTs({controlAt, setControlAt, setTokenId}) {
     for(let i=0; i<balance; i++){
       let tokenId = await NFTHelper.getTokenOfOwnerByIndex(account, i, nftReadProvider)
       let NFTObject = await NFTHelper.getTokenData(tokenId, nftReadProvider, NFTRewardsContract)
-      console.log(tokenId)
       await setNFTObjects(prev => [...prev, NFTObject])
     }
   }
