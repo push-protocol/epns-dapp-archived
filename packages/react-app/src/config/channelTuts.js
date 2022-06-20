@@ -149,6 +149,12 @@ const channelsTuts = {
     userjourneyshort: 'ethtracker',
     article: null
   },
+  ethgastracker: {
+    maintainer: '0xDBc5936E4daaE94F415C39D284f6a69c4d553F2F',
+    userjourneyyoutube: 'https://www.youtube.com/embed/13ahwv-Ox04?controls=0&autoplay=1',
+    userjourneyshort: 'ethgastracker',
+    article: null
+  },
   ethpricetracker: {
     maintainer: '0x2B8ffb4460550Dbe8Ec1cEA9C1B61322dB56B082',
     userjourneyyoutube: 'https://www.youtube.com/embed/13ahwv-Ox04?controls=0&autoplay=1',
