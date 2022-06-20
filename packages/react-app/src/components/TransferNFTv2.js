@@ -45,7 +45,6 @@ function TransferNFTv2({tokenId}) {
 
   const handleTransferNFT = async(e) => {
     if(nftWriteProvider){
-    console.log("🚀 ~ file: TransferNFT.js ~ line 64 ~ handleTransferNFT ~ nftWriteProvider", nftWriteProvider)
     e.preventDefault();
 
     if (isEmpty(toAddress)) {
