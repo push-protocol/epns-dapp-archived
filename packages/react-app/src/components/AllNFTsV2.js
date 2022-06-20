@@ -38,12 +38,9 @@ import ViewNFTV2Item from "components/ViewNFTsV2Item";
 
 const { scaleDown } = transitions;
 
-//Note: KOVAN PROVIDER -> remove after ROCKSTAR V2 mainnet deployment
-const provider = new ethers.providers.JsonRpcProvider("https://kovan.infura.io/v3/4ff53a5254144d988a8318210b56f47a");
-
 // Create Header
 function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
-  const { account } = useWeb3React();
+  const { account, library } = useWeb3React();
 
   const [nftReadProvider, setNftReadProvider] = React.useState(null);
   const [nftWriteProvider, setNftWriteProvider] = React.useState(null);
@@ -53,31 +50,28 @@ function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    //Note: replace 'provider' with 'library' after ROCKSTAR V2 mainnet deployment
-    if (!!(provider && account)) {
-      //Note: KOVAN PROVIDER -> replace 'provider' with 'library' after ROCKSTAR V2 mainnet deployment
+    if (!!(library && account)) {
       const contractInstance = new ethers.Contract(
         addresses.rockstarV2,
         abis.rockstarV2,
-        provider
+        library
       );
       setNftReadProvider(contractInstance);
-      let signer = provider.getSigner(account);
+      let signer = library.getSigner(account);
       const signerInstance = new ethers.Contract(
         addresses.rockstarV2,
         abis.rockstarV2,
         signer
       );
       setNftWriteProvider(signerInstance);
-      //Note: KOVAN PROVIDER -> replace 'provider' with 'library' after ROCKSTAR V2 mainnet deployment
       const NFTRewardsV2Instance = new ethers.Contract(
         addresses.NFTRewardsV2,
         abis.NFTRewardsV2,
-        provider
+        library
       );
       setNFTRewardsV2Contract(NFTRewardsV2Instance);
     }
-  }, [account, provider]);
+  }, [account, library]);
 
   React.useEffect(() => {
     if (nftReadProvider) {
@@ -100,7 +94,6 @@ function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
     let tokenUrl = NFTObject.metadata.replace('ipfs://','https://ipfs.io/ipfs/')
       let response = await fetch(`${tokenUrl}`);
       let data = await response.json()
-      // console.log(data)
       NFTObject['nftInfo'] = data
       await setNFTObjects((prev) => [...prev, NFTObject]);
 

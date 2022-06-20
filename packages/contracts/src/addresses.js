@@ -24,8 +24,8 @@ const addresses = {
   batchMintNFT: "0x6BaeeD93336B277D8949Cb89161269032698f443", //mainnet address
   NFTRewards: "0xc4708BB6EC3B797344f123126171302e4e3E68E2", //mainnet address
   distributor: "0x64CfAb2eA55ADAe08c9040fdA247828444fB9D0D", //mainnet address
-  rockstarV2:"0x20776990a8643Ad0729ba612Df576695FbAf5958",//kovan address
-  NFTRewardsV2: "0xdc0AB37352fe601C0A7eE5210e73D8450A602c30", //kovan address
+  rockstarV2:"0xA2b885e7065EA59a3251489715ca80DE5Ff642f8",//mainnet address
+  NFTRewardsV2: "0xdc66567a990B7fa10730459537620857c9e03287", //mainnet address
 };
 
 export default addresses;

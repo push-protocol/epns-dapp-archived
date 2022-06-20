@@ -22,9 +22,6 @@ import ReactPlayer from 'react-player';
 
 import NFTHelper from 'helpers/NFTHelper';
 
-//Note: KOVAN PROVIDER -> remove after NFTRewardsV2 mainnet deployment
-const provider = new ethers.providers.JsonRpcProvider("https://kovan.infura.io/v3/4ff53a5254144d988a8318210b56f47a");
-
 // Create Header
 function ViewNFTV2Item({ NFTObject, nftReadProvider, nftWriteProvider, controlAt, setControlAt, setTokenId}) {
   const { account, library } = useWeb3React();
@@ -37,8 +34,7 @@ function ViewNFTV2Item({ NFTObject, nftReadProvider, nftWriteProvider, controlAt
     if (!!(library && account)) {
       let signer = library.getSigner(account);
     
-      //Note: KOVAN PROVIDER -> replace 'provider' with 'library' after NFTRewardsV2 mainnet deployment
-      const NFTRewardsV2Instance = new ethers.Contract(addresses.NFTRewardsV2, abis.NFTRewardsV2, provider);
+      const NFTRewardsV2Instance = new ethers.Contract(addresses.NFTRewardsV2, abis.NFTRewardsV2, signer);
       setNFTRewardsV2Contract(NFTRewardsV2Instance);
     }
   }, [account,library]);
@@ -106,8 +102,6 @@ function ViewNFTV2Item({ NFTObject, nftReadProvider, nftWriteProvider, controlAt
   )
 
   let newIp = (NFTObject.nftInfo.animation_url).replace('https://epns.mypinata.cloud/ipfs/','https://ipfs.io/ipfs/')
-  // https://gateway.pinata.cloud/ipfs/QmdNo8rGFc1F84dcLvACvDYXTHSKfh7yqbGbLahnnkNk9T
-  // https://ipfs.io/ipfs/QmS1zUjqSRbzZkp5jABzAGCuds5mHkVohqvb5wWbxpVLRX
 
   // render
   return (
@@ -118,7 +112,7 @@ function ViewNFTV2Item({ NFTObject, nftReadProvider, nftWriteProvider, controlAt
         theme={
           !!account && !!library && account == NFTObject.owner ?
             "#e20880" :
-            !!account && !!library && NFTObject.owner != 0x452FD5f851c10C66FC66AeC1f6caE7B8131B8fca ?
+            !!account && !!library && NFTObject.owner != 0xce5febfD9Eb155dd7d996FC04F1d763A3a9E0020 ?
               "#eee" :
               "#fff"
         }
@@ -131,7 +125,7 @@ function ViewNFTV2Item({ NFTObject, nftReadProvider, nftWriteProvider, controlAt
             {!loading &&
               <ReactPlayer url={`${newIp}`} controls={true} playing={false} loop={true}/>
             }
-            {!!account && !!library && NFTObject.owner != 0x452FD5f851c10C66FC66AeC1f6caE7B8131B8fca &&
+            {!!account && !!library && NFTObject.owner != 0xce5febfD9Eb155dd7d996FC04F1d763A3a9E0020 &&
               <NFTStatus>
                 <IoIosGift size={20} color="#fff"/>
                 <NFTStatusTitle>
