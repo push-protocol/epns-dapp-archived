@@ -42,6 +42,21 @@ const NFTHelper = {
     })
   },
 
+  getTokenURIByIndex: async (index, contract) => {
+    const enableLogs = 0;
+    return new Promise ((resolve, reject) => {
+      contract.tokenURI(index)
+        .then(response => {
+          if (enableLogs) console.log("getTokenURIByIndex() --> %o", response);
+          resolve(response);
+        })
+        .catch(err => {
+          console.log("!!!Error, getTokenURIByIndex() --> %o", err);
+          reject(err);
+        });
+    })
+  },
+
   getOwnerOfTokenId: async (tokenId, contract) => {
     const enableLogs = 0;
 

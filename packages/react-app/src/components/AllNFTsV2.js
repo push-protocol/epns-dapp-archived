@@ -34,17 +34,17 @@ import NFTHelper from "helpers/NFTHelper";
 import { ethers } from "ethers";
 
 import DisplayNotice from "components/DisplayNotice";
-import ViewNFTItem from "components/ViewNFTItem";
+import ViewNFTV2Item from "components/ViewNFTsV2Item";
 
 const { scaleDown } = transitions;
 
 // Create Header
-function AllNFTs({ controlAt, setControlAt, setTokenId }) {
+function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
   const { account, library } = useWeb3React();
 
   const [nftReadProvider, setNftReadProvider] = React.useState(null);
   const [nftWriteProvider, setNftWriteProvider] = React.useState(null);
-  const [NFTRewardsContract, setNFTRewardsContract] = React.useState(null);
+  const [NFTRewardsV2Contract, setNFTRewardsV2Contract] = React.useState(null);
   const [NFTObjects, setNFTObjects] = React.useState([]);
 
   const [loading, setLoading] = React.useState(true);
@@ -52,45 +52,51 @@ function AllNFTs({ controlAt, setControlAt, setTokenId }) {
   React.useEffect(() => {
     if (!!(library && account)) {
       const contractInstance = new ethers.Contract(
-        addresses.rockstar,
-        abis.rockstar,
+        addresses.rockstarV2,
+        abis.rockstarV2,
         library
       );
       setNftReadProvider(contractInstance);
       let signer = library.getSigner(account);
       const signerInstance = new ethers.Contract(
-        addresses.rockstar,
-        abis.rockstar,
+        addresses.rockstarV2,
+        abis.rockstarV2,
         signer
       );
       setNftWriteProvider(signerInstance);
-      const NFTRewardsInstance = new ethers.Contract(
-        addresses.NFTRewards,
-        abis.NFTRewards,
-        signer
+      const NFTRewardsV2Instance = new ethers.Contract(
+        addresses.NFTRewardsV2,
+        abis.NFTRewardsV2,
+        library
       );
-      setNFTRewardsContract(NFTRewardsInstance);
+      setNFTRewardsV2Contract(NFTRewardsV2Instance);
     }
   }, [account, library]);
 
   React.useEffect(() => {
-    if (nftReadProvider && NFTRewardsContract) {
+    if (nftReadProvider) {
       fetchNFTDetails();
     }
-  }, [account, nftReadProvider, nftWriteProvider, NFTRewardsContract]);
+  }, [account, nftReadProvider]);
 
   // to fetch all minted NFT Details
   const fetchNFTDetails = async () => {
     let totalSupply = await NFTHelper.getTotalSupply(nftReadProvider);
     setLoading(false);
     for (let i = 0; i < totalSupply; i++) {
-      let tokenId = await NFTHelper.getTokenByIndex(i, nftReadProvider);
+      let tokenId = await NFTHelper.getTokenByIndex(i, nftReadProvider)
+      // let tokenURI = await NFTHelper.getTokenURIByIndex(tokenId, nftReadProvider);
       let NFTObject = await NFTHelper.getTokenData(
         tokenId,
         nftReadProvider,
-        NFTRewardsContract
+        NFTRewardsV2Contract
       );
+    let tokenUrl = NFTObject.metadata.replace('ipfs://','https://ipfs.io/ipfs/')
+      let response = await fetch(`${tokenUrl}`);
+      let data = await response.json()
+      NFTObject['nftInfo'] = data
       await setNFTObjects((prev) => [...prev, NFTObject]);
+
     }
   };
 
@@ -119,8 +125,8 @@ function AllNFTs({ controlAt, setControlAt, setTokenId }) {
             if (NFTObjects) {
               return (
                 <>
-                  <ViewNFTItem
-                    key={NFTObjects[index]?.id}
+                  <ViewNFTV2Item
+                    key={NFTObjects[index]}
                     NFTObject={NFTObjects[index]}
                     nftReadProvider={nftReadProvider}
                     nftWriteProvider={nftWriteProvider}
@@ -165,4 +171,4 @@ const Items = styled.div`
 `;
 
 // Export Default
-export default AllNFTs;
+export default AllNFTsV2;
