@@ -1580,10 +1580,10 @@
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.2.5.tgz#8eed982e2ee6f7f4e44c253e12962980791efd46"
   integrity sha512-6U71C2Wp7r5XtFtQzYrW5iKFT67OixrSxjI4MptCHzdSVlgabczzqLe0ZSgnub/5Kp4hSbpDB1tMytZY9pwxxA==
 
-"@epnsproject/frontend-sdk-staging@^1.8.4":
-  version "1.8.4"
-  resolved "https://registry.yarnpkg.com/@epnsproject/frontend-sdk-staging/-/frontend-sdk-staging-1.8.4.tgz#7099db410cebf4f0cfc3bb5f653463fdbbc1a934"
-  integrity sha512-duRO+PF/bLYzoWUYtzhZQtsEGGPn2oGEPcNG7dLQi1gyKVkwVdM7zbixcuF+XoIUON3tfem5+oCTSTL9qx8eiw==
+"@epnsproject/frontend-sdk-staging@^1.8.5":
+  version "1.8.5"
+  resolved "https://registry.yarnpkg.com/@epnsproject/frontend-sdk-staging/-/frontend-sdk-staging-1.8.5.tgz#c0e3ddb0f9144e76e0bebde1d0fd40b4a807d84b"
+  integrity sha512-iQIRtkwD98PtGELA2iZkSPL/W+fxlBnVYEQQr5JEmFWqkew8nFwpq8x//kBd0Q+V2s2fhoc0vvZ632WLAol5pA==
   dependencies:
     "@rollup/plugin-commonjs" "^20.0.0"
     ansi-regex "^2.1.1"
@@ -1691,10 +1691,10 @@
   optionalDependencies:
     fsevents "^2.3.2"
 
-"@epnsproject/sdk-restapi@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@epnsproject/sdk-restapi/-/sdk-restapi-0.0.3.tgz#6f71cb01a06093423fdf926953d4654781619952"
-  integrity sha512-gvXHV29Sl2MvSHgwdES61r4J6t4VwPejMOa30NFdc2/ruwdeuWRSX60edGdcQLNH8GFIZC2thsq9y0T0cb+emw==
+"@epnsproject/sdk-restapi@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@epnsproject/sdk-restapi/-/sdk-restapi-0.0.6.tgz#a0ae71882d82e858f39252281b4e8d6750499105"
+  integrity sha512-o42BMk2noQG3OCApIkqQwus1+uMpZvdSZT3J7h1H+GuIIGyHo+kcHhOjSbQXB/NtbIMLCwE4w1tGsWKokhEG0Q==
   dependencies:
     axios "^0.27.2"
     tslib "^2.3.0"
