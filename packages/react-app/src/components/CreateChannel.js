@@ -522,7 +522,7 @@ function CreateChannel() {
                 )}
               </Item>
 
-              <Item
+              {/* <Item
                 margin="15px 20px 15px 20px"
                 flex="1"
                 self="stretch"
@@ -562,7 +562,7 @@ function CreateChannel() {
                     setChannelAlias(e.target.value);
                   }}
                 />
-              </Item>
+              </Item> */}
               <Item
                 margin="15px 20px 15px 20px"
                 flex="1"
