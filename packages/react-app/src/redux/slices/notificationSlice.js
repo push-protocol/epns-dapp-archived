@@ -36,9 +36,7 @@ export const contractSlice = createSlice({
             state.finishedFetching = true;
         },
         updateTopNotifications: (state, action) => {
-            console.log({pp: action.payload});
             state.notifications = [...action.payload.notifs, ...state.notifications.slice(action.payload.pageSize)];
-            console.log({sn: state.notifications});
         }
     }
 });

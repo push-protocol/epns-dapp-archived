@@ -36,6 +36,13 @@ import { addNewNotification } from "redux/slices/notificationSlice";
 export const ALLOWED_CORE_NETWORK = envConfig.coreContractChain; //chainId of network which we have deployed the core contract on
 const CHANNEL_TAB = 2; //Default to 1 which is the channel tab
 
+const blockchainName = {
+  1: "ETH_MAINNET",
+  137: "POLYGON_MAINNET",
+  42: "ETH_TEST_KOVAN",
+  80001: "POLYGON_TEST_MUMBAI",
+};
+
 // Create Header
 function ChannelDashboardPage() {
   ReactGA.pageview("/channel_dashboard");
@@ -286,6 +293,7 @@ function ChannelDashboardPage() {
   const fetchDelegators = () => {
     postReq("/channels/delegatee/get_channels", {
       delegateAddress: account,
+      blockchain: blockchainName[chainId],
       op: "read",
     })
       .then(async ({ data: delegators }) => {

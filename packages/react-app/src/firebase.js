@@ -1,6 +1,6 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp } from "@firebase/app";
 import { envConfig } from "@project/contracts";
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import { getMessaging, getToken, onMessage } from "@firebase/messaging";
 
 // Initialize the Firebase app in the service worker by passing the generated config
 var firebaseConfig = { ...envConfig.firebaseConfig };

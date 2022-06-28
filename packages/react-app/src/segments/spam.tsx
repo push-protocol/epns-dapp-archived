@@ -11,6 +11,7 @@ import {
   utils,
   NotificationItem,
 } from "@epnsproject/frontend-sdk-staging";
+import * as EpnsAPI from "@epnsproject/sdk-restapi";
 import {
   addPaginatedNotifications,
   incrementPage,
@@ -20,8 +21,10 @@ import {
 import { postReq } from "api";
 import DisplayNotice from "components/DisplayNotice";
 import { ThemeProvider } from "styled-components";
+import CryptoHelper from "helpers/CryptoHelper";
 import { ethers } from "ethers";
-import * as EpnsAPI from "@epnsproject/sdk-restapi";
+import { toast as toaster } from "react-toastify";
+import NotificationToast from "components/NotificationToast";
 
 const NOTIFICATIONS_PER_PAGE = 10;
 // Create Header
@@ -36,6 +39,10 @@ function SpamBox({ currentTab }) {
 
   const [darkMode, setDarkMode] = useState(false);
 
+  // toast related section
+	const [toast, showToast] = React.useState(null);
+  const clearToast = () => showToast(null);
+  
   const { run } = useSelector((state: any) => state.userJourney);
 
   const { notifications, page, finishedFetching } = useSelector((state: any) => state.spam);
@@ -55,6 +62,27 @@ function SpamBox({ currentTab }) {
   const [loading, setLoading] = React.useState(false);
 
   const onCoreNetwork = (chainId === envConfig.coreContractChain);
+
+  // toast customize
+  const LoaderToast = ({ msg, color }) => (
+    <Toaster>
+      <Loader type="Oval" color={color} height={30} width={30} />
+      <ToasterMsg>{msg}</ToasterMsg>
+    </Toaster>
+	);
+
+	const NormalToast = ({ msg }) => (
+		<Toaster>
+      <ToasterMsg>{msg}</ToasterMsg>
+    </Toaster>
+  )
+  
+  //clear toast variable after it is shown
+	React.useEffect(() => {
+		if (toast) {
+			clearToast();
+		}
+	}, [toast]);
 
   const nameToIdDev = {
     "POLYGON_TEST_MUMBAI": 80001,
@@ -381,6 +409,74 @@ function SpamBox({ currentTab }) {
       .includes(account.toLowerCase());
   };
 
+  const onDecrypt = async ({ secret, title, message, image, cta }) => {
+    let txToast;
+    try {
+      let decryptedSecret = await CryptoHelper.decryptWithWalletRPCMethod(library.provider, secret, account);
+    
+      // decrypt notification message
+      const decryptedBody = await CryptoHelper.decryptWithAES(message, decryptedSecret);
+
+      // decrypt notification title
+      let decryptedTitle = await CryptoHelper.decryptWithAES(title, decryptedSecret);
+
+      // decrypt notification image
+      let decryptedImage = await CryptoHelper.decryptWithAES(image, decryptedSecret);
+
+      // decrypt notification cta
+      let decryptedCta = await CryptoHelper.decryptWithAES(cta, decryptedSecret);
+      return { title: decryptedTitle, body: decryptedBody, image: decryptedImage, cta: decryptedCta };
+    } catch (error) {
+      if (error.code === 4001) {
+        // EIP-1193 userRejectedRequest error
+        console.error(error);
+        txToast = toaster.dark(
+          <NormalToast msg="User denied message decryption" />,
+          {
+            position: "bottom-right",
+            type: toaster.TYPE.ERROR,
+            autoClose: 5000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          }
+        );
+      } else if(error.code === -32601) {
+					console.error(error);
+					txToast = toaster.dark(
+						<NormalToast msg="Your wallet doesn't support message decryption." />,
+						{
+							position: "bottom-right",
+							type: toaster.TYPE.ERROR,
+							autoClose: 5000,
+							hideProgressBar: true,
+							closeOnClick: true,
+							pauseOnHover: true,
+							draggable: true,
+							progress: undefined,
+						}
+					);
+				} else {
+					console.error(error);
+					txToast = toaster.dark(
+						<NormalToast msg="There was an error in message decryption" />,
+						{
+							position: "bottom-right",
+							type: toaster.TYPE.ERROR,
+							autoClose: 5000,
+							hideProgressBar: true,
+							closeOnClick: true,
+							pauseOnHover: true,
+							draggable: true,
+							progress: undefined,
+						}
+					);
+				}
+    }
+  }
+
   // Render
   return (
     <ThemeProvider theme={themes}>
@@ -401,6 +497,8 @@ function SpamBox({ currentTab }) {
                 app,
                 icon,
                 image,
+                secret,
+                notification,
                 channel,
                 subscribers,
                 blockchain
@@ -413,8 +511,8 @@ function SpamBox({ currentTab }) {
                     <Waypoint onEnter={handlePagination} />
                   )}
                   <NotificationItem
-                    notificationTitle={title}
-                    notificationBody={message}
+                    notificationTitle={notification.title}
+                    notificationBody={notification.body}
                     cta={cta}
                     app={app}
                     icon={icon}
@@ -426,6 +524,8 @@ function SpamBox({ currentTab }) {
                     }}
                     isSpam
                     isSubscribedFn={async () => isSubscribedFn(subscribers)}
+                    isSecret={secret != ''}
+                    decryptFn={() => onDecrypt({ secret, title, message, image, cta })}
                     chainName={blockchain}
                   />
                 </div>
@@ -444,6 +544,12 @@ function SpamBox({ currentTab }) {
             />
           </CenteredContainerInfo>
         )}
+        {toast && (
+					<NotificationToast
+						notification={toast}
+						clearToast={clearToast}
+					/>
+				)}
       </Container>
     </ThemeProvider>
   );
@@ -484,6 +590,17 @@ const Container = styled.div`
   // justify-content: center;
   // width: 100%;
   // min-height: 40vh;
+`;
+
+const Toaster = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0px 10px;
+`;
+
+const ToasterMsg = styled.div`
+  margin: 0px 10px;
 `;
 
 // Export Default

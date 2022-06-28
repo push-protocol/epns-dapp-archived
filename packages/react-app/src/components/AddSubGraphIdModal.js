@@ -49,7 +49,7 @@ onClose, onSuccess, addSubGraphDetails
 
             addSubGraphDetails(identityBytes)
                 .then(async (tx) => {
-                    console.log(tx);
+                    // console.log(tx);
                     setLoading("Transaction Sent!");
 
                     setTimeout(() => {
@@ -73,7 +73,6 @@ onClose, onSuccess, addSubGraphDetails
             onClose();
         }
     };
-
     return (
     <ThemeProvider theme={themes}>
       <Overlay>

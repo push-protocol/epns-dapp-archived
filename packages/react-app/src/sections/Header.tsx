@@ -94,7 +94,7 @@ const chainIds = envConfig.allowedNetworks;
     } else if (error instanceof UnsupportedChainIdError) {
       handleChangeNetwork();
       if(envConfig.coreContractChain === 42)
-      return "Unsupported Network, please connect to the Ethereum Kovan network"
+      return "Unsupported Network, please connect to the Ethereum Kovan network or Polygon Mumbai network"
       else 
       return "Unsupported Network, please connect to the Ethereum Mainnet network"
     } else if (

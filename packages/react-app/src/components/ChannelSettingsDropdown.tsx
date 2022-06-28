@@ -301,6 +301,8 @@ function ChannelSettings() {
               )}
             </ActionTitle>
           </ChannelActionButton>
+
+          
         </ActiveChannelWrapper>
       </DropdownWrapper>
       {/* modal to display the activate channel popup */}

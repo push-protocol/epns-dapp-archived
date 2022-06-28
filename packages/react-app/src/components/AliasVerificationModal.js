@@ -28,7 +28,7 @@ export default function AliasVerificationModal({
     useClickAway(modalRef, ()=>onClose(loading !== ''));
 
     const checkAlias = async () => {
-        console.log(mainAddress, aliasEthAccount);
+        // console.log(mainAddress, aliasEthAccount);
         if (mainAddress == aliasEthAccount) {
             submitAlias();
         } else {
@@ -44,7 +44,7 @@ export default function AliasVerificationModal({
         const anotherSendTxPromise = polygonCommsContract.verifyChannelAlias(mainAddress);
         anotherSendTxPromise
         .then(async (tx) => {
-            console.log(tx);
+            // console.log(tx);
             setLoading("Transaction Sent!");
 
 			await tx.wait(1);

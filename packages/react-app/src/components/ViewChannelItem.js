@@ -60,7 +60,6 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
   const onCoreNetwork = (chainId === envConfig.coreContractChain);
 
   const [channelObject, setChannelObject] = React.useState({});
-  const [isOwner, setIsOwner] = React.useState(false);
   const [channelJson, setChannelJson] = React.useState({});
   const [subscribed, setSubscribed] = React.useState(true);
   const [loading, setLoading] = React.useState(true);
@@ -81,6 +80,13 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
   const [toast, showToast] = React.useState(null);
   const clearToast = () => showToast(null);
 
+  let isOwner;
+  if(!onCoreNetwork) {
+    isOwner = channelObject.alias_address === account;
+  } else {
+    isOwner = channelObject.addr === account;
+  }
+
   //clear toast variable after it is shown
   React.useEffect(() => {
     if (toast) {
@@ -100,36 +106,11 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
     } else {
       // if this key (verifiedBy) is not present it means we are searching and should fetch the channel object from chain again
       epnsReadProvider.channels(channelObject.addr).then((response) => {
-        setChannelObject({ ...response, addr: channelObject.addr });
+        setChannelObject({ ...response, addr: channelObject.addr, alias_address: channelObject.alias_address });
         fetchChannelJson();
       });
     }
   }, [account, channelObject, chainId]);
-
-  React.useEffect(() => {
-    (async function init() {
-      if (!channelObject.addr) return;
-      // if we are not on the core network then check for if this account is an alias for another channel
-      if (!onCoreNetwork) {
-        // get the alias address of the eth address, in order to properly render information about the channel
-        const aliasEth = await postReq("/channels/get_alias_details", {
-          channel: channelObject.addr,
-          op: "read",
-        }).then(({ data }) => {
-          console.log({ data });
-          const aliasAccount = data;
-          if (aliasAccount) {
-            setEthAliasAccount(aliasAccount.aliasAddress);
-            setIsOwner(account === aliasAccount.aliasAddress);
-            fetchChannelJson();
-          }
-          return data;
-        });
-      } else {
-        setIsOwner(account === channelObject.addr);
-      }
-    })();
-    }, [account, channelObject, chainId]);
 
   React.useEffect(() => {
     if (!channelObjectProp) return;
@@ -173,8 +154,7 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
       }
       let channelAddress = channelObject.addr;
       if (!onCoreNetwork) {
-        if (ethAliasAccount == 'NULL') return;
-        channelAddress = ethAliasAccount;
+        channelAddress = channelObject.alias_address;
       }
       if (!channelAddress) return;
       const channelSubscribers = await postReq("/channels/get_subscribers", {
@@ -355,7 +335,7 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
 
       let channelAddress = channelObject.addr;
       if (!onCoreNetwork) {
-        channelAddress = ethAliasAccount;
+        channelAddress = channelObject.alias_address;
       }
 
       const message = {
@@ -468,7 +448,7 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
 
       let channelAddress = channelObject.addr;
       if (!onCoreNetwork) {
-        channelAddress = ethAliasAccount;
+        channelAddress = channelObject.alias_address;
       }
 
       const message = {
@@ -527,6 +507,11 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
     }
   };
 
+  const CTA_OVERRIDE_CACHE = {
+    "0xb1676B5Ab63F01F154bb9938F5e8999d9Da5444B": "https://boardroom.io/",
+    "0x7DA9A33d15413F499299687cC9d81DE84684E28E": "https://rmm.realtoken.network/dashboard",
+    "0x90A48D5CF7343B08dA12E067680B4C6dbfE551Be": "https://shapeshift.com"
+  }
   if (isBlocked) return <></>;
   if (isChannelBlacklisted) return <></>;
 
@@ -551,7 +536,7 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
             <Skeleton color={themes.interfaceSkeleton} width="50%" height={24} />
           ) : (
             <ChannelTitleLink
-              href={channelJson.url}
+              href={CTA_OVERRIDE_CACHE[channelObject.addr] || channelJson.url}
               target="_blank"
               rel="nofollow"
             >

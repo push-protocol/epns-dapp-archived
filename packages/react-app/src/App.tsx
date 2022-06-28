@@ -6,11 +6,11 @@ import { useWeb3React } from "@web3-react/core";
 import { AbstractConnector } from "@web3-react/abstract-connector";
 import { useEagerConnect, useInactiveListener } from "hooks";
 import { injected, walletconnect, portis, ledger } from "connectors";
+import { envConfig } from "@project/contracts";
 import Joyride, { ACTIONS, CallBackProps, EVENTS, STATUS, Step } from "react-joyride";
-import { ToastContainer, toast } from "react-toastify";
-import styled, {useTheme} from "styled-components";
-import { Item, ItemH, Span, H2, B, A, C } from "components/SharedStyling";
 
+import styled, {useTheme} from "styled-components";
+import { Item, ItemH, Span, H2, H3, B, A, C, Button } from "components/SharedStyling";
 import Header from "sections/Header";
 import Navigation from "sections/Navigation";
 
@@ -24,11 +24,12 @@ import GLOBALS from "config/Globals";
 
 import {setRun, setIndex, setWelcomeNotifsEmpty} from "./redux/slices/userJourneySlice";
 import { useSelector, useDispatch } from "react-redux";
-import UserJourneySteps from "segments/userJourneySteps.jsx";
+import UserJourneySteps from "segments/userJourneySteps";
 import { getPushToken, onMessageListener } from "./firebase";
 
 import * as dotenv from "dotenv";
 import { postReq } from "api";
+import { toast } from "react-toastify";
 dotenv.config();
 
 const CACHEPREFIX = "PUSH_TOKEN_";
@@ -48,7 +49,6 @@ const web3Connectors = {
   Ledger: { obj: ledger, logo: "./svg/login/ledger.svg", title: "Ledger" },
   Portis: { obj: portis, logo: "./svg/login/portis.svg", title: "Portis" },
 };
-
 export default function App() {
 
   const dispatch = useDispatch();
@@ -114,7 +114,7 @@ export default function App() {
     }).catch(err => console.log('failed: ', err))
     .finally(() => setTriggerNotification(!triggerNotification)); //retrigger the listener after it has been used once
   // }, [triggerNotification]);
-
+  
 
   React.useEffect(() => {
     const now = Date.now()/ 1000;
@@ -132,7 +132,7 @@ export default function App() {
   useInactiveListener(!triedEager || !!activatingConnector);
 
   // Initialize GA
-  ReactGA.initialize("UA-165415629-5");
+  ReactGA.initialize(envConfig.googleAnalyticsId);
   ReactGA.pageview("/login");
   // Initialize GA
 
@@ -218,14 +218,14 @@ export default function App() {
           steps={steps}
           continuous={tutorialContinous}
           stepIndex={stepIndex}
-          hideFooter={true}
-          primaryProps={false}
+          // hideFooter={true}
+          // primaryProps={false}
           hideBackButton={true}
           hideCloseButton={false}
           disableScrolling={true}
           disableScrollParentFix={true}
-          disableFlip={true}
-          showNextButton={false}
+          // disableFlip={true}
+          // showNextButton={false}
           showSkipButton={false}
           disableOverlayClose={true}
           callback={handleJoyrideCallback}
@@ -236,7 +236,6 @@ export default function App() {
               overlayColor:  darkMode ? themeDark.dynamicTutsBgOverlay : themeLight.dynamicTutsBgOverlay,
               primaryColor: darkMode ? themeDark.dynamicTutsPrimaryColor : themeLight.dynamicTutsPrimaryColor,
               textColor: darkMode ? themeDark.dynamicTutsFontColor : themeLight.dynamicTutsFontColor,
-              minWidth: 280,
               zIndex: 1000,
             },
           }}
@@ -346,7 +345,6 @@ export default function App() {
                 </A>
                 .
               </Span>
-              
               <Item
                 flex="initial"
                 padding="30px 15px"

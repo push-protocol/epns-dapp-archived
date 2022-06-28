@@ -39,6 +39,13 @@ import GLOBALS from "config/Globals";
 export const ALLOWED_CORE_NETWORK = envConfig.coreContractChain; //chainId of network which we have deployed the core contract on
 const CHANNEL_TAB = 1; //Default to 1 which is the channel tab
 
+const blockchainName = {
+  1: "ETH_MAINNET",
+  137: "POLYGON_MAINNET",
+  42: "ETH_TEST_KOVAN",
+  80001: "POLYGON_TEST_MUMBAI",
+};
+
 // Create Header
 function InboxPage({ loadTeaser, playTeaser }) {
   ReactGA.pageview("/channels");
@@ -281,6 +288,7 @@ function InboxPage({ loadTeaser, playTeaser }) {
   const fetchDelegators = () => {
     postReq("/channels/delegatee/get_channels", {
       delegateAddress: account,
+      blockchain: blockchainName[chainId],
       op: "read",
     })
       .then(async ({ data: delegators }) => {
@@ -311,6 +319,7 @@ function InboxPage({ loadTeaser, playTeaser }) {
 
   // Check if a user is a channel or not
   const checkUserForChannelOwnership = async () => {
+    if (!onCoreNetwork && !aliasEthAccount) return;
     // Check if account is admin or not and handle accordingly
     const ownerAccount = !onCoreNetwork ? aliasEthAccount : account;
     EPNSCoreHelper.getChannelJsonFromUserAddress(ownerAccount, epnsReadProvider)
