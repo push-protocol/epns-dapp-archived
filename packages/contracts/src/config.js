@@ -4,7 +4,7 @@ const config = {
     toolingApiUrl: "https://tooling.epns.io/apis",
     allowedNetworks: [
         42, //for ropsten
-        // 80001 //for mumbai polygon
+        80001 //for mumbai polygon
     ],
     coreContractChain: 42, //the chain id of the network which the core contract relies on
     mainnetCoreContractChain: 1,
