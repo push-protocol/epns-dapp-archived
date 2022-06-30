@@ -173,7 +173,7 @@ const NavigationList = {
             name: window.location.hostname == "app.epns.io" ? "Staging dApp" : "Prod dApp",
             title: window.location.hostname == "app.epns.io" ? "Staging dApp" : "Prod dApp",
             alt: window.location.hostname == "app.epns.io" ? "Checkout Staging dApp" : "Checkout Prod dApp",
-            href: window.location.hostname == "app.epns.io" ? "https://staging.epns.io" : "https://app.epns.io",
+            href: window.location.hostname == "app.epns.io" ? "https://staging-app.epns.io" : "https://app.epns.io",
             newTab: false,
             isRoute: false,
             hasMenuLogic: false,
