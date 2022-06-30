@@ -9,8 +9,9 @@ import SearchFilter from '../components/SearchFilter';
 import {
   api,
   utils,
-  NotificationItem,
+  // NotificationItem,
 } from "@epnsproject/frontend-sdk-staging";
+import { NotificationItem } from "@epnsproject/sdk-uiweb";
 import {
   addPaginatedNotifications,
   incrementPage,
@@ -124,10 +125,10 @@ function SpamBox({ currentTab }) {
         chainId,
         
       });
-        let parsedResponse = utils.parseApiResponse(results);
+        let parsedResponse = EpnsAPI.parseApiResponse(results);
           parsedResponse.forEach( (each,i) => {
-              each.date = results[i].epoch;
-              each.epoch = (new Date(each.date).getTime() / 1000);
+              each['date'] = results[i].epoch;
+              each['epoch'] = (new Date(each['date']).getTime() / 1000);
           })
           const parsedResponsePromise = parsedResponse.map(async (elem: any, i: any) => {
             elem.channel = results[i].channel;
@@ -169,10 +170,10 @@ function SpamBox({ currentTab }) {
       if (!notifications.length) {
         dispatch(incrementPage());
       }
-      let parsedResponse = utils.parseApiResponse(results);
+      let parsedResponse = EpnsAPI.parseApiResponse(results);
         parsedResponse.forEach( (each,i) => {
-            each.date = results[i].epoch;
-            each.epoch = (new Date(each.date).getTime() / 1000);
+            each['date'] = results[i].epoch;
+            each['epoch'] = (new Date(each['date']).getTime() / 1000);
         })
         const parsedResponsePromise = parsedResponse.map(async (elem: any, i: any) => {
           elem.channel = results[i].channel;
@@ -217,10 +218,10 @@ function SpamBox({ currentTab }) {
       if (!notifications.length) {
         dispatch(incrementPage());
       }
-      let parsedResponse = utils.parseApiResponse(results);
+      let parsedResponse = EpnsAPI.parseApiResponse(results);
         parsedResponse.forEach( (each,i) => {
-            each.date = results[i].epoch;
-            each.epoch = (new Date(each.date).getTime() / 1000);
+            each['date'] = results[i].epoch;
+            each['epoch'] = (new Date(each['date']).getTime() / 1000);
         })
         const parsedResponsePromise = parsedResponse.map(async (elem: any, i: any) => {
           elem.channel = results[i].channel;
@@ -235,7 +236,7 @@ function SpamBox({ currentTab }) {
         });
       parsedResponse = await Promise.all(parsedResponsePromise);
 
-      let res = parsedResponse.filter( notif => !isSubscribedFn(notif.subscribers));
+      let res = parsedResponse.filter( notif => !isSubscribedFn(notif['subscribers']));
       setNotif(res);
 
 
@@ -334,6 +335,8 @@ function SpamBox({ currentTab }) {
                 image,
                 channel,
                 subscribers,
+                url,
+                blockchain
               } = oneNotification;
               // render the notification item
               // console.log(app , index);
@@ -350,12 +353,11 @@ function SpamBox({ currentTab }) {
                     icon={icon}
                     image={image}
                     theme={themes.scheme}
-                    subscribeFn={(e) => {
-                      e?.stopPropagation();
-                      onSubscribeToChannel(channel);
-                    }}
+                    subscribeFn={() => onSubscribeToChannel(channel)}
                     isSpam
                     isSubscribedFn={async () => isSubscribedFn(subscribers)}
+                    chainName={blockchain}
+                    url={url}
                   />
                 </div>
               );

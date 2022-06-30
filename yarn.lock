@@ -1689,13 +1689,21 @@
   optionalDependencies:
     fsevents "^2.3.2"
 
-"@epnsproject/sdk-restapi@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@epnsproject/sdk-restapi/-/sdk-restapi-0.0.3.tgz#6f71cb01a06093423fdf926953d4654781619952"
-  integrity sha512-gvXHV29Sl2MvSHgwdES61r4J6t4VwPejMOa30NFdc2/ruwdeuWRSX60edGdcQLNH8GFIZC2thsq9y0T0cb+emw==
+"@epnsproject/sdk-restapi@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@epnsproject/sdk-restapi/-/sdk-restapi-0.1.2.tgz#253a8eff4b199f891c79541a19b5ad45cba45cd8"
+  integrity sha512-CohMLsz5WR5/9Yj8lDuiJGDoQxX7snBxehC4WCzgXTXSESToTqsabOfBun4cBC8CzEjI8qAe5pLaRUqgWKSfGg==
   dependencies:
     axios "^0.27.2"
     tslib "^2.3.0"
+
+"@epnsproject/sdk-uiweb@^0.1.7":
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/@epnsproject/sdk-uiweb/-/sdk-uiweb-0.1.7.tgz#14e41cd23da4b4e09da7389c03ea2099a01743b7"
+  integrity sha512-NvbzhStyjldsPwRDYPXY3Fb1KRHxVnCaQdOxQuLG2IIPWFE60KdxEluj0FjnYlyfP7GaWNPx7ny2gk7+0xywVw==
+  dependencies:
+    date-fns "^2.28.0"
+    html-react-parser "^1.4.13"
 
 "@ethersproject/abi@5.0.0-beta.153":
   version "5.0.0-beta.153"
@@ -9962,6 +9970,14 @@ html-dom-parser@1.1.1:
     domhandler "4.3.1"
     htmlparser2 "7.2.0"
 
+html-dom-parser@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/html-dom-parser/-/html-dom-parser-1.2.0.tgz#8f689b835982ffbf245eda99730e92b8462c111e"
+  integrity sha512-2HIpFMvvffsXHFUFjso0M9LqM+1Lm22BF+Df2ba+7QHJXjk63pWChEnI6YG27eaWqUdfnh5/Vy+OXrNTtepRsg==
+  dependencies:
+    domhandler "4.3.1"
+    htmlparser2 "7.2.0"
+
 html-encoding-sniffer@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/html-encoding-sniffer/-/html-encoding-sniffer-1.0.2.tgz#e70d84b94da53aa375e11fe3a351be6642ca46f8"
@@ -10001,6 +10017,16 @@ html-react-parser@^1.2.8:
     html-dom-parser "1.1.1"
     react-property "2.0.0"
     style-to-js "1.1.0"
+
+html-react-parser@^1.4.13:
+  version "1.4.14"
+  resolved "https://registry.yarnpkg.com/html-react-parser/-/html-react-parser-1.4.14.tgz#577b7a90be0c61eebbbc488d914ad08398c79ef5"
+  integrity sha512-pxhNWGie8Y+DGDpSh8cTa0k3g8PsDcwlfolA+XxYo1AGDeB6e2rdlyv4ptU9bOTiZ2i3fID+6kyqs86MN0FYZQ==
+  dependencies:
+    domhandler "4.3.1"
+    html-dom-parser "1.2.0"
+    react-property "2.0.0"
+    style-to-js "1.1.1"
 
 html-webpack-plugin@4.0.0-beta.11:
   version "4.0.0-beta.11"
@@ -18453,6 +18479,13 @@ style-to-js@1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/style-to-js/-/style-to-js-1.1.0.tgz#631cbb20fce204019b3aa1fcb5b69d951ceac4ac"
   integrity sha512-1OqefPDxGrlMwcbfpsTVRyzwdhr4W0uxYQzeA2F1CBc8WG04udg2+ybRnvh3XYL4TdHQrCahLtax2jc8xaE6rA==
+  dependencies:
+    style-to-object "0.3.0"
+
+style-to-js@1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/style-to-js/-/style-to-js-1.1.1.tgz#417786986cda61d4525c80aed9d1123a6a7af9b8"
+  integrity sha512-RJ18Z9t2B02sYhZtfWKQq5uplVctgvjTfLWT7+Eb1zjUjIrWzX5SdlkwLGQozrqarTmEzJJ/YmdNJCUNI47elg==
   dependencies:
     style-to-object "0.3.0"
 

@@ -45,7 +45,7 @@ function Feedbox() {
         page,
         chainId
       });
-      const parsedResponse = utils.parseApiResponse(results);
+      const parsedResponse = EpnsAPI.parseApiResponse(results);
       dispatch(addPaginatedNotifications(parsedResponse));
       if (count === 0) {
         dispatch(setFinishedFetching());
@@ -69,7 +69,7 @@ function Feedbox() {
       if (!notifications.length) {
         dispatch(incrementPage());
       }
-      const parsedResponse = utils.parseApiResponse(results);
+      const parsedResponse = EpnsAPI.parseApiResponse(results);
       // replace the first 20 notifications with these
       dispatch(
         updateTopNotifications({
