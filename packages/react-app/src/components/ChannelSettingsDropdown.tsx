@@ -262,19 +262,21 @@ function ChannelSettings() {
           </ActionTitle>
         </DeactivateButton>
         <ActiveChannelWrapper>
-
-        <ChannelActionButton
-            disabled={channelInactive}
-            onClick={() => !channelInactive && setAddSubGraphIdOpen(true)}
-          >
-            <ActionTitle>
-              {addSubgraphDetailsLoading ? (
-                <Loader type="Oval" color="#FFF" height={16} width={16} />
-              ) : (
-                "Add SubGraph Details"
-              )}
-            </ActionTitle>
-          </ChannelActionButton>
+        
+          {onCoreNetwork &&
+            <ChannelActionButton
+              disabled={channelInactive}
+              onClick={() => !channelInactive && setAddSubGraphIdOpen(true)}
+            >
+              <ActionTitle>
+                {addSubgraphDetailsLoading ? (
+                  <Loader type="Oval" color="#FFF" height={16} width={16} />
+                ) : (
+                  "Add SubGraph Details"
+                )}
+              </ActionTitle>
+            </ChannelActionButton>
+          }
 
           <ChannelActionButton
             disabled={channelInactive}

@@ -124,7 +124,7 @@ const ChannelOwnerDashboard = () => {
           {channelDetails && ((!onCoreNetwork && aliasVerified) || onCoreNetwork) ? <ChannelDetails /> : ""}
           {/* display the details about the profile of the channel */}
           {/* display the notifications settings */}
-          {(channelDetails && ((!onCoreNetwork && aliasVerified) || onCoreNetwork)) || delegatees?.length ? <SendNotifications /> : ""}
+          {(channelDetails && (!onCoreNetwork && aliasVerified)) || delegatees?.length ? <SendNotifications /> : ""}
           {/* display the notifications settings */}
         </ModifiedContent>
       </Section>

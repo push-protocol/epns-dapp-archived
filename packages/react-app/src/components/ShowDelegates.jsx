@@ -9,10 +9,16 @@ import { useDeviceWidthCheck } from "hooks";
 import RemoveDelegateModal from "./RemoveDelegateModal";
 import DelegateInfo from "./DelegateInfo";
 
+const blockchainName = {
+  1: "ETH_MAINNET",
+  137: "POLYGON_MAINNET",
+  42: "ETH_TEST_KOVAN",
+  80001: "POLYGON_TEST_MUMBAI",
+};
+
 const ShowDelegates = () => {
-  const { account } = useWeb3React();
+  const { account, chainId } = useWeb3React();
   const [delegatees, setDelegatees] = React.useState([account]);
-  const isMobile = useDeviceWidthCheck(600);
   const theme = useTheme();
   const [isActiveDelegateDropdown, setIsActiveDelegateDropdown] = React.useState(false);
   const [removeModalOpen, setRemoveModalOpen] = React.useState(false);
@@ -37,7 +43,8 @@ const ShowDelegates = () => {
   const fetchDelegatees = async () => {
     try {
       const { data } = await postReq("/channels/delegatee/get_delegate", {
-        channelAddress: account
+        channelAddress: account,
+        blockchain: blockchainName[chainId]
       });
 
       if (data?.delegateAddress) {

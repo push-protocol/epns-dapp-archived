@@ -22,10 +22,8 @@ export default function PreviewNotif({ details }) {
   const [check, setCheck] = useState();
 
   let channelDetail;
-  if (account !== details.channelAddress)
-    channelDetail = delegatees.filter(delegateeInfo => delegateeInfo.address == details.channelAddress)[0];
-  else
-    channelDetail = channelDetails;    
+  channelDetail = delegatees.filter(delegateeInfo => delegateeInfo.address == details.channelAddress)[0];
+  if(!channelDetail) channelDetail = channelDetails;    
 
   const themes = useTheme();
   const NotifItem = ({ test }) => {

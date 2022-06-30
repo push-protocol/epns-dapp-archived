@@ -255,11 +255,11 @@ function ChannelDashboardPage() {
     setChannelJson([]);
     // save push admin to global state
     epnsReadProvider.pushChannelAdmin()
-    .then((response) => {
+      .then((response) => {
       dispatch(setPushAdmin(response));
     })
-    .catch(err =>{
-      console.log({err})
+      .catch(err => {
+      console.log("hello", {err})
     });
 
     // EPNS Read Provider Set
@@ -302,11 +302,12 @@ function ChannelDashboardPage() {
         if (delegators && delegators.channelOwners) {
           const channelInformationPromise = [
             ...new Set([account, ...delegators.channelOwners])//make the accounts unique
-          ].map((channelAddress) =>
-            ChannelsDataStore.instance
+          ].map((channelAddress) => {
+            return ChannelsDataStore.instance
               .getChannelJsonAsync(channelAddress)
               .then((res) => ({ ...res, address: channelAddress }))
               .catch(() => false)
+          }
           );
           const channelInformation = await Promise.all(
             channelInformationPromise
@@ -324,6 +325,11 @@ function ChannelDashboardPage() {
 
   // Check if a user is a channel or not
   const checkUserForChannelOwnership = async () => {
+    if (!onCoreNetwork && aliasEthAccount == null) {
+      setChannelAdmin(false);
+      setAdminStatusLoaded(true);
+      return;
+    }
     // Check if account is admin or not and handle accordingly
     const ownerAccount = !onCoreNetwork ? aliasEthAccount : account;
     console.log(ownerAccount);
