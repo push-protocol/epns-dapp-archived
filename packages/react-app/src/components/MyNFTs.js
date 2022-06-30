@@ -69,7 +69,7 @@ function MyNFTs({controlAt, setControlAt, setTokenId}) {
       {!loading && NFTObjects.length == 0 &&
         <ContainerInfo>
           <DisplayNotice
-            title="No ROCKSTAR tokens are available in your account"
+            title="No ROCKSTAR NFTs are available in your account"
             theme="primary"
           />
         </ContainerInfo>
