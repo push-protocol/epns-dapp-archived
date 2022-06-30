@@ -371,6 +371,7 @@ function Feedbox() {
                 cta,
                 title,
                 message,
+                url,
                 app,
                 icon,
                 image,
@@ -382,6 +383,7 @@ function Feedbox() {
                   <NotificationItem
                     notificationTitle={title}
                     notificationBody={message}
+                    url={url}
                     cta={cta}
                     app={app}
                     icon={icon}
@@ -396,6 +398,7 @@ function Feedbox() {
             const {
               cta,
               title,
+              url,
               message,
               app,
               icon,
@@ -403,7 +406,8 @@ function Feedbox() {
               secret,
               notification,
               blockchain
-            } = oneNotification;
+              } = oneNotification;
+              console.log(oneNotification);
             if(run) return;
             // render the notification item
             return (
@@ -414,6 +418,7 @@ function Feedbox() {
                 <NotificationItem
                   notificationTitle={notification.title}
                   notificationBody={notification.body}
+                  url={url}
                   cta={cta}
                   app={app}
                   icon={icon}
