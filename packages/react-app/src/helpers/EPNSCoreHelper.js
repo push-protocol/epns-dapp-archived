@@ -187,7 +187,6 @@ const EPNSCoreHelper = {
       })
         .then(response => {
           if (enableLogs) console.log("getAliasAddressFromChannelAddress() --> %o", response);
-          console.log(response?.data?.aliasAddress);
           resolve(response?.data?.aliasAddress);
         })
         .catch(err => {
@@ -206,10 +205,8 @@ const EPNSCoreHelper = {
       EPNSCoreHelper.getChannelInfo(channel, contract)
         .then(response => EPNSCoreHelper.getChannelEvent(channel, response.channelStartBlock.toNumber(), response.channelUpdateBlock.toNumber(), contract))
         .then(response => {
-          console.log(response, channel);
           // add little hack for now to change coindesk's descriptioon
           const hash = channel === COINDESK_CHANNEL_ADDR ? COINDESK_HASH : (channel === ENS_CHANNEL_ADDR ? ENS_HASH : response);
-          console.log(hash);
           return EPNSCoreHelper.getJsonFileFromIdentity(hash, channel)
           // return EPNSCoreHelper.getJsonFileFromIdentity(response, channel)
         })

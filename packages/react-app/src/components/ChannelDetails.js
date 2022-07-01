@@ -65,7 +65,7 @@ export default function ChannelDetails() {
         op: "read",
       }).then(async ({ data }) => {
         const aliasAccount = data;
-        console.log(aliasAccount);
+        // console.log(aliasAccount);
         if (aliasAccount.aliasAddress) {
           const { aliasAddress } = aliasAccount;
             await postReq("/channels/get_alias_verification_status", {

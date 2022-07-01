@@ -507,7 +507,7 @@ export default class ChannelsDataStore {
           
           await Promise.all([getAliasAddress, getChannelJson]);
 
-          console.log("getChannelJsonAsync() [Address: %s] --> %o", channelAddress, objResponse);
+          console.log("getChannelJsonAsync() [Address: %s] --> %o", objResponse);
           this.state.channelsJson[channelAddress] = objResponse;
           resolve(objResponse);
         } catch(err) {

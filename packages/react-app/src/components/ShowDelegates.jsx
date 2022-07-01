@@ -48,7 +48,6 @@ const ShowDelegates = () => {
       });
 
       if (data?.delegateAddress) {
-        console.log(data.delegateAddress);
         setDelegatees([account, ...data.delegateAddress]);
       }
     } catch (err) {

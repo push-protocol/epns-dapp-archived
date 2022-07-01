@@ -82,7 +82,7 @@ function SendNotifications() {
   const isChannelDeactivated = channelDetails
       ? channelDetails.channelState === CHANNNEL_DEACTIVATED_STATE
         : false;
-    console.log(delegatees);
+    // console.log(delegatees);
     let cannotDisplayDelegatees;
     if (onCoreNetwork)
         cannotDisplayDelegatees = (delegatees.length === 1 && delegatees[0].address === account) ||
@@ -121,10 +121,8 @@ function SendNotifications() {
             (nfCTAEnabled && nfCTA == "") ||
             (nfMediaEnabled && nfMedia == "")
         ) {
-            console.log("hello world 1");
             return false;
         }
-        console.log("hello world 2");
         return true;
     };
 

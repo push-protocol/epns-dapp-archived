@@ -259,7 +259,7 @@ function ChannelDashboardPage() {
       dispatch(setPushAdmin(response));
     })
       .catch(err => {
-      console.log("hello", {err})
+      console.log({err})
     });
 
     // EPNS Read Provider Set
