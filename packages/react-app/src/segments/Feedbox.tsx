@@ -9,12 +9,8 @@ import DisplayNotice from "components/DisplayNotice";
 import { postReq } from "api";
 import SearchFilter from '../components/SearchFilter';
 import {ThemeProvider} from "styled-components";
-import {
-  api,
-  utils,
-  NotificationItem,
-} from "@epnsproject/frontend-sdk-staging";
 import * as EpnsAPI from "@epnsproject/sdk-restapi";
+import { NotificationItem } from "@epnsproject/sdk-uiweb";
 import {
   addPaginatedNotifications,
   incrementPage,
@@ -157,7 +153,7 @@ function Feedbox() {
         chainId,
         
       });
-      const parsedResponse = utils.parseApiResponse(results);
+      const parsedResponse = EpnsAPI.parseApiResponse(results);
       dispatch(addPaginatedNotifications(parsedResponse));
       if (count === 0) {
         dispatch(setFinishedFetching());
@@ -182,7 +178,7 @@ function Feedbox() {
             if (!notifications.length) {
                 dispatch(incrementPage());
             }
-            const parsedResponse = utils.parseApiResponse(results);
+            const parsedResponse = EpnsAPI.parseApiResponse(results);
             const map1 = new Map();
             const map2 = new Map();
             results.forEach( each => {
@@ -190,9 +186,9 @@ function Feedbox() {
                 map2.set(each.payload.data.sid , each.channel);
             })
             parsedResponse.forEach( each => {
-                each.date = map1.get(each.sid);
-                each.epoch = (new Date(each.date).getTime() / 1000);
-                each.channel = map2.get(each.sid);
+                each['date'] = map1.get(each.sid);
+                each['epoch'] = (new Date(each['date']).getTime() / 1000);
+                each['channel'] = map2.get(each.sid);
             })
             dispatch(
                 updateTopNotifications({
@@ -224,7 +220,7 @@ function Feedbox() {
           if (!notifications.length) {
               dispatch(incrementPage());
           }
-          const parsedResponse = utils.parseApiResponse(results);
+          const parsedResponse = EpnsAPI.parseApiResponse(results);
           const map1 = new Map();
           const map2 = new Map();
           results.forEach( each => {
@@ -232,9 +228,9 @@ function Feedbox() {
               map2.set(each.payload.data.sid , each.channel);
           })
           parsedResponse.forEach( each => {
-              each.date = map1.get(each.sid);
-              each.epoch = (new Date(each.date).getTime() / 1000);
-              each.channel = map2.get(each.sid);
+              each['date'] = map1.get(each.sid);
+              each['epoch'] = (new Date(each['date']).getTime() / 1000);
+              each['channel'] = map2.get(each.sid);
           })
           setNotif(parsedResponse);
       } catch (err) {
@@ -375,6 +371,7 @@ function Feedbox() {
                 app,
                 icon,
                 image,
+                blockchain
               } = oneNotification;
 
               // render the notification item
@@ -388,6 +385,7 @@ function Feedbox() {
                     app={app}
                     icon={icon}
                     image={image}
+                    chainName={blockchain}
                     theme={themes.scheme}
                   />
                 </div>
@@ -405,9 +403,8 @@ function Feedbox() {
               image,
               secret,
               notification,
-              blockchain
-              } = oneNotification;
-              console.log(oneNotification);
+              blockchain,
+            } = oneNotification;
             if(run) return;
             // render the notification item
             return (
