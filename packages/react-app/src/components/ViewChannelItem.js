@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import styled, { css, useTheme } from "styled-components";
 import { Device } from "assets/Device";
 
@@ -12,15 +12,13 @@ import { FaRegAddressCard } from "react-icons/fa";
 import { AiOutlineShareAlt } from "react-icons/ai";
 import { useWeb3React } from "@web3-react/core";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 
-import {ThemeProvider} from "styled-components";
-import { Item, ItemH, Span, H2, B, A } from "components/SharedStyling";
+import { ItemH, Span } from "../primaries/SharedStyling";
 
 import { postReq } from "api";
 
 import MetaInfoDisplayer from "components/MetaInfoDisplayer";
-import NotificationToast from "components/NotificationToast";
+import NotificationToast from "../primaries/NotificationToast";
 
 import ChannelTutorial, { isChannelTutorialized } from "segments/ChannelTutorial";
 
@@ -28,16 +26,14 @@ import ChannelsDataStore from "singletons/ChannelsDataStore";
 import { cacheChannelInfo } from "redux/slices/channelSlice";
 
 import { envConfig } from "@project/contracts";
-import { incrementStepIndex,addNewWelcomeNotif } from "redux/slices/userJourneySlice";
+import { incrementStepIndex, addNewWelcomeNotif } from "redux/slices/userJourneySlice";
+import { cacheSubscribe, cacheUnsubscribe } from "redux/slices/channelSlice";
 
 // Create Header
 function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
   const dispatch = useDispatch();
 
   const themes = useTheme();
-  const [darkMode, setDarkMode] = useState(false);
-
-  const navigate = useNavigate();
 
   const {
     run,
@@ -106,7 +102,7 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
     } else {
       // if this key (verifiedBy) is not present it means we are searching and should fetch the channel object from chain again
       epnsReadProvider.channels(channelObject.addr).then((response) => {
-        setChannelObject({ ...response, addr: channelObject.addr, alias_address: channelObject.alias_address });
+        setChannelObject({ ...response, addr: channelObject.addr, alias_address: channelObject.alias_address, memberCount: channelObject.memberCount, isSubscriber: channelObject.isSubscriber });
         fetchChannelJson();
       });
     }
@@ -157,29 +153,12 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
         channelAddress = channelObject.alias_address;
       }
       if (!channelAddress) return;
-      const channelSubscribers = await postReq("/channels/get_subscribers", {
-        channel: channelAddress,
-        blockchain: chainId,
-        op: "read",
-      })
-        .then(({ data }) => {
-          const subs = data.subscribers;
-
-          return subs;
-        })
-        .catch((err) => {
-          console.log(`getChannelSubscribers => ${err.message}`);
-          return [];
-        });
-        let subscribed = channelSubscribers.find((sub) => {
-        return sub.toLowerCase() === account.toLowerCase();
-      });
 
       if (run) subscribed = false;
       setIsPushAdmin(pushAdminAddress === account);
-      setMemberCount(channelSubscribers.length);
-      setSubscribed(subscribed);
-      setChannelJson({ ...channelJson, addr: channelObject.addr });
+      setMemberCount(channelObject.memberCount);
+      setSubscribed(channelObject.isSubscriber);
+      setChannelJson({ ...channelJson, addr: channelObject.addr, memberCount: channelObject.memberCount, isSubscriber: channelObject.isSubscriber });
       setLoading(false);
     } catch (err) {
       setIsBlocked(true);
@@ -390,6 +369,7 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
         chainId,
         contractAddress: epnsCommReadProvider.address,
       }).then((res) => {
+        dispatch(cacheSubscribe({ channelAddress: channelObject.addr }));
         setSubscribed(true);
         setMemberCount(memberCount + 1);
         toaster.update(txToast, {
@@ -481,6 +461,7 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
         contractAddress: epnsCommReadProvider.address,
       })
         .then((res) => {
+          dispatch(cacheUnsubscribe({ channelAddress: channelObject.addr }));
           setSubscribed(false);
           setMemberCount(memberCount - 1);
           toaster.update(txToast, {

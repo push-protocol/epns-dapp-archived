@@ -4,12 +4,12 @@ import { ethers } from "ethers";
 import styled, { useTheme, ThemeProvider } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import { useWeb3React } from "@web3-react/core";
-import { Item, Button } from "components/SharedStyling";
+import { Item, Button } from "../primaries/SharedStyling";
 import { addresses, abis, envConfig } from "@project/contracts";
 import { postReq } from "api";
 
 import { toast as toaster } from "react-toastify";
-import NotificationToast from "components/NotificationToast";
+import NotificationToast from "../primaries/NotificationToast";
 
 import Loader from "react-loader-spinner";
 
@@ -43,7 +43,7 @@ function InboxPage() {
 	const clearToast = () => showToast(null);
 
 	// whether secret notif are enabled
-	const [enabledSecretNotif, setEnabledSecretNotif] = React.useState(false);
+	// const [enabledSecretNotif, setEnabledSecretNotif] = React.useState(false);
 
 	const themes = useTheme();
 	const onCoreNetwork = ALLOWED_CORE_NETWORK === chainId;
@@ -56,18 +56,21 @@ function InboxPage() {
 	}, [toast]);
 	// toast related section
 
-	// React.useEffect(async () => {
-	// 	// get public key from Backend API
-	// 	let encryptionKey = await postReq('/encryption_key/get_encryption_key', {
-	// 			address: account,
-	// 			op: "read"
-	// 	}).then(res => {
-	// 			return res.data?.encryption_key;
-	// 	});
+	// React.useEffect(() => {
+	// 	const fetchEncryptionKey = async () => {
+	// 		// get public key from Backend API
+	// 		let encryptionKey = await postReq('/encryption_key/get_encryption_key', {
+	// 				address: account,
+	// 				op: "read"
+	// 		}).then(res => {
+	// 				return res.data?.encryption_key;
+	// 		});
 
-	// 	if (encryptionKey != null) {
-	// 		setEnabledSecretNotif(true);
+	// 		if (encryptionKey != null) {
+	// 			setEnabledSecretNotif(true);
+	// 		}
 	// 	}
+	// 	fetchEncryptionKey();
 	// }, [enabledSecretNotif])
 
 	React.useEffect(() => {
@@ -364,10 +367,7 @@ function InboxPage() {
 const Container = styled.div`
 	flex-direction: column;
 	background: ${(props) => props.theme.mainBg};
-	height: calc(
-		100vh - ${GLOBALS.CONSTANTS.HEADER_HEIGHT}px - 52px -
-			${(props) => props.theme.interfaceTopPadding}
-	);
+	height: calc(100vh - ${GLOBALS.CONSTANTS.HEADER_HEIGHT}px - 52px - ${props => props.theme.interfaceTopPadding});
 	align-items: stretch;
 	align-self: stretch;
 `;

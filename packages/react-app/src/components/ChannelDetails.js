@@ -6,7 +6,7 @@ import styled , {useTheme} from "styled-components";
 import { useSelector } from "react-redux";
 import ChannelsDataStore from "singletons/ChannelsDataStore";
 import ShowDelegates from "./ShowDelegates";
-import { Item } from "./SharedStyling";
+import { Item } from "../primaries/SharedStyling";
 import { postReq } from "api";
 import { useWeb3React } from "@web3-react/core";
 const DATE_FORMAT = "DD/MM/YYYY";
@@ -66,6 +66,34 @@ export default function ChannelDetails() {
       }).then(async ({ data }) => {
         const aliasAccount = data;
         // console.log(aliasAccount);
+        if (aliasAccount.aliasAddress) {
+          const { aliasAddress } = aliasAccount;
+            await postReq("/channels/get_alias_verification_status", {
+              aliasAddress: aliasAddress,
+              op: "read",
+            }).then(({ data }) => {
+              if (!data) {
+                return;
+              }
+              const { status } = data;
+              setAliasVerified(status || false);
+              return data;
+            });
+        }
+      });
+    })();
+  }, [account , chainId]);
+
+  React.useEffect(() => {
+    if (!onCoreNetwork) return;
+
+    (async function() {
+      await postReq("/channels/get_alias_details", {
+        channel : account,
+        op: "read",
+      }).then(async ({ data }) => {
+        const aliasAccount = data;
+        console.log(aliasAccount);
         if (aliasAccount.aliasAddress) {
           const { aliasAddress } = aliasAccount;
             await postReq("/channels/get_alias_verification_status", {
@@ -185,13 +213,6 @@ const Subscribers = styled.div`
   align-items: center;
 `;
 
-const ActiveIcon = styled.span`
-  width: 8px;
-  height: 8px;
-  background: #57c255;
-  border-radius: 50%;
-`;
-
 const ChanneStateText = styled.span`
   color: #57c255;
   font-family: Source Sans Pro;
@@ -205,7 +226,6 @@ const ChanneStateText = styled.span`
   margin-bottom: 8px;
   display: flex;
   align-items: center;
-
   ${(props) =>
     props.active &&
     `
@@ -240,10 +260,6 @@ const Details = styled.div`
   display: flex;
   flex-direction: column;
 `;
-const SectionLine = styled.div`
-  margin-left: 30px;
-  margin-right: 30px;
-`;
 
 const Date = styled.div`
   display: flex;
@@ -256,7 +272,6 @@ const Verified = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-
   & > span {
     color: #ec008c;
     fontsize: 1em;
@@ -267,7 +282,6 @@ const Verified = styled.div`
 const ChannelName = styled.div`
   display: flex;
   flex-direction: row;
-
   font-family: Source Sans Pro;
   font-style: normal;
   font-weight: normal;

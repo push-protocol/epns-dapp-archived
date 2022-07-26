@@ -1,11 +1,10 @@
 import React from "react";
-import { Item, Span, Section, Content, H2, H3 } from "./SharedStyling";
+import { Item, Span, Section, Content, H2, H3 } from "primaries/SharedStyling";
 import { GoTriangleDown, GoTriangleUp } from "react-icons/go";
 import { postReq } from "api";
 import { useWeb3React } from "@web3-react/core";
 import styled, { useTheme, css } from "styled-components";
 import { useSelector } from "react-redux";
-import { useDeviceWidthCheck } from "hooks";
 import RemoveDelegateModal from "./RemoveDelegateModal";
 import DelegateInfo from "./DelegateInfo";
 

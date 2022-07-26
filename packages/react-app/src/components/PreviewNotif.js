@@ -1,13 +1,9 @@
-import React, { useRef } from "react";
-import { useClickAway } from "react-use";
+import React from "react";
 import styled, { ThemeProvider, useTheme } from "styled-components";
-import { Item, Span, H2, P } from "./SharedStyling";
+import { Item, Span, H2 } from "../primaries/SharedStyling";
 import { useWeb3React } from "@web3-react/core";
 import { NotificationItem } from "@epnsproject/sdk-uiweb";
 import { useSelector } from "react-redux";
-import { set } from "react-ga";
-import { useState } from "react";
-import { useEffect } from "react";
 
 const blockchainName = {
   1: "ETH_MAINNET",
@@ -18,12 +14,11 @@ const blockchainName = {
 
 export default function PreviewNotif({ details }) {
   const { delegatees, channelDetails } = useSelector((state) => state.admin);
-  const { chainId, account } = useWeb3React();
-  const [check, setCheck] = useState();
+  const { chainId } = useWeb3React();
 
   let channelDetail;
   channelDetail = delegatees.filter(delegateeInfo => delegateeInfo.address == details.channelAddress)[0];
-  if(!channelDetail) channelDetail = channelDetails;    
+  if(!channelDetail) channelDetail = channelDetails; 
 
   const themes = useTheme();
   const NotifItem = ({ test }) => {
@@ -49,7 +44,7 @@ export default function PreviewNotif({ details }) {
         <Item align="flex-start">
           <H2 textTransform="uppercase" spacing="0.1em">
             <Span weight="200" style={{ color: themes.color }}>
-              Notification {" "}
+              Notification
             </Span>
             <Span bg="#674c9f" color="#fff" weight="600" padding="0px 8px">
               Preview

@@ -1,45 +1,34 @@
 import React, { useState, useRef, useEffect } from "react";
-import Select from "react-select";
 import styled, { css, useTheme } from "styled-components";
+import Dropdown from "react-dropdown";
+import "react-dropdown/style.css";
 import {
   Section,
   Content,
   Item,
   ItemH,
-  ItemBreak,
-  H1,
   H2,
   H3,
-  Image,
-  P,
   Span,
-  Anchor,
   Button,
-  Showoff,
   FormSubmision,
   Input,
   TextField,
-} from "components/SharedStyling";
+} from "../primaries/SharedStyling";
 import { FiLink } from "react-icons/fi";
 import "react-dropzone-uploader/dist/styles.css";
-import Dropzone from "react-dropzone-uploader";
-import { makeStyles } from "@material-ui/core/styles";
-import Slider from "@material-ui/core/Slider";
 import Loader from "react-loader-spinner";
 
 import { envConfig } from "@project/contracts";
 
-import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
+import { useWeb3React } from "@web3-react/core";
 import { ThemeProvider } from "styled-components";
-import { themeLight, themeDark } from "config/Themization";
 import { addresses, abis } from "@project/contracts";
-import ImageClipper from "./ImageClipper";
+import ImageClipper from "../primaries/ImageClipper";
 import { ReactComponent as ImageIcon } from "../assets/Image.svg";
 import "./createChannel.css";
 
 const ethers = require("ethers");
-
-const ipfs = require("ipfs-api")();
 
 const minStakeFees = 50;
 const ALIAS_CHAINS = [
@@ -56,11 +45,10 @@ const CORE_CHAIN_ID = envConfig.coreContractChain;
 
 // Create Header
 function CreateChannel() {
-  const { active, error, account, library, chainId } = useWeb3React();
+  const { account, library, chainId } = useWeb3React();
 
   const themes = useTheme();
 
-  const [darkMode, setDarkMode] = useState(false);
   const onCoreNetwork = CORE_CHAIN_ID === chainId;
 
   const [processing, setProcessing] = React.useState(0);
@@ -71,7 +59,6 @@ function CreateChannel() {
   const [channelInfoDone, setChannelInfoDone] = React.useState(false);
 
   const [chainDetails, setChainDetails] = React.useState("Ethereum");
-  // const [chainDetailsComp, setChainDetailsComp] = React.useState("");
   const [channelName, setChannelName] = React.useState("");
   const [channelAlias, setChannelAlias] = React.useState("");
   const [channelInfo, setChannelInfo] = React.useState("");
@@ -79,6 +66,7 @@ function CreateChannel() {
   const [channelFile, setChannelFile] = React.useState(undefined);
   const [channelStakeFees, setChannelStakeFees] = React.useState(minStakeFees);
   const [daiAmountVal, setDaiAmountVal] = useState("");
+  const [txStatus, setTxStatus] = useState(2);
 
   //image upload states
   const childRef = useRef();
@@ -110,38 +98,6 @@ function CreateChannel() {
     checkDaiFunc();
   }, []);
 
-  // called every time a file's `status` changes
-  const handleChangeStatus = ({ meta, file }, status) => {
-    console.log(status, meta, file);
-  };
-
-  const onDropHandler = (files) => {};
-
-  // receives array of files that are done uploading when submit button is clicked
-  const handleLogoSubmit = (files, allFiles) => {
-    // console.log(files.map(f => f.meta))
-    allFiles.forEach((f) => {
-      var file = f.file;
-      var reader = new FileReader();
-      reader.readAsDataURL(file);
-      // console.log(f.file);
-
-      reader.onloadend = function(e) {
-        // console.log(reader.result);
-        const response = handleLogoSizeLimitation(reader.result);
-        if (response.success) {
-          setStepFlow(2);
-          setProcessing(0);
-          setUploadDone(true);
-          setChannelFile(reader.result);
-        } else {
-          setProcessing(3);
-          setProcessingInfo(response.info);
-        }
-      };
-    });
-  };
-
   const proceed = () => {
     setStepFlow(2);
     setProcessing(0);
@@ -165,10 +121,6 @@ function CreateChannel() {
       };
     }
 
-    // only proceed if png or jpg
-    // This is brilliant: https://stackoverflow.com/questions/27886677/javascript-get-extension-from-base64-image
-    // char(0) => '/' : jpg
-    // char(0) => 'i' : png
     let fileext;
     console.log(base64Data.charAt(0));
     if (base64Data.charAt(0) == "/") {
@@ -295,13 +247,25 @@ function CreateChannel() {
       .then(async function(tx) {
         console.log(tx);
         console.log("Check: " + account);
-        await library.waitForTransaction(tx.hash);
-        setProcessing(3);
-        setProcessingInfo("Channel Created! Reloading...");
+        let txCheck = await library.waitForTransaction(tx.hash);
 
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
+        if(txCheck.status === 0){
+          setProcessing(3);
+          setTxStatus(0);
+          setProcessingInfo("Transaction Failed due to some error! Try again");
+          setTimeout(() => {
+            setProcessing(0);
+            setTxStatus(2);
+            setChannelInfoDone(false);
+          }, 10000);
+        }
+        else {
+          setProcessing(3);
+          setProcessingInfo("Channel Created! Reloading...");
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        }
       })
       .catch((err) => {
         console.log("Error --> %o", err);
@@ -711,36 +675,18 @@ function CreateChannel() {
                     height="20px"
                     style={{ position: "relative" }}
                   >
-                    {/* <ItemAlias> */}
-
-                    <Select
-                      // className="basic-single"
-                      // classNamePrefix="select"
-                      placeholder="Choose the channels network"
-                      name="color"
-                      options={ALIAS_CHAINS}
-                      theme={(theme) => ({
-                        ...theme,
-                        borderRadius: 0,
-                        colors: {
-                          ...theme.colors,
-                          primary25: "#e20880",
-                          primary: "#e20880",
-                        },
-                      })}
-                      styles={{
-                        control: (base) => ({
-                          ...base,
-                          "&:hover": {
-                            borderColor: "red",
-                          },
-                        }),
+                    
+                    {/* dropdown */}
+                    <DropdownStyledParent>
+                      <DropdownStyled
+                        options={ALIAS_CHAINS}
+                        onChange={(option) => {
+                            setChainDetails(option.value);
+                            console.log(option);
                         }}
-                      defaultValue={{label: "Ethereum", value:"Ethereum"}}
-                      onChange={(selectedOption) => {
-                        setChainDetails(selectedOption.value);
-                      }}
-                    />
+                        value={chainDetails}
+                      />
+                    </DropdownStyledParent>
 
                     <span
                       className="imgSpan"
@@ -973,6 +919,18 @@ function CreateChannel() {
                     size="1em"
                   >
                     {processingInfo}
+                    {txStatus === 0 &&
+                      <div
+                        style={{
+                          textTransform: "none",
+                          padding: "10px 0px"
+                        }}
+                      >
+                        <div style={{paddingBottom: "5px"}}>It may be possible due to one of the following reasons:</div>
+                        <div>1. There is not enough DAI in your wallet.</div>
+                        <div>2. Network may be congested, due to that gas price increased. Try by increasing gas limit manually.</div> 
+                      </div>
+                    }  
                   </Span>
                 </Item>
               </Content>
@@ -1032,71 +990,12 @@ const Line = styled.div`
   z-index: -1;
 `;
 
-const Channel = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-`;
-
-const Notice = styled.div`
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-`;
-
-const Title = styled.h1`
-  color: #674c9f;
-  font-size: 30px;
-  font-weight: 300;
-  margin-top: 0px;
-  margin-bottom: 30px;
-`;
-
 const Info = styled.label`
   padding-bottom: 20px;
   font-size: 14px;
   color: #000;
 `;
 
-const Info2 = styled(Info)``;
-const Name = styled(Input)`
-  border-bottom: 1px solid #e20880;
-  font-size: 24px;
-`;
-
-const ShortInfo = styled.textarea`
-  outline: 0;
-  border: 0;
-  border-bottom: 1px solid #35c5f3;
-  margin: 10px;
-  font-size: 18px;
-  min-height: 80px;
-  color: #111;
-`;
-
-const Url = styled(Input)`
-  border-bottom: 1px solid #674c9f;
-  font-size: 1=8px;
-`;
-
-const Text = styled.span``;
-
-const Continue = styled.button`
-  border: 0;
-  outline: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  border-radius: 20px;
-  font-size: 14px;
-  background: ${(props) => props.theme || "#674c9f"};
-  margin: 30px 0px 0px 0px;
-  border-radius: 8px;
-  padding: 16px;
-  font-size: 16px;
-  font-weight: 400;
-`;
 const Minter = styled.div`
   display: flex;
   flex-direction: row;
@@ -1254,5 +1153,45 @@ const Field = styled.div`
   text-transform: uppercase;
 `;
 
-// Export Default
+const DropdownStyledParent = styled.div`
+flex:1;
+.is-open {
+    margin-bottom: 130px;
+}
+`
+
+const DropdownStyled = styled(Dropdown)`
+  .Dropdown-control {
+      background-color: #fff;
+      color: #000;
+      border: 1px solid black;
+      width:100%;
+      outline: none;
+      height: 59px;
+      display: flex;
+      align-items: center;
+  }
+  .Dropdown-arrow {
+      top: 30px;
+      bottom: 0;
+      border-color: #f #000 #000;
+  }
+  .Dropdown-menu {
+    border-color: #000;
+      .is-selected {
+      background-color: #D00775;
+      color:#fff;
+    }
+  }
+ 
+  .Dropdown-option {
+      background-color: #fff;
+      color: #000;
+  }
+  .Dropdown-option:hover {
+      background-color: #D00775;
+      color: #000;
+  }
+  `;
+
 export default CreateChannel;

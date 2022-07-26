@@ -1,8 +1,5 @@
-import React from "react";
-
 import axios from 'axios';
 import { postReq } from "api";
-import { addresses, abis } from "@project/contracts";
 import { ethers } from "ethers";
 //import { parseEther, bigNumber } from 'ethers/utils'
 
@@ -174,6 +171,7 @@ const EPNSCoreHelper = {
 
     });
   },
+  
   // Helper to get Channel Alias from Channel's address
   getAliasAddressFromChannelAddress: async (channel) => {
     if (channel === null) return;

@@ -9,7 +9,7 @@ import {
   Button,
   H2,
   Input
-} from "components/SharedStyling";
+} from "primaries/SharedStyling";
 const ethers = require("ethers");
 
 export default function AddSubGraphIdModal({
@@ -49,7 +49,7 @@ onClose, onSuccess, addSubGraphDetails
 
             addSubGraphDetails(identityBytes)
                 .then(async (tx) => {
-                    // console.log(tx);
+                    console.log(tx);
                     setLoading("Transaction Sent!");
 
                     setTimeout(() => {
@@ -73,6 +73,7 @@ onClose, onSuccess, addSubGraphDetails
             onClose();
         }
     };
+    
     return (
     <ThemeProvider theme={themes}>
       <Overlay>
