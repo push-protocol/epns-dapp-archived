@@ -30,6 +30,7 @@ import { useWeb3React } from "@web3-react/core";
 import { CloseIcon } from "assets/icons";
 import EPNSCoreHelper from "helpers/EPNSCoreHelper";
 import CryptoHelper from "helpers/CryptoHelper";
+import { IPFSupload } from "helpers/UtilityHelper";
 const ethers = require("ethers");
 
 // Set Notification Form Type | 0 is reserved for protocol storage
@@ -346,7 +347,7 @@ function SendNotifications() {
               jsonPayload["recipients"] = [...multipleRecipients];
           }
 
-          const input = JSON.stringify(jsonPayload);
+          let input = JSON.stringify(jsonPayload);
           console.log(input);
 
           console.log("Uploding to IPFS...");
@@ -354,12 +355,13 @@ function SendNotifications() {
               render: "Preparing Payload for upload",
           });
 
-          const ipfs = require("nano-ipfs-store").at(
-              "https://ipfs.infura.io:5001"
-          );
+        //   const ipfs = require("nano-ipfs-store").at(
+        //       "https://ipfs.infura.io:5001"
+        //   );
 
           try {
-              storagePointer = await ipfs.add(input);
+            //   storagePointer = await ipfs.add(input);
+            storagePointer = await IPFSupload(input);
           } catch (e) {
               setNFProcessing(2);
               setNFInfo("IPFS Upload Error");

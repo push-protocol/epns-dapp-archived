@@ -9,6 +9,7 @@ import { useWeb3React, UnsupportedChainIdError } from '@web3-react/core'
 import { addresses, abis } from "@project/contracts";
 import EPNSCoreHelper from 'helpers/EPNSCoreHelper';
 import CryptoHelper from 'helpers/CryptoHelper';
+import { IPFSupload } from "helpers/UtilityHelper";
 const ethers = require('ethers');
 
 const ipfs = require('ipfs-api')()
@@ -85,10 +86,11 @@ function ChannelDashboard() {
         }
       }
     )
-    const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
+    // const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 
     console.log("sending payload");
-    const cid = await ipfs.add(input);
+    // const cid = await ipfs.add(input);
+    const cid = await IPFSupload(input);
     console.log("IPFS cid:", cid);
     //console.log(await ipfs.cat(cid));
 

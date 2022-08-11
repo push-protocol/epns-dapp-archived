@@ -38,6 +38,7 @@ import { ThemeProvider } from "styled-components";
 import { themeLight, themeDark } from "config/Themization";
 
 import { addresses, abis } from "@project/contracts";
+import { IPFSupload } from "helpers/UtilityHelper";
 const ethers = require("ethers");
 
 const ipfs = require("ipfs-api")();
@@ -217,10 +218,11 @@ function CreateChannel() {
       address: address,
     });
 
-    const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
+    // const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 
     setProcessingInfo("Uploading Payload...");
-    const storagePointer = await ipfs.add(input);
+    // const storagePointer = await ipfs.add(input);
+    const storagePointer = await IPFSupload(input);
     console.log("IPFS storagePointer:", storagePointer);
     setProcessingInfo("Payload Uploaded, Approval to transfer DAI...");
     //console.log(await ipfs.cat(storagePointer));
