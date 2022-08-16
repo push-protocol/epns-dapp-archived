@@ -27,6 +27,7 @@ import { addresses, abis } from "@project/contracts";
 import ImageClipper from "../primaries/ImageClipper";
 import { ReactComponent as ImageIcon } from "../assets/Image.svg";
 import "./createChannel.css";
+import { IPFSupload } from "helpers/UtilityHelper";
 
 const ethers = require("ethers");
 
@@ -199,7 +200,8 @@ function CreateChannel() {
     const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 
     setProcessingInfo("Uploading Payload...");
-    var storagePointer = (storagePointer = await ipfs.add(input));
+    // var storagePointer = (storagePointer = await ipfs.add(input));
+    let storagePointer = await IPFSupload(input);
     console.log("IPFS storagePointer:", storagePointer);
     setProcessingInfo("Payload Uploaded, Approval to transfer DAI...");
     //console.log(await ipfs.cat(storagePointer));
