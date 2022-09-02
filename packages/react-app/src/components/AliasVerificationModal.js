@@ -4,8 +4,9 @@ import styled, {ThemeProvider, useTheme} from 'styled-components';
 import { useWeb3React } from '@web3-react/core';
 import { addresses, abis } from "@project/contracts";
 import Loader from 'react-loader-spinner';
-import { postReq } from "../api";
+import { getReq, postReq } from "../api";
 import {Item, H2, H3, Span, Button, Input} from '../primaries/SharedStyling';
+import { convertAddressToAddrCaip } from 'helpers/CaipHelper';
 
 const ethers = require('ethers');
 
@@ -13,7 +14,7 @@ const ethers = require('ethers');
 export default function AliasVerificationModal({
     onClose, onSuccess, verificationStatus, aliasEthAccount
 }) {
-    const { account, library } = useWeb3React();
+    const { account, library, chainId } = useWeb3React();
     const signer = library.getSigner(account);
 
     const themes = useTheme();
@@ -55,11 +56,14 @@ export default function AliasVerificationModal({
                 }, 2000);
 
                 const intervalId = setInterval(async () => {
-                    const response = await postReq("/channels/get_alias_verification_status", {
-                        aliasAddress: account,
-                        op: "read",
-                    })
-                    const status = response?.data?.status;
+                    const userAddressInCaip = convertAddressToAddrCaip(account, chainId);
+                    const status = await getReq(`/v1/alias/${userAddressInCaip}/channel`).then(({ data }) => {
+                        const isVerified = false;
+                        if (data) {
+                            isVerified = data.is_alias_verified;
+                        }
+                        return isVerified;
+                    });
                     if (status == true) {
                         clearInterval(intervalId);
                         onSuccess();

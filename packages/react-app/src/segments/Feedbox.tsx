@@ -185,7 +185,7 @@ function Feedbox(props) {
       const results = await EpnsAPI.user.getFeeds({
         user: user, // user address in CAIP
         env: 'dev',
-        limit: 1000,
+        limit: 10000,
         page: page,
         raw:true
       });

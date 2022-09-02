@@ -142,7 +142,7 @@ function SpamBox(props) {
             
             const {
               data: { subscribers },
-            } = await postReq("/channels/_get_subscribers", {
+            } = await postReq("/channels/__get_subscribers", {
               channel: address,
               blockchain: chainId,
               op: "read",
@@ -189,7 +189,7 @@ function SpamBox(props) {
 
           const {
             data: { subscribers },
-          } = await postReq("/channels/_get_subscribers", {
+          } = await postReq("/channels/__get_subscribers", {
             channel: address,
             blockchain: chainId,
             op: "read",
@@ -240,7 +240,7 @@ function SpamBox(props) {
           
           const {
             data: { subscribers },
-          } = await postReq("/channels/_get_subscribers", {
+          } = await postReq("/channels/__get_subscribers", {
             channel: address,
             op: "read",
           });
