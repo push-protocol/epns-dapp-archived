@@ -1,7 +1,7 @@
 import EPNSCoreHelper from "helpers/EPNSCoreHelper";
 
 import { envConfig } from "@project/contracts";
-import { postReq } from "api";
+import { getReq, postReq } from "api";
 
 // STATIC SINGLETON
 export const ChannelEvents = {
@@ -324,7 +324,7 @@ export default class ChannelsDataStore {
    * @returns
    */
   getChannelFromApi = async (startIndex, pageCount, account, chainId) => {
-    return postReq("/channels/search", {
+    return postReq("/channels/_search", {
       page: Math.ceil(startIndex / pageCount) || 1,
       pageSize: pageCount,
       address: account,
@@ -339,6 +339,40 @@ export default class ChannelsDataStore {
       });
       return output;
     })
+  };
+  // Helper to get Channel Alias from Channel's address
+  getChannelDetailsFromAddress = async (channel) => {
+    if (channel === null) return;
+    const enableLogs = 0;
+
+    return new Promise((resolve, reject) => {
+      // To get channel info from a channel address
+      getReq(`/v1/channels/search?query=${channel}`)
+        .then((response) => {
+          let output;
+          output = response.data.channels.map(
+            ({
+              alias_address,
+              is_alias_verified,
+            }) => {
+              return {
+                aliasAddress: alias_address,
+                isAliasVerified: is_alias_verified,
+              };
+            }
+          );
+          if (enableLogs)
+            console.log("getChannelDetailsFromAddress() --> %o", response);
+          if (output.length === 0) {
+            output.push({ alias_address: null, isAliasVerified: null });
+          }
+          resolve(output[0]);
+        })
+        .catch((err) => {
+          console.log("!!!Error, getChannelDetailsFromAddress() --> %o", err);
+          reject(err);
+        });
+    });
   };
   // CHANNELS META FUNCTIONS
   // To get channels meta
@@ -464,7 +498,7 @@ export default class ChannelsDataStore {
     }
     let address = channelAddress;
     
-    return postReq("/channels/get_subscribers", {
+    return postReq("/channels/_get_subscribers", {
       channel: address,
       blockchain: this.state.chainId,
       op: "read",
@@ -488,7 +522,7 @@ export default class ChannelsDataStore {
     }
     let address = channelAddress;
     
-    return postReq("/channels/get_subscribers", {
+    return postReq("/channels/_get_subscribers", {
       channel: address,
       blockchain: this.state.chainId,
       op: "read",

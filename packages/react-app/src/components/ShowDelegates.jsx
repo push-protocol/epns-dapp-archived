@@ -1,12 +1,13 @@
 import React from "react";
 import { Item, Span, Section, Content, H2, H3 } from "primaries/SharedStyling";
 import { GoTriangleDown, GoTriangleUp } from "react-icons/go";
-import { postReq } from "api";
+import { getReq, postReq } from "api";
 import { useWeb3React } from "@web3-react/core";
 import styled, { useTheme, css } from "styled-components";
 import { useSelector } from "react-redux";
 import RemoveDelegateModal from "./RemoveDelegateModal";
 import DelegateInfo from "./DelegateInfo";
+import { convertAddressToAddrCaip } from "helpers/CaipHelper";
 
 const blockchainName = {
   1: "ETH_MAINNET",
@@ -41,13 +42,12 @@ const ShowDelegates = () => {
 
   const fetchDelegatees = async () => {
     try {
-      const { data } = await postReq("/channels/delegatee/get_delegate", {
-        channelAddress: account,
-        blockchain: blockchainName[chainId]
-      });
-
-      if (data?.delegateAddress) {
-        setDelegatees([account, ...data.delegateAddress]);
+      const channelAddressinCAIP = convertAddressToAddrCaip(account, chainId);
+      const { data } = await getReq(`/v1/channels/${channelAddressinCAIP}/delegates`);
+      if (data?.delegates) {
+        const delegateeList = data.delegates.map((delegate) => delegate.delegate);
+        delegateeList.unshift(account);
+        setDelegatees(delegateeList);
       }
     } catch (err) {
       console.error(err);

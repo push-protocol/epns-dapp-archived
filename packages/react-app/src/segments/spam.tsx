@@ -15,16 +15,17 @@ import {
   updateTopNotifications
 } from "redux/slices/spamSlice";
 import { cacheSubscribe } from "redux/slices/channelSlice";
-import { postReq } from "api";
+import { getReq, postReq } from "api";
 import DisplayNotice from "../primaries/DisplayNotice";
 import { ThemeProvider } from "styled-components";
 import CryptoHelper from "helpers/CryptoHelper";
 import { toast as toaster } from "react-toastify";
 import NotificationToast from "../primaries/NotificationToast";
+import { convertAddressToAddrCaip } from "helpers/CaipHelper";
 
 const NOTIFICATIONS_PER_PAGE = 10;
 // Create Header
-function SpamBox({ currentTab }) {
+function SpamBox(props) {
   const dispatch = useDispatch();
   const { account, chainId, library } = useWeb3React();
   const { epnsCommReadProvider } = useSelector(
@@ -32,11 +33,13 @@ function SpamBox({ currentTab }) {
   );
 
   const themes = useTheme();
+  let user = convertAddressToAddrCaip(account,chainId)
+
 
   // toast related section
-	const [toast, showToast] = React.useState(null);
+  const [toast, showToast] = React.useState(null);
   const clearToast = () => showToast(null);
-  
+
   const { run } = useSelector((state: any) => state.userJourney);
 
   const { notifications, page, finishedFetching } = useSelector((state: any) => state.spam);
@@ -121,13 +124,14 @@ function SpamBox({ currentTab }) {
     if (loading || finishedFetching || run) return;
     setLoading(true);
     try {
-      const { count, results } = await EpnsAPI.fetchSpamNotifications({
-        user: account,
-        pageSize: NOTIFICATIONS_PER_PAGE,
-        page,
-        chainId,
+      const results = await EpnsAPI.user.getFeeds({
+        user: user,
+        limit: NOTIFICATIONS_PER_PAGE,
+        page: page,
+        env: 'staging',
+        spam: true
       });
-        let parsedResponse = EpnsAPI.parseApiResponse(results);
+        let parsedResponse = EpnsAPI.utils.parseApiResponse(results);
           parsedResponse.forEach( (each,i) => {
               each['date'] = results[i].epoch;
               each['epoch'] = (new Date(each['date']).getTime() / 1000);
@@ -138,7 +142,7 @@ function SpamBox({ currentTab }) {
             
             const {
               data: { subscribers },
-            } = await postReq("/channels/get_subscribers", {
+            } = await postReq("/channels/__get_subscribers", {
               channel: address,
               blockchain: chainId,
               op: "read",
@@ -148,7 +152,7 @@ function SpamBox({ currentTab }) {
         });
       parsedResponse = await Promise.all(parsedResponsePromise);
       dispatch(addPaginatedNotifications(parsedResponse));
-      if (count === 0) {
+      if (results.length === 0) {
         dispatch(setFinishedFetching());
       }
     } catch (err) {
@@ -164,16 +168,17 @@ function SpamBox({ currentTab }) {
     setLoading(true);
 
     try {
-      const { count, results } = await EpnsAPI.fetchSpamNotifications({
-        user: account,
-        pageSize: NOTIFICATIONS_PER_PAGE,
+      const results = await EpnsAPI.user.getFeeds({
+        user: user,
+        limit: NOTIFICATIONS_PER_PAGE,
         page: 1,
-        chainId,
+        env: 'staging',
+        spam: true
       });
       if (!notifications.length) {
         dispatch(incrementPage());
       }
-      let parsedResponse = EpnsAPI.parseApiResponse(results);
+      let parsedResponse = EpnsAPI.utils.parseApiResponse(results);
         parsedResponse.forEach( (each,i) => {
             each['date'] = results[i].epoch;
             each['epoch'] = (new Date(each['date']).getTime() / 1000);
@@ -181,9 +186,10 @@ function SpamBox({ currentTab }) {
         const parsedResponsePromise = parsedResponse.map(async (elem: any, i: any) => {
           elem.channel = results[i].channel;
           let address = results[i].channel;
+
           const {
             data: { subscribers },
-          } = await postReq("/channels/get_subscribers", {
+          } = await postReq("/channels/__get_subscribers", {
             channel: address,
             blockchain: chainId,
             op: "read",
@@ -198,7 +204,7 @@ function SpamBox({ currentTab }) {
           pageSize: NOTIFICATIONS_PER_PAGE,
         })
       );
-      if (count === 0) {
+      if (results.length === 0) {
         dispatch(setFinishedFetching());
       }
     } catch (err) {
@@ -212,16 +218,18 @@ function SpamBox({ currentTab }) {
   const fetchAllNotif = async () => {
     setLoadFilter(true);
     try {
-      const { count, results } = await EpnsAPI.fetchSpamNotifications({
-        user: account,
-        pageSize: 100000,
+      const results = await EpnsAPI.user.getFeeds({
+        user: user,
+        limit: 10000,
         page: 1,
-        chainId,
+        env: 'staging',
+        spam: true
       });
+
       if (!notifications.length) {
         dispatch(incrementPage());
       }
-      let parsedResponse = EpnsAPI.parseApiResponse(results);
+      let parsedResponse = EpnsAPI.utils.parseApiResponse(results);
         parsedResponse.forEach( (each,i) => {
             each['date'] = results[i].epoch;
             each['epoch'] = (new Date(each['date']).getTime() / 1000);
@@ -232,7 +240,7 @@ function SpamBox({ currentTab }) {
           
           const {
             data: { subscribers },
-          } = await postReq("/channels/get_subscribers", {
+          } = await postReq("/channels/__get_subscribers", {
             channel: address,
             op: "read",
           });
@@ -265,14 +273,11 @@ function SpamBox({ currentTab }) {
 
   const fetchAliasAddress = async (channelAddress) => {
     if (channelAddress === null) return;
-    const ethAlias = await postReq("/channels/get_alias_details", {
-      channel: channelAddress,
-      op: "read",
-    }).then(({ data }) => {
-      console.log({ data });
+    const userAddressInCaip = convertAddressToAddrCaip(channelAddress, chainId);
+    const ethAlias = await getReq(`/v1/alias/${userAddressInCaip}/channel`).then(({ data }) => {
       let aliasAccount;
       if (data) {
-        aliasAccount = data.aliasAddress
+        aliasAccount = data.alias_address;
       }
       return aliasAccount;
     });
@@ -282,17 +287,15 @@ function SpamBox({ currentTab }) {
 
   const fetchEthAddress = async (channelAddress) => {
     if (channelAddress === null) return;
-    const aliasEth = await postReq("/channels/get_eth_address", {
-      aliasAddress: channelAddress,
-      op: "read",
-    }).then(({ data }) => {
-      console.log({ data });
+    const userAddressInCaip = convertAddressToAddrCaip(account, chainId);
+    const aliasEth = await getReq(`/v1/alias/${userAddressInCaip}/channel`).then(({ data }) => {
       let ethAccount;
       if (data) {
-        ethAccount = data.ethAddress
+        ethAccount = data.channel;
       }
       return ethAccount;
     });
+
     return aliasEth;
   }
 
@@ -340,7 +343,7 @@ function SpamBox({ currentTab }) {
     const signature = await library
       .getSigner(account)
       ._signTypedData(EPNS_DOMAIN, type, message);
-    return postReq("/channels/subscribe_offchain", {
+    return postReq("/channels/subscribe", {
       signature,
       message,
       op: "write",
@@ -361,6 +364,7 @@ function SpamBox({ currentTab }) {
     let txToast;
     try {
       let decryptedSecret = await CryptoHelper.decryptWithWalletRPCMethod(library.provider, secret, account);
+
       // decrypt notification message
       const decryptedBody = await CryptoHelper.decryptWithAES(message, decryptedSecret);
 
@@ -428,7 +432,13 @@ function SpamBox({ currentTab }) {
   return (
     <ThemeProvider theme={themes}>
       <Container>
-        <SearchFilter notifications={allNotif} filterNotifications={filterNotifications} filter={filter} reset={reset} loadFilter={loadFilter} />
+        <SearchFilter 
+          notifications={allNotif} 
+          filterNotifications={filterNotifications} 
+          filter={filter} reset={reset} 
+          loadFilter={loadFilter} 
+          showFilter={props.showFilter}
+        />
         {bgUpdateLoading && (
           <div style={{ marginTop: "10px" }}>
             <Loader type="Oval" color="#35c5f3" height={40} width={40} />
@@ -462,7 +472,6 @@ function SpamBox({ currentTab }) {
                     notificationTitle={notification.title}
                     notificationBody={notification.body}
                     cta={cta}
-                    url={url}
                     app={app}
                     icon={icon}
                     image={image}
@@ -473,6 +482,7 @@ function SpamBox({ currentTab }) {
                     isSecret={secret != ''}
                     decryptFn={() => onDecrypt({ secret, title, message, image, cta })}
                     chainName={blockchain}
+                    url={url}
                   />
                 </div>
               );
@@ -519,14 +529,12 @@ const Container = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
-
   font-weight: 200;
   align-content: center;
   align-items: center;
   justify-content: center;
   max-height: 100vh;
   background: ${props => props.theme.mainBg};
-
   // padding: 20px;
   // font-size: 16px;
   // display: flex;
