@@ -12,6 +12,7 @@ import { FaRegAddressCard } from "react-icons/fa";
 import { AiOutlineShareAlt } from "react-icons/ai";
 import { useWeb3React } from "@web3-react/core";
 import { useDispatch, useSelector } from "react-redux";
+import * as EpnsAPI from "@epnsproject/sdk-restapi";
 
 import { ItemH, Span } from "../primaries/SharedStyling";
 
@@ -28,6 +29,7 @@ import { cacheChannelInfo } from "redux/slices/channelSlice";
 import { envConfig } from "@project/contracts";
 import { incrementStepIndex, addNewWelcomeNotif } from "redux/slices/userJourneySlice";
 import { cacheSubscribe, cacheUnsubscribe } from "redux/slices/channelSlice";
+import { convertAddressToAddrCaip } from "helpers/CaipHelper";
 
 // Create Header
 function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
@@ -317,15 +319,24 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
         channelAddress = channelObject.alias_address;
       }
 
+      const channelAddrInCaip = convertAddressToAddrCaip(channelAddress, chainId).toString();
+      const userAddressInCaip = convertAddressToAddrCaip(account, chainId).toString();
+      
       const message = {
-        channel: channelAddress,
-        subscriber: account,
+        channel: channelAddrInCaip,
+        subscriber: userAddressInCaip,
         action: "Subscribe",
       };
 
+      const messageToSend = {
+        channel: channelAddress,
+        subscriber: account,
+        action: "Subscribe",
+      }
+
       const signature = await library
         .getSigner(account)
-        ._signTypedData(EPNS_DOMAIN, type, message);
+        ._signTypedData(EPNS_DOMAIN, type, messageToSend);
       txToast = toaster.dark(
         <LoaderToast msg="Waiting for Confirmation..." color="#35c5f3" />,
         {
@@ -339,7 +350,7 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
         }
       );
 
-      if(run) {
+      if (run) {
         console.log("in run");
         toaster.update(txToast, {
           render: "Successfully opted into channel !",
@@ -356,18 +367,15 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
           app: channelJson.name,
           image: ""
         }))
-        setTxInProgress(false); 
+        setTxInProgress(false);
         setSubscribed(true);
-        if(stepIndex === 5) {console.log("this is working"); dispatch(incrementStepIndex());}
+        if (stepIndex === 5) { console.log("this is working"); dispatch(incrementStepIndex()); }
         return;
       }
 
-      postReq("/channels/subscribe_offchain", {
-        signature,
-        message,
-        op: "write",
-        chainId,
-        contractAddress: epnsCommReadProvider.address,
+      postReq(`/v1/channels/${channelAddrInCaip}/subscribe`, {
+        verificationProof: signature,
+        message: message
       }).then((res) => {
         dispatch(cacheSubscribe({ channelAddress: channelObject.addr }));
         setSubscribed(true);
@@ -431,14 +439,24 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
         channelAddress = channelObject.alias_address;
       }
 
+      const channelAddrInCaip = convertAddressToAddrCaip(channelAddress, chainId).toString();
+      const userAddressInCaip = convertAddressToAddrCaip(account, chainId).toString();
+      
       const message = {
+        channel: channelAddrInCaip,
+        unsubscriber: userAddressInCaip,
+        action: "Unsubscribe",
+      };
+
+      const messageToSend = {
         channel: channelAddress,
         unsubscriber: account,
         action: "Unsubscribe",
-      };
+      }
+
       const signature = await library
         .getSigner(account)
-        ._signTypedData(EPNS_DOMAIN, type, message);
+        ._signTypedData(EPNS_DOMAIN, type, messageToSend);
 
       txToast = toaster.dark(
         <LoaderToast msg="Waiting for Confirmation..." color="#35c5f3" />,
@@ -453,12 +471,9 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
         }
       );
 
-      postReq("/channels/unsubscribe_offchain", {
-        signature,
-        message,
-        op: "write",
-        chainId,
-        contractAddress: epnsCommReadProvider.address,
+      postReq(`/v1/channels/${channelAddrInCaip}/unsubscribe`, {
+        verificationProof: signature,
+        message: message
       })
         .then((res) => {
           dispatch(cacheUnsubscribe({ channelAddress: channelObject.addr }));
