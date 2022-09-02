@@ -155,7 +155,7 @@ function Feedbox(props) {
       const map2 = new Map();
       results.forEach( each => {
         map1.set(each.payload.data.sid , each.epoch);
-        map2.set(each.payload.data.sid , each.channel);
+        map2.set(each.payload.data.sid , each.sender);
     })
     parsedResponse.forEach( each => {
         each['date'] = map1.get(each.sid);
@@ -197,7 +197,7 @@ function Feedbox(props) {
       const map2 = new Map();
       results.forEach( each => {
         map1.set(each.payload.data.sid , each.epoch);
-        map2.set(each.payload.data.sid , each.channel);
+        map2.set(each.payload.data.sid , each.sender);
     })
     parsedResponse.forEach( each => {
         each['date'] = map1.get(each.sid);
