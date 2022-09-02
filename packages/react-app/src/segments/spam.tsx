@@ -128,7 +128,7 @@ function SpamBox(props) {
         user: user,
         limit: NOTIFICATIONS_PER_PAGE,
         page: page,
-        env: 'dev',
+        env: 'staging',
         spam: true
       });
         let parsedResponse = EpnsAPI.utils.parseApiResponse(results);
@@ -172,7 +172,7 @@ function SpamBox(props) {
         user: user,
         limit: NOTIFICATIONS_PER_PAGE,
         page: 1,
-        env: 'dev',
+        env: 'staging',
         spam: true
       });
       if (!notifications.length) {
@@ -222,7 +222,7 @@ function SpamBox(props) {
         user: user,
         limit: 10000,
         page: 1,
-        env: 'dev',
+        env: 'staging',
         spam: true
       });
 

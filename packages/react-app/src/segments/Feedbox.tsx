@@ -119,7 +119,7 @@ function Feedbox(props) {
       const results = await EpnsAPI.user.getFeeds({
         user: user, // user address in CAIP
         raw: true,
-        env: 'dev',
+        env: 'staging',
         page: page,
         limit: NOTIFICATIONS_PER_PAGE
       });
@@ -142,7 +142,7 @@ function Feedbox(props) {
     try {
       const results = await EpnsAPI.user.getFeeds({
         user: user, // user address in CAIP
-        env: 'dev',
+        env: 'staging',
         raw: true,
         page: 1,
         limit: NOTIFICATIONS_PER_PAGE
@@ -184,7 +184,7 @@ function Feedbox(props) {
     try {
       const results = await EpnsAPI.user.getFeeds({
         user: user, // user address in CAIP
-        env: 'dev',
+        env: 'staging',
         limit: 10000,
         page: page,
         raw:true
