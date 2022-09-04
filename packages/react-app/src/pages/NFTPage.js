@@ -38,13 +38,6 @@ function NFTPage() {
     setShowAnswers(newShowAnswers);
   }
 
-  // React.useEffect(() => {
-  //   if (!onCoreNetwork) {
-  //     const url = window.location.origin;
-  //     window.location.replace(`${url}/#/notavailable`);
-  //   }
-  // })
-
   React.useEffect(() => {
     userClickedAt(2);
   }, [account]);

@@ -144,6 +144,29 @@ const NavigationList = {
               }
             }
           },
+          sendNotifs: {
+            uid: GLOBALS.CONSTANTS.NAVBAR_IDENTIFIERS.SEND_NOTIFS,
+            src: "svg/send.svg",
+            iconFactory: null,
+            name: 'Send Notifications',
+            title: 'Send Notifications',
+            alt: 'Send Notifs',
+            href: '/send',
+            newTab: false,
+            isRoute: true,
+            hasMenuLogic: true,
+            headerTag: {
+              title: 'Send Notifications',
+              light: {
+                bg: GLOBALS.COLORS.GRADIENT_SECONDARY,
+                fg: themeLight.headerTagFg,
+              },
+              dark: {
+                bg: themeDark.headerTagBg,
+                fg: themeDark.headerTagFg,
+              }
+            }
+          },
           developerGuide: {
             uid: GLOBALS.CONSTANTS.NAVBAR_IDENTIFIERS.DEVELOPER_GUIDE,
             src: "svg/tutorial.svg",
@@ -173,7 +196,7 @@ const NavigationList = {
             name: window.location.hostname == "app.epns.io" ? "Staging dApp" : "Prod dApp",
             title: window.location.hostname == "app.epns.io" ? "Staging dApp" : "Prod dApp",
             alt: window.location.hostname == "app.epns.io" ? "Checkout Staging dApp" : "Checkout Prod dApp",
-            href: window.location.hostname == "app.epns.io" ? "https://staging-app.epns.io" : "https://app.epns.io",
+            href: window.location.hostname == "app.epns.io" ? "https://staging.epns.io" : "https://app.epns.io",
             newTab: false,
             isRoute: false,
             hasMenuLogic: false,

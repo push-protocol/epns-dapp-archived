@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled, { useTheme } from 'styled-components';
-import Loader from "react-loader-spinner";
+import { Oval } from "react-loader-spinner";
 import { Waypoint } from "react-waypoint";
 import { useWeb3React } from "@web3-react/core";
 import { useSelector, useDispatch } from "react-redux";
@@ -34,7 +34,6 @@ function SpamBox(props) {
 
   const themes = useTheme();
   let user = convertAddressToAddrCaip(account,chainId)
-
 
   // toast related section
   const [toast, showToast] = React.useState(null);
@@ -128,7 +127,7 @@ function SpamBox(props) {
         user: user,
         limit: NOTIFICATIONS_PER_PAGE,
         page: page,
-        env: 'staging',
+        env: envConfig['env'],
         spam: true,
         raw:true
       });
@@ -173,7 +172,7 @@ function SpamBox(props) {
         user: user,
         limit: NOTIFICATIONS_PER_PAGE,
         page: 1,
-        env: 'staging',
+        env: envConfig['env'],
         spam: true,
         raw:true
       });
@@ -222,9 +221,9 @@ function SpamBox(props) {
     try {
       const results = await EpnsAPI.user.getFeeds({
         user: user,
-        limit: 10000,
+        limit: 100000,
         page: 1,
-        env: 'staging',
+        env: envConfig['env'],
         spam: true,
         raw:true
       });
@@ -451,7 +450,7 @@ function SpamBox(props) {
         />
         {bgUpdateLoading && (
           <div style={{ marginTop: "10px" }}>
-            <Loader type="Oval" color="#35c5f3" height={40} width={40} />
+            <Oval color="#35c5f3" height={40} width={40} />
           </div>
         )}
         {notifications && (
@@ -500,7 +499,7 @@ function SpamBox(props) {
           </Items>
         )}
         {loading && !bgUpdateLoading && (
-          <Loader type="Oval" color="#35c5f3" height={40} width={40} />
+          <Oval color="#35c5f3" height={40} width={40} />
         )}
         {(!notifications.length || (filter && !filteredNotifications.length)) && !loading && (
           <CenteredContainerInfo>

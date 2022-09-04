@@ -32,7 +32,6 @@ import InitState from "components/InitState";
 
 dotenv.config();
 
-const CACHEPREFIX = "PUSH_TOKEN_";
 // define the different type of connectors which we use
 const web3Connectors = {
   Injected: {
@@ -49,6 +48,7 @@ const web3Connectors = {
   Ledger: { obj: ledger, logo: "./svg/login/ledger.svg", title: "Ledger" },
   Portis: { obj: portis, logo: "./svg/login/portis.svg", title: "Portis" },
 };
+
 export default function App() {
 
   const dispatch = useDispatch();
@@ -425,32 +425,4 @@ const ProviderImage = styled.img`
   width: 32px;
   max-height: 32px;
   padding: 10px;
-`;
-
-const BeaconExample = styled.span`
-  height: 10px;
-  width: 10px;
-  background: ${props => props.theme.dynamicTutsPrimaryColor};
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 100%;
-  position: relative;
-  margin: 0px 10px;
-`;
-
-const BeaconExamplePulse = styled.span`
-  animation: 1.2s ease-in-out 0s infinite normal none running joyride-beacon-outer;
-  background-color: transparent;
-  border: 2px solid ${props => props.theme.dynamicTutsPrimaryColor};
-  border-radius: 50%;
-  box-sizing: border-box;
-  display: block;
-  height: 26px;
-  width: 26px;
-  left: -8px;
-  top: -8px;
-  opacity: 0.9;
-  position: absolute;
-  transform-origin: center center;
 `;

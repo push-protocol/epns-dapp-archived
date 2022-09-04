@@ -25,6 +25,7 @@ const RPC_URLS: { [chainId: number]: string } = {
 
 export const injected = new InjectedConnector({ supportedChainIds: SUPPORTED_CHAIN_IDS })
 
+
 // Only receive messages from platform.apps.ledger.com
 export const ledgerLiveConnector = new LedgerHQFrameConnector();
 

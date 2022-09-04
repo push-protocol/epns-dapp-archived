@@ -1,6 +1,6 @@
 import React from "react";
 import styled, { useTheme } from "styled-components";
-import Loader from "react-loader-spinner";
+import { Oval } from "react-loader-spinner";
 import { Waypoint } from "react-waypoint";
 import { useWeb3React } from "@web3-react/core";
 import { useSelector, useDispatch } from "react-redux";
@@ -16,6 +16,7 @@ import {
   setFinishedFetching,
   updateTopNotifications,
 } from "redux/slices/notificationSlice";
+import { envConfig } from "@project/contracts";
 
 import { toast as toaster } from "react-toastify";
 import NotificationToast from "../primaries/NotificationToast";
@@ -119,7 +120,7 @@ function Feedbox(props) {
       const results = await EpnsAPI.user.getFeeds({
         user: user, // user address in CAIP
         raw: true,
-        env: 'staging',
+        env: envConfig['env'],
         page: page,
         limit: NOTIFICATIONS_PER_PAGE
       });
@@ -142,7 +143,7 @@ function Feedbox(props) {
     try {
       const results = await EpnsAPI.user.getFeeds({
         user: user, // user address in CAIP
-        env: 'staging',
+        env: envConfig['env'],
         raw: true,
         page: 1,
         limit: NOTIFICATIONS_PER_PAGE
@@ -184,8 +185,8 @@ function Feedbox(props) {
     try {
       const results = await EpnsAPI.user.getFeeds({
         user: user, // user address in CAIP
-        env: 'staging',
-        limit: 10000,
+        env: envConfig['env'],
+        limit: 100000,
         page: page,
         raw:true
       });
@@ -340,7 +341,7 @@ function Feedbox(props) {
             <Notifs id="scrollstyle-secondary">
               {bgUpdateLoading && (
                 <Item padding="10px 20px">
-                  <Loader type="Oval" color="#35c5f3" height={40} width={40} />
+                  <Oval color="#35c5f3" height={40} width={40} />
                 </Item>
               )}
               {run &&
@@ -417,7 +418,7 @@ function Feedbox(props) {
 
               {loading && !bgUpdateLoading && (
                 <Item padding="10px 20px">
-                  <Loader type="Oval" color="#35c5f3" height={40} width={40} />
+                  <Oval color="#35c5f3" height={40} width={40} />
                 </Item>
               )}
             </Notifs>

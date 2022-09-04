@@ -3,7 +3,7 @@ import ReactGA from "react-ga";
 
 import styled, { css, useTheme } from 'styled-components';
 import { Section, Content, Item, ItemH, A, B, H2, H3, LI, Span, Button, Input, UL } from '../primaries/SharedStyling';
-import Loader from 'react-loader-spinner'
+import { Oval } from 'react-loader-spinner'
 import { BsChevronExpand } from 'react-icons/bs';
 import { toast } from 'react-toastify';
 import InfoTooltip from "../primaries/InfoTooltip";
@@ -55,7 +55,6 @@ function GovernancePage() {
 
   const [showDelegateePrompt, setShowDelegateePrompt] = React.useState(false);
   const [delegatee, setDelegatee] = React.useState(null);
-  const [delegateTxLoading, setDelegateTxLoading] = React.useState(false);
 
   const [showAnswers, setShowAnswers] = React.useState([]);
   const [selfVotingPower, setSelfVotingPower] = React.useState(null);
@@ -78,13 +77,6 @@ function GovernancePage() {
     }
   })
 
-  React.useEffect(()=>{
-      toolingPostReq('/gov/prev_delegation',{"walletAddress": account}).then(res=>{
-        console.log("result",res.data.user)
-        setGaslessInfo(res.data.user);
-      }
-      )
-  },[]);
   React.useEffect(() => {
     toolingPostReq('/gov/prev_delegation', { "walletAddress": account }).then(res => {
       console.log("result", res.data.user)
@@ -226,6 +218,7 @@ function GovernancePage() {
   const checkForDelegateError = async (gasEstimate) => {
     // return false if no error
     // otherwise return error message
+
     // get gas price
     const gasPrice = await EPNSCoreHelper.getGasPriceInDollars(library);
     const totalCost = gasPrice * gasEstimate;
@@ -237,6 +230,7 @@ function GovernancePage() {
 
 
   //execute delegate tx wth gas when tokenbalance < PUSH_BALANCE_TRESHOLD
+
 
   const delegateAction = async (newDelegatee) => {
     setTxInProgress(true);
@@ -322,8 +316,7 @@ function GovernancePage() {
   // toast customize
   const LoaderToast = ({ msg, color }) => (
     <Toaster>
-      <Loader
-        type="Oval"
+      <Oval
         color={color}
         height={30}
         width={30}
@@ -339,7 +332,7 @@ function GovernancePage() {
           <Item align="stretch" justify="flex-start" margin="0px 15px 15px 15px">
             {(dashboardLoading || !prettyTokenBalance || !selfVotingPower) &&
               <Item padding="20px">
-                <Loader type="Oval" color="#e20880" height={40} width={40} />
+                <Oval color="#e20880" height={40} width={40} />
               </Item>
             }
 
@@ -363,8 +356,7 @@ function GovernancePage() {
                         </Blocky>
                         <Wallet>
                           {!ensFetched &&
-                            <Loader
-                              type="Oval"
+                            <Oval
                               color="#FFF"
                               height={16}
                               width={16}
@@ -508,8 +500,7 @@ function GovernancePage() {
                         >{
                             txInProgress ? (
                               <ActionTitle>
-                                <Loader
-                                  type="Oval"
+                                <Oval
                                   color="#35c5f3"
                                   height={20}
                                   width={20}
@@ -551,8 +542,7 @@ function GovernancePage() {
               <NomineeContainer>
                 {delegateesLoading ? (
                   <ContainerInfo>
-                    <Loader
-                      type="Oval"
+                    <Oval
                       color="#35c5f3"
                       height={40}
                       width={40}
@@ -595,8 +585,7 @@ function GovernancePage() {
           <Item>
             {dashboardLoading &&
               <ContainerInfo>
-                <Loader
-                  type="Oval"
+                <Oval
                   color="#35c5f3"
                   height={40}
                   width={40}
