@@ -13,7 +13,7 @@ import {
 import { convertAddressToAddrCaip } from "helpers/CaipHelper";
 import { useDeviceWidthCheck } from "hooks";
 
-const isOwner=(account,delegate)=>{
+const isOwner = (account, delegate) => {
   return account.toLowerCase() !== delegate.toLowerCase() 
 }
 
@@ -35,7 +35,7 @@ const ShowDelegates = () => {
   };
 
   useEffect(()=>{
-    fetchDelegatees()
+    fetchDelegatees();
   },[])
 
   const fetchDelegatees = async () => {
@@ -43,7 +43,7 @@ const ShowDelegates = () => {
       const channelAddressinCAIP = convertAddressToAddrCaip(account, chainId);
       const { data } = await getReq(`/v1/channels/${channelAddressinCAIP}/delegates`);
       if (data?.delegates) {
-        const delegateeList = data.delegates.map((delegate) => delegate.delegate);
+        let delegateeList = data.delegates.map((delegate) => delegate);
         delegateeList.unshift(account);
         setDelegatees(delegateeList);
       }
@@ -84,7 +84,8 @@ const ShowDelegates = () => {
           justify="flex-start"
           align="stretch"
         >
-          {delegatees.map((delegate,idx) => {
+          {delegatees && delegatees.length>0 && delegatees.map((delegate, idx) => {
+            if (!delegate) return;
             return (
               <Item
                 padding={!isMobile ? "25px":"12px"}

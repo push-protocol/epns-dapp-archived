@@ -4,7 +4,7 @@ const addresses = {
   ceaErc20: "0xc1C0472c0C80bCcDC7F5D01A376Bd97a734B8815",
   epnscore: "0x97D7c5f14B8fe94Ef2b4bA589379f5Ec992197dA",
   epnsEthComm: "0x87da9Af1899ad477C67FeA31ce89c1d2435c77DC", // the core contract
-  epnsPolyComm: "0xD2ee1e96e3592d5945dDc1808834d7EE67400823", // the ploygon comm contract
+  epnsPolyComm: "0xb3971BCef2D791bc4027BbfedFb47319A4AAaaAa", // the ploygon comm contract
   dai: "0xff795577d9ac8bd7d90ee22b6c1703490b6512fd", //address for dai
   aDai: "0x58AD4cB396411B691A9AAb6F74545b2C5217FE6a",
   staking: "0x8e129EF695F8761922F1AA38588292f8d8817bA5",
