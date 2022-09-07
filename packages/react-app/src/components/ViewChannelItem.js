@@ -25,7 +25,7 @@ import ChannelTutorial, {
 } from "segments/ChannelTutorial";
 
 import ChannelsDataStore from "singletons/ChannelsDataStore";
-import { cacheChannelInfo } from "redux/slices/channelSlice";
+import { cacheChannelInfo, setChannelMeta } from "redux/slices/channelSlice";
 
 import { envConfig } from "@project/contracts";
 import {
@@ -55,7 +55,7 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
     ZERO_ADDRESS,
   } = useSelector((state) => state.contracts);
   const { canVerify } = useSelector((state) => state.admin);
-  const { channelsCache, CHANNEL_BLACKLIST } = useSelector(
+  const { channelsCache, CHANNEL_BLACKLIST, channels } = useSelector(
     (state) => state.channels
   );
   const { account, library, chainId } = useWeb3React();
@@ -64,9 +64,9 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
 
   const [channelObject, setChannelObject] = React.useState({});
   const [channelJson, setChannelJson] = React.useState({});
-  const [subscribed, setSubscribed] = React.useState(true);
+  const [subscribed, setSubscribed] = React.useState(channelObjectProp['isSubscriber']);
   const [loading, setLoading] = React.useState(true);
-  const [memberCount, setMemberCount] = React.useState(0);
+  const [memberCount, setMemberCount] = React.useState(channelObjectProp['memberCount']);
   const [isPushAdmin, setIsPushAdmin] = React.useState(false);
   const [isVerified, setIsVerified] = React.useState(false);
   const [isBlocked, setIsBlocked] = React.useState(false);
@@ -122,8 +122,14 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
 
   React.useEffect(() => {
     if (!channelObjectProp) return;
-    setChannelObject(channelObjectProp);
-  }, [channelObjectProp]);
+    const channelIndex = channels.findIndex((channelInfo) => channelInfo.addr === channelObjectProp.addr);
+    if (channelIndex === -1) {
+      dispatch(setChannelMeta([...channels, channelObjectProp]));
+      setChannelObject(channelObjectProp);
+    } else {
+      setChannelObject(channels[channelIndex]);
+    }
+  }, [channelObjectProp, channels]);
 
   React.useEffect(() => {
     if (!isVerified || channelObject?.verifiedBy === ZERO_ADDRESS) return;
@@ -401,7 +407,7 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
         channelAddress: convertAddressToAddrCaip(channelAddress, chainId), // channel address in CAIP
         userAddress: convertAddressToAddrCaip(account, chainId), // user address in CAIP
         onSuccess: () => {
-          // dispatch(cacheSubscribe({ channelAddress: channelObject.addr }));
+          dispatch(cacheSubscribe({ channelAddress: channelObject.addr }));
           setSubscribed(true);
           setMemberCount(memberCount + 1);
 
@@ -513,7 +519,7 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
         channelAddress: convertAddressToAddrCaip(channelAddress, chainId), // channel address in CAIP
         userAddress: convertAddressToAddrCaip(account, chainId), // user address in CAIP
         onSuccess: () => {
-          // dispatch(cacheUnsubscribe({ channelAddress: channelObject.addr }));
+          dispatch(cacheUnsubscribe({ channelAddress: channelObject.addr }));
           setSubscribed(false);
           setMemberCount(memberCount - 1);
 

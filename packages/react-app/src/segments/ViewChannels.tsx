@@ -109,10 +109,10 @@ function ViewChannels({ loadTeaser, playTeaser }) {
   };
 
   // Search Channels Feature
-  React.useEffect(() => {
-    if (!channels.length) return;
-    setChannelToShow(channels);
-  }, [channels]);
+  // React.useEffect(() => {
+  //   if (!channels.length) return;
+  //   setChannelToShow(channels);
+  // }, [channels]);
 
   function searchForChannel() {
     if (loadingChannel) return; //if we are already loading, do nothing
