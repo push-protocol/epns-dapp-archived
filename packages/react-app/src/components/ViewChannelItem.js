@@ -401,7 +401,7 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
         channelAddress: convertAddressToAddrCaip(channelAddress, chainId), // channel address in CAIP
         userAddress: convertAddressToAddrCaip(account, chainId), // user address in CAIP
         onSuccess: () => {
-          dispatch(cacheSubscribe({ channelAddress: channelObject.addr }));
+          // dispatch(cacheSubscribe({ channelAddress: channelObject.addr }));
           setSubscribed(true);
           setMemberCount(memberCount + 1);
 
@@ -513,7 +513,7 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
         channelAddress: convertAddressToAddrCaip(channelAddress, chainId), // channel address in CAIP
         userAddress: convertAddressToAddrCaip(account, chainId), // user address in CAIP
         onSuccess: () => {
-          dispatch(cacheUnsubscribe({ channelAddress: channelObject.addr }));
+          // dispatch(cacheUnsubscribe({ channelAddress: channelObject.addr }));
           setSubscribed(false);
           setMemberCount(memberCount - 1);
 
