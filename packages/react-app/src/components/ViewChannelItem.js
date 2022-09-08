@@ -26,7 +26,7 @@ import ChannelTutorial, { isChannelTutorialized } from "segments/ChannelTutorial
 
 import ChannelsDataStore from "singletons/ChannelsDataStore";
 import { cacheChannelInfo } from "redux/slices/channelSlice";
-import { incrementStepIndex,addNewWelcomeNotif } from "redux/slices/userJourneySlice";
+import { incrementStepIndex, addNewWelcomeNotif } from "redux/slices/userJourneySlice";
 // Create Header
 function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
   const dispatch = useDispatch();
@@ -492,6 +492,16 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
     "0x90A48D5CF7343B08dA12E067680B4C6dbfE551Be": "https://shapeshift.com"
   }
 
+  const correctChannelTitleLink = () => {
+    const channelLink = CTA_OVERRIDE_CACHE[channelObject.addr] || channelJson.url;
+    if(/(?:http|https):\/\//i.test(channelLink)) {
+      window.open(channelLink, '_blank', 'noopener,noreferrer');
+    }
+    else{
+      window.open(`https://${channelLink}`, '_blank', 'noopener,noreferrer');
+    }
+  }
+
   if (isBlocked) return <></>;
   if (isChannelBlacklisted) return <></>;
 
@@ -516,9 +526,7 @@ function ViewChannelItem({ channelObjectProp, loadTeaser, playTeaser }) {
             <Skeleton color={themes.interfaceSkeleton} width="50%" height={24} />
           ) : (
             <ChannelTitleLink
-              href={CTA_OVERRIDE_CACHE[channelObject.addr] || channelJson.url}
-              target="_blank"
-              rel="nofollow"
+              onClick = {() => correctChannelTitleLink()}
             >
               <Span>
                 {channelJson.name}
