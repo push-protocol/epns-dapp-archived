@@ -38,7 +38,7 @@ import { ThemeProvider } from "styled-components";
 import { themeLight, themeDark } from "config/Themization";
 
 import { addresses, abis } from "@project/contracts";
-import { IPFSupload } from "helpers/UtilityHelper";
+import { IPFSupload, isValidUrl } from "helpers/UtilityHelper";
 const ethers = require("ethers");
 
 const ipfs = require("ipfs-api")();
@@ -192,6 +192,13 @@ function CreateChannel() {
       setProcessing(3);
       setProcessingInfo("Channel Fields are Empty! Please retry!");
 
+      return false;
+    }
+
+    if(!isValidUrl(channelURL))
+    {
+      setProcessing(3);
+      setProcessingInfo("Channel Url is invalid! Please retry!");
       return false;
     }
 
