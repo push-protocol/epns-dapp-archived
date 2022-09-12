@@ -93,7 +93,7 @@ function Navigation() {
           Object.entries(section.drilldown).forEach(([drillkey, drillvalue]) => {
             drillcount++;
             let drillIdentifier = drillcount.toString();
-            const item = section.drilldown[drillkey];
+            let item = section.drilldown[drillkey];
 
             drilldownModified[drillIdentifier] = {};
             drilldownModified[drillIdentifier].active = false;
@@ -112,7 +112,10 @@ function Navigation() {
                 drilldownModified[drillIdentifier].active = true;
             }
 
-            drilldownModified[drillIdentifier].data = drillvalue;
+            while (!item?.name) {
+              item = item.data;
+            }
+            drilldownModified[drillIdentifier].data = item;
           })
 
           transformedList[identifier].data.drilldown = drilldownModified;
@@ -265,7 +268,7 @@ function Navigation() {
             count++;
             let identifier = count.toString();
 
-            const item = section.drilldown[drillkey];
+            let item = section.drilldown[drillkey];
 
             transformedList[identifier] = {};
             transformedList[identifier].active = false;
@@ -276,7 +279,10 @@ function Navigation() {
             if (location.pathname === item.href) {
               transformedList[identifier].active = true;
             }
-            transformedList[identifier].data = drillvalue.data;
+            while (!item?.name) {
+              item = item.data;
+            }
+            transformedList[identifier].data = item;
           })
         }
         else {
