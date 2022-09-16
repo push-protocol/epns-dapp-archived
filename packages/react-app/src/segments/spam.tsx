@@ -330,13 +330,13 @@ function SpamBox(props) {
     let address = channelAddress;
 
     const nameToObj = (envConfig.coreContractChain === 1) ? nameToIdProd : nameToIdDev;
-    if (chainId !== nameToObj[blockchain]) {
-      if (!onCoreNetwork) {
-        address = await fetchAliasAddress(channelAddress);
-      } else {
-        address = await fetchEthAddress(channelAddress);
-      }
-    }
+    // if (chainId !== nameToObj[blockchain]) {
+    //   if (!onCoreNetwork) {
+    //     address = await fetchAliasAddress(channelAddress);
+    //   } else {
+    //     address = await fetchEthAddress(channelAddress);
+    //   }
+    // }
 
     if (!address) return;
     subscribeToast.showToast("Waiting for Confirmation...");

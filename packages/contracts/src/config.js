@@ -1,17 +1,17 @@
 // environmental configurations for the dapp for different environments
 const config = {
-    apiUrl: "https://backend-staging.epns.io/apis",
-    env: 'staging',
+    apiUrl: "https://backend.epns.io/apis", //the right backend URL to be used
+    env: 'prod',
     toolingApiUrl: "https://tooling.epns.io/apis",
     allowedNetworks: [
-        42, //for kovan
-        80001 //for mumbai polygon
+        1, //for eth
+        // 137 //for polygon
     ],
-    coreContractChain: 42, //the chain id of the network which the core contract relies on
+    coreContractChain: 1, //the chain id of the network which the core contract relies on
     mainnetCoreContractChain: 1,
-    coreRPC: "https://kovan.infura.io/v3/4ff53a5254144d988a8318210b56f47a",
+    coreRPC: "https://mainnet.infura.io/v3/4ff53a5254144d988a8318210b56f47a",
     mainnetCoreRPC: "https://mainnet.infura.io/v3/4ff53a5254144d988a8318210b56f47a",
-    googleAnalyticsId: "UA-165415629-5",
+    googleAnalyticsId: "UA-165415629-1",
     vapidKey: "BFRmmAEEXOhk31FIsooph5CxlXKh6N0_NocUWHzvtpoUEvqQTwLXu6XtwkrH7ckyr2CvVz1ll-8q4oo6-ZqFJPY",
     firebaseConfig: {
         apiKey: "AIzaSyClOk4qP0ttFW-BPnXy7WT920xfdXSbFu8",

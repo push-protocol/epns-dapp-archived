@@ -250,7 +250,8 @@ function ChannelSettings({props}) {
   return (
     <div>
       <DropdownWrapper background ={theme}>
-        <ActiveChannelWrapper>
+        {/* Commenting out the add subgraph from channel settings dropdown*/}
+        {/* <ActiveChannelWrapper>
           {onCoreNetwork &&
             <ChannelActionButton
               disabled={channelInactive}
@@ -268,7 +269,7 @@ function ChannelSettings({props}) {
                 )}
               </div>
             </ChannelActionButton>
-          }
+          } */}
 
           <ChannelActionButton
             disabled={channelInactive}

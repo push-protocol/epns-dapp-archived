@@ -31,7 +31,7 @@ const networkName = {
   1: "Ethereum Mainnet",
 };
 
-const coreChain = "Ethereum Kovan";
+const coreChain = "Ethereum Mainnet";
 const CORE_CHAIN_ID = envConfig.coreContractChain;
 
 // Create Header

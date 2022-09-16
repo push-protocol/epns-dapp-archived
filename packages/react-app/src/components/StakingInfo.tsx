@@ -52,9 +52,9 @@ const StakingInfo = ({channelStakeFees, setStakeFeesChoosen, setStepFlow,setProc
           <TextSpace>
               <Span color="#657795" size="14px" weight="500" spacing="-0.011em" line="30px">Make sure you have sufficient balance before moving to the next steps.</Span>
 
-              <AnchorLink href='https://faucet.paradigm.xyz/' target="_blank">ETH Faucet</AnchorLink>
+              {/* <AnchorLink href='https://faucet.paradigm.xyz/' target="_blank">ETH Faucet</AnchorLink> */}
 
-              {!UtilityHelper.isMainnet(chainId) ? (
+              {/* {!UtilityHelper.isMainnet(chainId) ? (
               <Minter
                 onClick={() => {
                   mintDai();
@@ -64,7 +64,7 @@ const StakingInfo = ({channelStakeFees, setStakeFeesChoosen, setStepFlow,setProc
               </Minter>
           ) : (
             <></>
-          )}
+          )} */}
           </TextSpace>
 
         <Item width="12.2em" self="stretch" align="stretch" margin="100px auto 50px auto">
