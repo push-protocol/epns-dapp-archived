@@ -18,6 +18,7 @@ import Dropdown from "react-dropdown";
 import styled, { useTheme } from "styled-components";
 import { FaCheckCircle } from "react-icons/fa";
 import { Oval } from "react-loader-spinner";
+import {envConfig} from "@project/contracts";
 
 import { ThemeProvider } from "styled-components";
 
@@ -83,7 +84,7 @@ const SupportPage = () => {
         };
 
         fetch(
-          "https://backend-kovan.epns.io/apis/mailing/sendMail",
+          `${envConfig.apiUrl}/v1/mailing/send`,
           requestOptions
         )
           .then((response) => response.json())

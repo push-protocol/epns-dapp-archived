@@ -120,21 +120,14 @@ function ViewChannels({ loadTeaser, playTeaser }) {
       setLoadingChannel(true); //begin loading here
       setChannelToShow([]); //maybe remove later
       let payloadToSearchApiObj;
-      if (envConfig.coreContractChain === 42) {
-        payloadToSearchApiObj = {
-          query: search,
-          op: "read",
-          page: 1,
-          address: account,
-          pageSize: 1000,
-          chainId: chainId,
-        };
-      } else {
-        payloadToSearchApiObj = {
-          query: search,
-          op: "read",
-        };
-      }
+      payloadToSearchApiObj = {
+        query: search,
+        op: "read",
+        page: 1,
+        address: account,
+        pageSize: 1000,
+        chainId: chainId,
+      };
       postReq("/channels/_search", payloadToSearchApiObj)
         .then((data) => {
           setChannelToShow(data.data.channels || []);

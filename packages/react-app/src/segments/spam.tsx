@@ -22,6 +22,8 @@ import CryptoHelper from "helpers/CryptoHelper";
 import { toast as toaster } from "react-toastify";
 import NotificationToast from "../primaries/NotificationToast";
 import { convertAddressToAddrCaip } from "helpers/CaipHelper";
+import useToast from "hooks/useToast";
+import { MdCheckCircle, MdError } from "react-icons/md";
 
 const NOTIFICATIONS_PER_PAGE = 10;
 // Create Header
@@ -143,7 +145,7 @@ function SpamBox(props) {
             const {
               data: { subscribers },
             } = await postReq("/channels/_get_subscribers", {
-              channel: account,
+              channel: address,
               blockchain: chainId,
               op: "read",
             });
@@ -191,7 +193,7 @@ function SpamBox(props) {
           const {
             data: { subscribers },
           } = await postReq("/channels/_get_subscribers", {
-            channel: account,
+            channel: address,
             blockchain: chainId,
             op: "read",
           });
@@ -243,7 +245,7 @@ function SpamBox(props) {
           const {
             data: { subscribers },
           } = await postReq("/channels/_get_subscribers", {
-            channel: account,
+            channel: address,
             blockchain: chainId,
             op: "read",
           });
@@ -322,6 +324,7 @@ function SpamBox(props) {
     );
   };
 
+  const subscribeToast = useToast();
   const onSubscribeToChannel = async (channelAddress, blockchain) => {
     if (!channelAddress) return;
     let address = channelAddress;
@@ -336,31 +339,32 @@ function SpamBox(props) {
     }
 
     if (!address) return;
-    const type = {
-      Subscribe: [
-        { name: "channel", type: "address" },
-        { name: "subscriber", type: "address" },
-        { name: "action", type: "string" },
-      ],
-    };
-    const message = {
-      channel: address,
-      subscriber: account,
-      action: "Subscribe",
-    };
+    subscribeToast.showToast("Waiting for Confirmation...");
 
-    const signature = await library
-      .getSigner(account)
-      ._signTypedData(EPNS_DOMAIN, type, message);
-    return postReq("/channels/subscribe", {
-      signature,
-      message,
-      op: "write",
-      chainId,
-      contractAddress: epnsCommReadProvider.address,
-    }).then((res) => {
-        dispatch(cacheSubscribe({ channelAddress: channelAddress }));
-      });;
+    const _signer = await library.getSigner(account);
+    await EpnsAPI.channels.subscribe({
+      signer: _signer,
+      channelAddress: convertAddressToAddrCaip(channelAddress, chainId), // channel address in CAIP
+      userAddress: convertAddressToAddrCaip(account, chainId), // user address in CAIP
+      onSuccess: () => {
+        subscribeToast.updateToast(
+          "Success",
+          "Successfully opted into channel !",
+          "SUCCESS",
+          (size) => <MdCheckCircle size={size} color="green" />
+        );
+      },
+      onError: () => {
+        console.error('opt in error');
+        subscribeToast.updateToast(
+          "Error",
+          `There was an error opting into channel`,
+          "ERROR",
+          (size) => <MdError size={size} color="red" />
+        );
+      },
+      env: envConfig['env']
+    })
   };
 
   const isSubscribedFn = (subscribers: any) => {
