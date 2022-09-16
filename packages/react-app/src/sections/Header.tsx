@@ -7,7 +7,7 @@ import {
   UserRejectedRequestError as UserRejectedRequestErrorInjected
 } from '@web3-react/injected-connector'
 import { Web3Provider } from 'ethers/providers'
-import { hexlify } from "ethers/utils";
+import { ethers } from "ethers";
 
 import { DarkModeSwitch } from 'react-toggle-dark-mode';
 
@@ -79,7 +79,7 @@ const chainIds = envConfig.allowedNetworks;
         try {
           await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
-            params: [{ chainId: hexlify(envConfig.coreContractChain) }]
+            params: [{ chainId: ethers.utils.hexValue(envConfig.coreContractChain) }]
           });
         } catch (err) {
           console.error(err);

@@ -13,7 +13,7 @@ const aliasChainId = aliasChainIdsMapping[coreChainId];
 
 const ALIAS_CHAINS = [
   { value: coreChainId, label: networkName[coreChainId] },
-  { value: aliasChainId, label: networkName[aliasChainId] },
+  // { value: aliasChainId, label: networkName[aliasChainId] },
 ];
 
 const ChannelInfo = ({

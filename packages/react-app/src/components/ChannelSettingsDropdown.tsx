@@ -251,8 +251,8 @@ function ChannelSettings({props}) {
     <div>
       <DropdownWrapper background ={theme}>
         {/* Commenting out the add subgraph from channel settings dropdown*/}
-        {/* <ActiveChannelWrapper>
-          {onCoreNetwork &&
+        <ActiveChannelWrapper>
+          {/* {onCoreNetwork &&
             <ChannelActionButton
               disabled={channelInactive}
               onClick={() => !channelInactive && setAddSubGraphIdOpen(true)}
