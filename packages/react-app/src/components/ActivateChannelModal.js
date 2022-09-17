@@ -1,7 +1,7 @@
-import React, { useRef, useState } from "react";
+import React from "react";
 import Slider from "@material-ui/core/Slider";
 import styled from "styled-components";
-import Loader from "react-loader-spinner";
+import { Oval } from "react-loader-spinner";
 import { useClickAway } from "react-use";
 import {
   Section,
@@ -10,7 +10,7 @@ import {
   H3,
   Span,
   Button,
-} from "components/SharedStyling";
+} from "primaries/SharedStyling";
 
 const MIN_STAKE_FEES = 50;
 
@@ -69,7 +69,7 @@ export default function ActivateChannelModal({
                 onClick={activateChannel}
               >
                 {loading ? (
-                  <Loader type="Oval" color="#FFF" height={16} width={16} />
+                  <Oval color="#FFF" height={16} width={16} />
                 ) : (
                   <Span
                     color="#fff"

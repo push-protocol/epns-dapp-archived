@@ -1,20 +1,19 @@
 import React from "react";
-import styled, { css } from 'styled-components';
-import Loader from 'react-loader-spinner'
-import { Waypoint } from "react-waypoint";
+import styled from 'styled-components';
+import { Oval } from 'react-loader-spinner'
+import { envConfig } from "@project/contracts";
 
 import { useWeb3React } from '@web3-react/core'
 import { addresses, abis } from "@project/contracts";
 import NFTHelper from 'helpers/NFTHelper';
 import { ethers } from "ethers";
 
-import DisplayNotice from "components/DisplayNotice";
+import DisplayNotice from "../primaries/DisplayNotice";
 import ViewNFTItem from "components/ViewNFTItem";
 
-
 // Create Header
-function MyNFTs({controlAt, setControlAt, setTokenId}) {
-  const { account, library } = useWeb3React();
+function MyNFTs({ controlAt, setControlAt, setTokenId }) {
+  const { account, library, chainId } = useWeb3React();
 
   const [nftReadProvider, setNftReadProvider] = React.useState(null);
   const [nftWriteProvider, setNftWriteProvider] = React.useState(null);
@@ -23,21 +22,26 @@ function MyNFTs({controlAt, setControlAt, setTokenId}) {
 
   const [loading, setLoading] = React.useState(true);
 
-  React.useEffect(() => {
+  const onMainnetCore = chainId === envConfig.mainnetCoreContractChain;
 
-    if (!!(library && account)) {
-      const contractInstance = new ethers.Contract(addresses.rockstar, abis.rockstar, library);
+  const mainnetCoreProvider = onMainnetCore
+    ? library
+    : new ethers.providers.JsonRpcProvider(envConfig.mainnetCoreRPC);
+
+  React.useEffect(() => {
+    if (!!(mainnetCoreProvider && account)) {
+      const contractInstance = new ethers.Contract(addresses.rockstar, abis.rockstar, mainnetCoreProvider);
       setNftReadProvider(contractInstance);
-      let signer = library.getSigner(account);
+      let signer = mainnetCoreProvider.getSigner(account);
       const signerInstance = new ethers.Contract(addresses.rockstar, abis.rockstar, signer);
       setNftWriteProvider(signerInstance);
       const NFTRewardsInstance = new ethers.Contract(addresses.NFTRewards, abis.NFTRewards, signer);
       setNFTRewardsContract(NFTRewardsInstance);
     }
-  }, [account,library]);
+  }, [account]);
 
   React.useEffect(() => {
-    if(nftReadProvider && NFTRewardsContract){
+    if (nftReadProvider && NFTRewardsContract) {
       fetchNFTDetails();
     }
   }, [account, nftReadProvider, nftWriteProvider, NFTRewardsContract]);
@@ -46,7 +50,7 @@ function MyNFTs({controlAt, setControlAt, setTokenId}) {
   const fetchNFTDetails = async () => {
     let balance = await NFTHelper.getNFTBalance(account, nftReadProvider);
     setLoading(false);
-    for(let i=0; i<balance; i++){
+    for (let i = 0; i < balance; i++) {
       let tokenId = await NFTHelper.getTokenOfOwnerByIndex(account, i, nftReadProvider)
       let NFTObject = await NFTHelper.getTokenData(tokenId, nftReadProvider, NFTRewardsContract)
       await setNFTObjects(prev => [...prev, NFTObject])
@@ -57,11 +61,10 @@ function MyNFTs({controlAt, setControlAt, setTokenId}) {
     <>
       {loading &&
         <ContainerInfo>
-          <Loader
-           type="Oval"
-           color="#35c5f3"
-           height={40}
-           width={40}
+          <Oval
+            color="#35c5f3"
+            height={40}
+            width={40}
           />
         </ContainerInfo>
       }
@@ -69,7 +72,7 @@ function MyNFTs({controlAt, setControlAt, setTokenId}) {
       {!loading && NFTObjects.length == 0 &&
         <ContainerInfo>
           <DisplayNotice
-            title="No ROCKSTAR NFTs are available in your account"
+            title="No ROCKSTAR tokens are available in your account"
             theme="primary"
           />
         </ContainerInfo>
@@ -102,18 +105,6 @@ function MyNFTs({controlAt, setControlAt, setTokenId}) {
 }
 
 // css styles
-const Container = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-
-  font-weight: 200;
-  align-content: center;
-  align-items: center;
-  justify-content: center;
-
-  max-height: 80vh;
-`
 const ContainerInfo = styled.div`
   padding: 20px;
 `

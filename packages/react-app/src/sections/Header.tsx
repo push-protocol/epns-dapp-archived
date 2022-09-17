@@ -7,21 +7,24 @@ import {
   UserRejectedRequestError as UserRejectedRequestErrorInjected
 } from '@web3-react/injected-connector'
 import { Web3Provider } from 'ethers/providers'
+import { ethers } from "ethers";
 
 import { DarkModeSwitch } from 'react-toggle-dark-mode';
 
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
 
 import styled, { css, useTheme } from "styled-components";
-import {Section, Item, ItemH, Button, Span} from 'components/SharedStyling';
+import {Section, Item, ItemH, Button, Span} from 'primaries/SharedStyling';
 
-import Profile from 'components/Profile';
-import Bell from 'components/Bell';
+import Profile from 'primaries/Profile';
+import Bell from 'primaries/Bell';
 import NavigationButton from 'components/NavigationButton';
 
 import { NavigationContext } from "contexts/NavigationContext";
 
 import GLOBALS from "config/Globals";
+import { envConfig } from "@project/contracts";
+
 
 // Create Header
 function Header({ isDarkMode, darkModeToggle }) {
@@ -70,12 +73,29 @@ function Header({ isDarkMode, darkModeToggle }) {
     }
   }
 
+async function handleChangeNetwork(){
+const chainIds = envConfig.allowedNetworks;
+  if (!chainIds.includes(window.ethereum.networkVersion)) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: ethers.utils.hexValue(envConfig.coreContractChain) }]
+          });
+        } catch (err) {
+          console.error(err);
+        }
+      }
+}
 
   // handle error functions
   function getErrorMessage(error: Error) {
     if (error instanceof NoEthereumProviderError) {
       return 'Web3 not enabled, install MetaMask on desktop or visit from a dApp browser on mobile'
     } else if (error instanceof UnsupportedChainIdError) {
+      handleChangeNetwork();
+      if(envConfig.coreContractChain === 42)
+      return "Unsupported Network, please connect to the Ethereum Kovan network or Polygon Mumbai network"
+      else 
       return "Unsupported Network, please connect to the Ethereum Mainnet network"
     } else if (
       error instanceof UserRejectedRequestErrorInjected

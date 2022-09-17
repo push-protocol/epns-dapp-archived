@@ -6,7 +6,7 @@ import { WalletConnectConnector } from '@web3-react/walletconnect-connector'
 // import { WalletLinkConnector } from '@web3-react/walletlink-connector'
 import { LedgerConnector } from '@web3-react/ledger-connector'
 import { TrezorConnector } from '@web3-react/trezor-connector'
-import { LedgerHQFrameConnector } from '@epnsproject/sdk-ledgerlive'
+import { LedgerHQFrameConnector } from "@epnsproject/sdk-ledgerlive";
 // import { FrameConnector } from '@web3-react/frame-connector'
 // import { AuthereumConnector } from '@web3-react/authereum-connector'
 // import { FortmaticConnector } from '@web3-react/fortmatic-connector'
@@ -25,8 +25,9 @@ const RPC_URLS: { [chainId: number]: string } = {
 
 export const injected = new InjectedConnector({ supportedChainIds: SUPPORTED_CHAIN_IDS })
 
+
 // Only receive messages from platform.apps.ledger.com
-export const ledgerLiveConnector = new LedgerHQFrameConnector()
+export const ledgerLiveConnector = new LedgerHQFrameConnector();
 
 export const walletconnect = new WalletConnectConnector({
   rpc: { ...RPC_URLS },
@@ -47,7 +48,7 @@ export const trezor = new TrezorConnector({
   url: CORE_RPC,
   pollingInterval: POLLING_INTERVAL,
   manifestEmail: 'support@epns.io',
-  manifestAppUrl: 'https://staging-app.epns.io'
+  manifestAppUrl: 'https://app.epns.io'
 })
 
 //

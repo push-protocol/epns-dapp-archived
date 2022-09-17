@@ -1,34 +1,35 @@
-import React, {useState} from "react";
-import { envConfig } from "@project/contracts";
-
+import React, { useState } from "react";
 import ReactGA from "react-ga";
 
 import { Web3Provider } from "ethers/providers";
 import { useWeb3React } from "@web3-react/core";
 import { AbstractConnector } from "@web3-react/abstract-connector";
-import { useEagerConnect, useInactiveListener } from "hooks";
+import { useEagerConnect, useInactiveListener, useBrowserNotification } from "hooks";
 import { injected, walletconnect, portis, ledger } from "connectors";
-import Joyride, { ACTIONS, CallBackProps, EVENTS, STATUS, Step } from "react-joyride";
+import { envConfig } from "@project/contracts";
+import Joyride, { CallBackProps } from "react-joyride";
 
-import styled, {useTheme} from "styled-components";
-import { Item, ItemH, Span, H2, B, A, C } from "components/SharedStyling";
-
+import styled from "styled-components";
+import { Item, ItemH, Span, H2, B, A, C } from "./primaries/SharedStyling";
 import Header from "sections/Header";
 import Navigation from "sections/Navigation";
 
 import NavigationContextProvider from "contexts/NavigationContext";
 import MasterInterfacePage from "pages/MasterInterfacePage";
 
-import {ThemeProvider} from "styled-components";
+import { ThemeProvider } from "styled-components";
 
 import { themeLight, themeDark } from "config/Themization";
 import GLOBALS from "config/Globals";
 
-import {setRun, setIndex, setWelcomeNotifsEmpty} from "./redux/slices/userJourneySlice";
+import { setRun, setIndex, setWelcomeNotifsEmpty } from "./redux/slices/userJourneySlice";
 import { useSelector, useDispatch } from "react-redux";
-import UserJourneySteps from "segments/userJourneySteps.jsx";
+import UserJourneySteps from "segments/userJourneySteps";
 
 import * as dotenv from "dotenv";
+import InitState from "components/InitState";
+
+
 dotenv.config();
 
 // define the different type of connectors which we use
@@ -52,24 +53,24 @@ export default function App() {
 
   const dispatch = useDispatch();
 
-  const { connector, activate, active, error } = useWeb3React<Web3Provider>();
+  const { connector, activate, active, error, account } = useWeb3React<Web3Provider>();
   const [activatingConnector, setActivatingConnector] = React.useState<
     AbstractConnector
   >();
   const [currentTime, setcurrentTime] = React.useState(0);
-
-  const themes = useTheme();
 
   const {
     run,
     stepIndex,
     tutorialContinous,
   } = useSelector((state: any) => state.userJourney);
+
   
-  React.useEffect(()=>{
-    const now = Date.now()/ 1000;
+
+  React.useEffect(() => {
+    const now = Date.now() / 1000;
     setcurrentTime(now)
-  },[])
+  }, [])
   React.useEffect(() => {
     if (activatingConnector && activatingConnector === connector) {
       setActivatingConnector(undefined);
@@ -89,46 +90,49 @@ export default function App() {
   // Initialize Theme
   const [darkMode, setDarkMode] = useState(false);
 
+  // Enable browser notification
+  useBrowserNotification(account)
+
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   }
 
   React.useEffect(() => {
     const data = localStorage.getItem('theme')
-    if(data){
+    if (data) {
       setDarkMode(JSON.parse(data))
     }
-  },[])
+  }, [])
 
   React.useEffect(() => {
     localStorage.setItem('theme', JSON.stringify(darkMode))
   })
 
-  React.useEffect(()=>{
+  React.useEffect(() => {
     document.body.style.backgroundColor = darkMode ? "#000" : "#fff";
-  },[darkMode])
+  }, [darkMode])
 
 
-  React.useEffect(()=>{
+  React.useEffect(() => {
     window?.Olvy?.init({
       organisation: "epns",
-    target: "#olvy-target",
-    type: "sidebar",
-    view: {
-      showSearch: false,
-      compact: false,
-      showHeader: true, // only applies when widget type is embed. you cannot hide header for modal and sidebar widgets
-      showUnreadIndicator: true,
-      unreadIndicatorColor: "#cc1919",
-      unreadIndicatorPosition: "top-right"
-    }
+      target: "#olvy-target",
+      type: "sidebar",
+      view: {
+        showSearch: false,
+        compact: false,
+        showHeader: true, // only applies when widget type is embed. you cannot hide header for modal and sidebar widgets
+        showUnreadIndicator: true,
+        unreadIndicatorColor: "#cc1919",
+        unreadIndicatorPosition: "top-right"
+      }
     });
     return function cleanup() {
       window?.Olvy?.teardown();
     };
   });
 
-  const steps = UserJourneySteps({darkMode});
+  const steps = UserJourneySteps({ darkMode });
 
   const handleJoyrideCallback = (data: CallBackProps) => {
     // console.log(data)
@@ -139,9 +143,9 @@ export default function App() {
         document.querySelector("div > section > div").scrollTop = 0
       }, 100)
     }
-    
-    
-    if ( action === "close" || index === 20 ) { //action === "close" ||
+
+
+    if (action === "close" || index === 20) { //action === "close" ||
       dispatch(setRun(false))
       dispatch(setIndex(0))
       dispatch(setWelcomeNotifsEmpty());
@@ -152,21 +156,22 @@ export default function App() {
   }
 
   return (
-    <ThemeProvider theme={darkMode ? themeDark : themeLight }>
+    <ThemeProvider theme={darkMode ? themeDark : themeLight}>
+      <InitState />
       <NavigationContextProvider>
         <Joyride
           run={run}
           steps={steps}
           continuous={tutorialContinous}
           stepIndex={stepIndex}
-          hideFooter={true}
-          primaryProps={false}
+          // hideFooter={true}
+          // primaryProps={false}
           hideBackButton={true}
           hideCloseButton={false}
           disableScrolling={true}
           disableScrollParentFix={true}
-          disableFlip={true}
-          showNextButton={false}
+          // disableFlip={true}
+          // showNextButton={false}
           showSkipButton={false}
           disableOverlayClose={true}
           callback={handleJoyrideCallback}
@@ -174,10 +179,9 @@ export default function App() {
             options: {
               arrowColor: darkMode ? themeDark.dynamicTutsBg : themeLight.dynamicTutsBg,
               backgroundColor: darkMode ? themeDark.dynamicTutsBg : themeLight.dynamicTutsBg,
-              overlayColor:  darkMode ? themeDark.dynamicTutsBgOverlay : themeLight.dynamicTutsBgOverlay,
+              overlayColor: darkMode ? themeDark.dynamicTutsBgOverlay : themeLight.dynamicTutsBgOverlay,
               primaryColor: darkMode ? themeDark.dynamicTutsPrimaryColor : themeLight.dynamicTutsPrimaryColor,
               textColor: darkMode ? themeDark.dynamicTutsFontColor : themeLight.dynamicTutsFontColor,
-              minWidth: 280,
               zIndex: 1000,
             },
           }}
@@ -186,7 +190,7 @@ export default function App() {
           <Header
             isDarkMode={darkMode}
             darkModeToggle={toggleDarkMode}
-          />  
+          />
         </HeaderContainer>
 
         <ParentContainer
@@ -219,7 +223,7 @@ export default function App() {
                 src="./epnshomelogo.png"
                 srcSet={"./epnshomelogo@2x.png 2x, ./epnshomelogo@2x.png 3x"}
               />
-              
+
               <Item
                 bg={darkMode ? themeDark : themeLight}
                 border="1px solid #ddd"
@@ -276,7 +280,7 @@ export default function App() {
                 </ItemH>
               </Item>
 
-              <Span margin="30px 0px 0px 0px" size="14px" color={darkMode ? themeDark.fontColor : themeLight.fontColor }>
+              <Span margin="30px 0px 0px 0px" size="14px" color={darkMode ? themeDark.fontColor : themeLight.fontColor}>
                 By unlocking your wallet, <B>You agree</B> to our{" "}
                 <A href="https://epns.io/tos" target="_blank">
                   Terms of Service
@@ -287,7 +291,6 @@ export default function App() {
                 </A>
                 .
               </Span>
-              
               <Item
                 flex="initial"
                 padding="30px 15px"
@@ -319,9 +322,11 @@ const StyledItem = styled(Item)`
   line-height: 18px;
   align-items: center;
   width:44rem;
+
   span{
     color: #e20880;
   }
+
   @media(max-width:400px){
     width: auto;
   }
@@ -420,32 +425,4 @@ const ProviderImage = styled.img`
   width: 32px;
   max-height: 32px;
   padding: 10px;
-`;
-
-const BeaconExample = styled.span`
-  height: 10px;
-  width: 10px;
-  background: ${props => props.theme.dynamicTutsPrimaryColor};
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 100%;
-  position: relative;
-  margin: 0px 10px;
-`;
-
-const BeaconExamplePulse = styled.span`
-  animation: 1.2s ease-in-out 0s infinite normal none running joyride-beacon-outer;
-  background-color: transparent;
-  border: 2px solid ${props => props.theme.dynamicTutsPrimaryColor};
-  border-radius: 50%;
-  box-sizing: border-box;
-  display: block;
-  height: 26px;
-  width: 26px;
-  left: -8px;
-  top: -8px;
-  opacity: 0.9;
-  position: absolute;
-  transform-origin: center center;
 `;

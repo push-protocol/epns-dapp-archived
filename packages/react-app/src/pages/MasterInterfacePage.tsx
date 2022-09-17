@@ -1,9 +1,8 @@
 import React from "react";
-import ReactGA from "react-ga";
-import { Navigate, Routes, Route, Link } from "react-router-dom";
+import { Navigate, Routes, Route,useLocation } from "react-router-dom";
 
 import styled from "styled-components";
-import { Content, Item, ItemH, Span, H2, B, Anchor } from "components/SharedStyling";
+import { Item, Anchor } from "../primaries/SharedStyling";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
@@ -14,6 +13,7 @@ import InboxPage from "pages/InboxPage";
 import SpamPage from "pages/SpamPage";
 import ViewChannelsPage from "pages/ViewChannelsPage";
 import ChannelDashboardPage from "pages/ChannelDashboardPage";
+import SendNotifs from "pages/SendNotifs";
 import ReceiveNotifsPage from "pages/ReceiveNotifsPage";
 
 import GovernancePage from "pages/GovernancePage";
@@ -22,10 +22,11 @@ import YieldFarmingPage from "pages/YieldFarmingPage";
 import NFTPage from "pages/NFTPage";
 import AirdropPage from "pages/AirdropPage";
 import ComingSoonPage from "pages/ComingSoonPage";
+import NotAvailablePage from "./NotAvailablePage";
 import TutorialPage from "pages/TutorialPage";
 import FAQPage from "pages/FAQPage";
 
-import {SupportPage} from "pages/SupportPage";
+import { SupportPage } from "pages/SupportPage";
 
 import GLOBALS from "config/Globals";
 
@@ -34,26 +35,23 @@ function MasterInterfacePage() {
   // Master Interface controls settings
   const [playTeaserVideo, setPlayTeaserVideo] = React.useState(false);
   const [loadTeaserVideo, setLoadTeaserVideo] = React.useState(null);
-
-  const runYoutube = (flag) => {
-    setPlayTeaserVideo(flag);
-    console.log("here");
-  }
+  const location = useLocation()
 
   // Render
   return (
     <Container>
-      <Interface>
+      <Interface location={location.pathname}>
         <Routes>
-          <Route path="inbox" element={<InboxPage />} />
           <Route path="channels" element={
-              <ViewChannelsPage 
-                loadTeaser={setLoadTeaserVideo}
-                playTeaser={setPlayTeaserVideo}
-              />
-            } 
+            <ViewChannelsPage
+              loadTeaser={setLoadTeaserVideo}
+              playTeaser={setPlayTeaserVideo}
+            />
+          }
           />
+          <Route path="inbox" element={<InboxPage />} />
           <Route path="dashboard" element={<ChannelDashboardPage />} />
+          <Route path="send" element={<SendNotifs />} />
           <Route path="spam" element={<SpamPage />} />
           <Route path="receive" element={<ReceiveNotifsPage />} />
 
@@ -64,18 +62,19 @@ function MasterInterfacePage() {
           <Route path="gratitude" element={<AirdropPage />} />
           <Route path="live_walkthrough" element={<TutorialPage />} />
           <Route path="comingsoon" element={<ComingSoonPage />} />
+          <Route path="notavailable" element={<NotAvailablePage />} />
           <Route path="faq" element={<FAQPage />} />
           <Route
-              path="/"
-              element={<Navigate to="/channels" />}
+            path="/"
+            element={<Navigate to="/channels" />}
           />
-          <Route path="support" element={<SupportPage/>}/>
+          <Route path="support" element={<SupportPage />} />
         </Routes>
       </Interface>
 
       {/* For Channels Opt-in / Opt-out */}
-      <ToastContainer
-        position="bottom-right"
+      <StyledToastContainer
+        position="top-right"
         autoClose={false}
         newestOnTop
         closeOnClick
@@ -90,7 +89,7 @@ function MasterInterfacePage() {
           <PreviewBG
             href="#"
             bg="transparent"
-            onClick={(e) => {e.preventDefault(); setPlayTeaserVideo(!playTeaserVideo)}}
+            onClick={(e) => { e.preventDefault(); setPlayTeaserVideo(!playTeaserVideo) }}
           >
             <PreviewContent className="contentBox">
               <PreviewClose
@@ -98,12 +97,12 @@ function MasterInterfacePage() {
                 bg="transparent"
                 hover="transparent"
                 hoverBG="transparent"
-                onClick={(e) => {e.preventDefault(); setPlayTeaserVideo(!playTeaserVideo)}}
+                onClick={(e) => { e.preventDefault(); setPlayTeaserVideo(!playTeaserVideo) }}
               >
-                <VscClose size={40} color="#fff"/>
+                <VscClose size={40} color="#fff" />
               </PreviewClose>
               <Preview>
-                <div class='videoWrapper'><iframe src={loadTeaserVideo} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+                <div className='videoWrapper'><iframe src={loadTeaserVideo} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
               </Preview>
             </PreviewContent>
           </PreviewBG>
@@ -120,10 +119,13 @@ const Container = styled.div`
   min-height: calc(100vh - ${GLOBALS.CONSTANTS.HEADER_HEIGHT}px - 20px - ${props => props.theme.interfaceTopPadding});
   padding: ${props => props.theme.interfaceTopPadding} 20px 20px 20px;
   align-items: stretch;
+
 `;
 
 const Interface = styled(Item)`
-  flex: 1;
+  // flex: 1;
+  // width:50%;
+  width: ${props => props.location === '/send' ? '70%' : '100%'};
   display: flex;
   align-items: stretch;
 
@@ -131,11 +133,15 @@ const Interface = styled(Item)`
   border-radius: 20px;
   border: 1px solid ${props => props.theme.interfaceBorder};
 
-  margin: 15px 15px 15px 0px;
+  // margin: 15px 15px 15px 0px;
+  margin: ${props => props.location === '/send' ? '15px auto' : '15px 15px 15px 0px'};
   overflow: hidden;
 
+
   @media (max-width: 992px) {
-    margin: 15px 0px;
+    // margin: 15px 0px;
+    width:100%;
+    margin: ${props => props.location === '/send' ? '15px auto' : '15px 0px'};
   }
 `
 
@@ -178,6 +184,17 @@ const PreviewClose = styled(Anchor)`
   align-self: flex-end;
   margin-bottom: -40px;
 `
+
+const StyledToastContainer = styled(ToastContainer)`
+  &&&.Toastify__toast-container {
+    top: 7vh;
+    right: 2vw;
+  }
+  // .Toastify__toast {}
+  // .Toastify__toast-body {}
+  // .Toastify__progress-bar {}
+  // .Toastify__toast-container--top-right {}
+`;
 
 // Export Default
 export default MasterInterfacePage;

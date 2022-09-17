@@ -1,46 +1,23 @@
 import React from "react";
 
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import {
   Section,
-  Content,
-  Item,
   ItemH,
-  ItemBreak,
-  A,
-  B,
-  H1,
-  H2,
-  H3,
-  Image,
-  P,
-  Span,
-  Anchor,
-  Button,
-  Showoff,
-  FormSubmision,
-  Input,
-  TextField,
-} from "components/SharedStyling";
+} from "../primaries/SharedStyling";
 
-import StackGrid, { transitions } from "react-stack-grid";
-
-import Loader from "react-loader-spinner";
-import { Waypoint } from "react-waypoint";
+import { Oval } from "react-loader-spinner";
 
 import { useWeb3React } from "@web3-react/core";
 import { addresses, abis } from "@project/contracts";
 import NFTHelper from "helpers/NFTHelper";
 import { ethers } from "ethers";
-
-import DisplayNotice from "components/DisplayNotice";
+import { envConfig } from "@project/contracts";
 import ViewNFTV2Item from "components/ViewNFTsV2Item";
-
-const { scaleDown } = transitions;
 
 // Create Header
 function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
-  const { account, library } = useWeb3React();
+  const { account, chainId, library } = useWeb3React();
 
   const [nftReadProvider, setNftReadProvider] = React.useState(null);
   const [nftWriteProvider, setNftWriteProvider] = React.useState(null);
@@ -49,15 +26,21 @@ function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
 
   const [loading, setLoading] = React.useState(true);
 
+  const onMainnetCore = chainId === envConfig.mainnetCoreContractChain;
+
+  const mainnetCoreProvider = onMainnetCore
+    ? library
+    : new ethers.providers.JsonRpcProvider(envConfig.mainnetCoreRPC)
+
   React.useEffect(() => {
-    if (!!(library && account)) {
+    if (!!(mainnetCoreProvider && account)) {
       const contractInstance = new ethers.Contract(
         addresses.rockstarV2,
         abis.rockstarV2,
-        library
+        mainnetCoreProvider
       );
       setNftReadProvider(contractInstance);
-      let signer = library.getSigner(account);
+      let signer = mainnetCoreProvider.getSigner(account);
       const signerInstance = new ethers.Contract(
         addresses.rockstarV2,
         abis.rockstarV2,
@@ -67,11 +50,11 @@ function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
       const NFTRewardsV2Instance = new ethers.Contract(
         addresses.NFTRewardsV2,
         abis.NFTRewardsV2,
-        library
+        signer
       );
       setNFTRewardsV2Contract(NFTRewardsV2Instance);
     }
-  }, [account, library]);
+  }, [account]);
 
   React.useEffect(() => {
     if (nftReadProvider) {
@@ -91,7 +74,7 @@ function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
         nftReadProvider,
         NFTRewardsV2Contract
       );
-    let tokenUrl = NFTObject.metadata.replace('ipfs://','https://ipfs.io/ipfs/')
+      let tokenUrl = NFTObject.metadata.replace('ipfs://', 'https://ipfs.io/ipfs/')
       let response = await fetch(`${tokenUrl}`);
       let data = await response.json()
       NFTObject['nftInfo'] = data
@@ -104,14 +87,13 @@ function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
     <Section align="center">
       {loading && (
         <ContainerInfo>
-          <Loader type="Oval" color="#674c9f" height={40} width={40} />
+          <Oval color="#674c9f" height={40} width={40} />
         </ContainerInfo>
       )}
 
       {/* {!loading && NFTObjects.length == 0 &&
         <ContainerInfo>
-          <Loader
-           type="Oval"
+          <Oval
            color="#674c9f"
            height={40}
            width={40}
@@ -145,29 +127,8 @@ function AllNFTsV2({ controlAt, setControlAt, setTokenId }) {
 }
 
 // css styles
-const Container = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-
-  font-weight: 200;
-  align-content: center;
-  align-items: center;
-  justify-content: center;
-
-  max-height: 80vh;
-`;
-
 const ContainerInfo = styled.div`
   padding: 20px;
-`;
-
-const Items = styled.div`
-  display: block;
-  align-self: stretch;
-  padding: 10px 20px;
-  overflow-y: scroll;
-  background: #fafafa;
 `;
 
 // Export Default

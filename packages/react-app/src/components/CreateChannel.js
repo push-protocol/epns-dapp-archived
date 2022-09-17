@@ -1,67 +1,51 @@
-import React, { useState } from "react";
-import Select from "react-select";
+import React, { useState, useEffect } from "react";
 import styled, { css, useTheme } from "styled-components";
+import "react-dropdown/style.css";
 import {
   Section,
   Content,
   Item,
-  ItemH,
-  ItemBreak,
-  H1,
   H2,
-  H3,
-  Image,
-  P,
   Span,
-  Anchor,
-  Button,
-  Showoff,
-  FormSubmision,
-  Input,
-  TextField,
-} from "components/SharedStyling";
-
-import { FiLink } from "react-icons/fi";
-
+  H3,
+} from "../primaries/SharedStyling";
 import "react-dropzone-uploader/dist/styles.css";
-import Dropzone from "react-dropzone-uploader";
-
-import { makeStyles } from "@material-ui/core/styles";
-import Slider from "@material-ui/core/Slider";
-
-import Loader from "react-loader-spinner";
-
-import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
-
+import { Oval } from "react-loader-spinner";
+import UploadLogo from "./UploadLogo";
+import StakingInfo from "./StakingInfo";
+import ChannelInfo from "./ChannelInfo";
+import ProcessingInfo from "./ProcessingInfo";
+import { MdCallMade, MdError } from "react-icons/md";
+import { useWeb3React } from "@web3-react/core";
 import { ThemeProvider } from "styled-components";
+import { addresses, abis, envConfig } from "@project/contracts";
+import "./createChannel.css";
+import { getCAIPObj } from "helpers/CaipHelper";
+import { IPFSupload } from "helpers/IpfsHelper";
+import useToast from "hooks/useToast";
 
-import { themeLight, themeDark } from "config/Themization";
-
-import { addresses, abis } from "@project/contracts";
-import { IPFSupload, isValidUrl } from "helpers/UtilityHelper";
 const ethers = require("ethers");
-
-const ipfs = require("ipfs-api")();
-
 const minStakeFees = 50;
-const ALIAS_CHAINS = [{ value: "POLYGON_TEST_MUMBAI:80001", label: "Polygon" }];
+const networkName = {
+  42: "Ethereum Kovan",
+  1: "Ethereum Mainnet",
+};
+
+const coreChain = "Ethereum Mainnet";
+const CORE_CHAIN_ID = envConfig.coreContractChain;
 
 // Create Header
 function CreateChannel() {
-  const { active, error, account, library, chainId } = useWeb3React();
-
+  const { account, library, chainId } = useWeb3React();
   const themes = useTheme();
-
-  const [darkMode, setDarkMode] = useState(false);
-
+  const onCoreNetwork = CORE_CHAIN_ID === chainId;
   const [processing, setProcessing] = React.useState(0);
   const [processingInfo, setProcessingInfo] = React.useState("");
 
   const [uploadDone, setUploadDone] = React.useState(false);
   const [stakeFeesChoosen, setStakeFeesChoosen] = React.useState(false);
   const [channelInfoDone, setChannelInfoDone] = React.useState(false);
-
-  const [chainDetails, setChainDetails] = React.useState("");
+  const [chainDetails, setChainDetails] = React.useState(CORE_CHAIN_ID);
   const [channelName, setChannelName] = React.useState("");
   const [channelAlias, setChannelAlias] = React.useState("");
   const [channelInfo, setChannelInfo] = React.useState("");
@@ -69,10 +53,23 @@ function CreateChannel() {
   const [channelFile, setChannelFile] = React.useState(undefined);
   const [channelStakeFees, setChannelStakeFees] = React.useState(minStakeFees);
   const [daiAmountVal, setDaiAmountVal] = useState("");
+  const [txStatus, setTxStatus] = useState(2);
+  const [progress, setProgress] = React.useState(0);
+  const [progressInfo, setProgressInfo] = React.useState("");
+  const [logoInfo, setLogoInfo] = React.useState("");
+
+  //image upload states
+  const [view, setView] = useState(false);
+  const [imageSrc, setImageSrc] = useState(undefined);
+  const [croppedImage, setCroppedImage] = useState(undefined);
+
   const [stepFlow, setStepFlow] = React.useState(1);
+  const channelToast = useToast();
+  const channelToastNotif = useToast();
 
   //checking DAI for user
   React.useEffect(() => {
+    if (!onCoreNetwork) return;
     const checkDaiFunc = async () => {
       let checkDaiAmount = new ethers.Contract(
         addresses.dai,
@@ -84,53 +81,34 @@ function CreateChannel() {
       value = value?.toString();
       const convertedVal = ethers.utils.formatEther(value);
       setDaiAmountVal(convertedVal);
-      if (convertedVal >= 50.0) {
+      if (convertedVal >= minStakeFees) {
         setChannelStakeFees(convertedVal);
       }
     };
     checkDaiFunc();
   }, []);
 
-  // called every time a file's `status` changes
-  const handleChangeStatus = ({ meta, file }, status) => {
-    console.log(status, meta, file);
-  };
+  // timer
+  // React.useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     setProgress((oldProgress) => {
+  //       if (oldProgress === 100) {
+  //         return 0;
+  //       }
+  //       const diff = Math.random() * 10;
+  //       return Math.min(oldProgress + diff, 100);
+  //     });
+  //   }, 500);
 
-  const onDropHandler = (files) => {
-    //   var file = files[0]
-    //   const reader = new FileReader();
-    //   reader.onload = (event) => {
-    //     console.log(event.target.result);
-    //   };
-    //   reader.readAsDataURL(file);
-    // setChannelFile(file);
-    // console.log("Drop Handler");
-    // console.log(file);
-  };
+  //   return () => {
+  //     clearInterval(timer);
+  //   };
+  // }, []);
 
-  // receives array of files that are done uploading when submit button is clicked
-  const handleLogoSubmit = (files, allFiles) => {
-    // console.log(files.map(f => f.meta))
-    allFiles.forEach((f) => {
-      var file = f.file;
-      var reader = new FileReader();
-      reader.readAsDataURL(file);
-      // console.log(f.file);
-
-      reader.onloadend = function(e) {
-        // console.log(reader.result);
-        const response = handleLogoSizeLimitation(reader.result);
-        if (response.success) {
-          setStepFlow(2);
-          setProcessing(0);
-          setUploadDone(true);
-          setChannelFile(reader.result);
-        } else {
-          setProcessing(3);
-          setProcessingInfo(response.info);
-        }
-      };
-    });
+  const proceed = () => {
+    setStepFlow(3);
+    setProcessing(0);
+    setUploadDone(true);
   };
 
   const handleLogoSizeLimitation = (base64) => {
@@ -149,18 +127,13 @@ function CreateChannel() {
       };
     }
 
-    // only proceed if png or jpg
-    // This is brilliant: https://stackoverflow.com/questions/27886677/javascript-get-extension-from-base64-image
-    // char(0) => '/' : jpg
-    // char(0) => 'i' : png
-    let fileext;
     console.log(base64Data.charAt(0));
-    if (base64Data.charAt(0) == "/") {
+    if (base64Data.charAt(0) === "/") {
       return {
         success: 1,
         info: "Image checks passed",
       };
-    } else if (base64Data.charAt(0) == "i") {
+    } else if (base64Data.charAt(0) === "i") {
       return {
         success: 1,
         info: "Image checks passed",
@@ -176,561 +149,348 @@ function CreateChannel() {
   const handleCreateChannel = async (e) => {
     // Check everything in order
     // skip this for now
+
     e.preventDefault();
 
-    if (
-      isEmpty(channelName) ||
-      isEmpty(channelInfo) ||
-      isEmpty(channelURL) ||
-      isEmpty(channelFile) ||
-      channelAlias
-        ? isEmpty(chainDetails)
-        : chainDetails
-        ? isEmpty(channelAlias)
-        : false
-    ) {
-      setProcessing(3);
-      setProcessingInfo("Channel Fields are Empty! Please retry!");
+    if (!channelFile) {
+      setLogoInfo("Please upload logo of the channel");
 
-      return false;
-    }
-
-    if(!isValidUrl(channelURL))
-    {
-      setProcessing(3);
-      setProcessingInfo("Channel Url is invalid! Please retry!");
       return false;
     }
 
     // Check complete, start logic
-    setChannelInfoDone(true);
+    // setChannelInfoDone(true);
+    proceed();
     setProcessing(1);
 
-    console.log({
-      chainDetails,
-      channelAlias,
-    });
-    var chainDetailsSplit = chainDetails.split(":");
-    var blockchain = chainDetailsSplit[0];
-    var chain_id = chainDetailsSplit[1];
-    var address = channelAlias;
+    const aliaschainId = chainDetails;
+    const aliasAddress = channelAlias;
 
-    const input = JSON.stringify({
+    let input = {
       name: channelName,
       info: channelInfo,
       url: channelURL,
       icon: channelFile,
-      blockchain: blockchain,
-      chain_id: chain_id,
-      address: address,
-    });
+      aliasDetails: getCAIPObj({
+        chainId: aliaschainId,
+        address: aliasAddress,
+      }),
+    };
 
+    console.log(input);
+
+    input = JSON.stringify(input);
+    setProgress(0);
+    console.log(`input is ${input}`);
     // const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
+    channelToast.showToast("Waiting for Confirmation...");
 
-    setProcessingInfo("Uploading Payload...");
-    // const storagePointer = await ipfs.add(input);
-    const storagePointer = await IPFSupload(input);
+    setProcessingInfo("Payload Uploaded");
+    setProgressInfo(
+      "Please complete the transaction in your wallet to continue."
+    );
+    setProgress(10);
+    // var storagePointer = (storagePointer = await ipfs.add(input));
+    let storagePointer = await IPFSupload(input);
     console.log("IPFS storagePointer:", storagePointer);
-    setProcessingInfo("Payload Uploaded, Approval to transfer DAI...");
+    // setProcessingInfo("Payload Uploaded, Approval to transfer DAI...");
     //console.log(await ipfs.cat(storagePointer));
 
     // Send Transaction
     // First Approve DAI
     var signer = library.getSigner(account);
+    console.log(signer);
 
     let daiContract = new ethers.Contract(addresses.dai, abis.erc20, signer);
 
     // Pick between 50 DAI AND 25K DAI
     const fees = ethers.utils.parseUnits(channelStakeFees.toString(), 18);
-    if (daiAmountVal < 50.0) {
-      var sendTransactionPromise = daiContract.approve(
+
+    try {
+      if (daiAmountVal < 50.0) {
+        var sendTransactionPromise = daiContract.approve(
+          addresses.epnscore,
+          fees
+        );
+        const tx = await sendTransactionPromise;
+
+        console.log(tx);
+        console.log("waiting for tx to finish");
+        setProgress(30);
+
+        await library.waitForTransaction(tx.hash);
+      }
+
+      let contract = new ethers.Contract(
         addresses.epnscore,
-        fees
+        abis.epnscore,
+        signer
       );
-      const tx = await sendTransactionPromise;
+
+      const channelType = 2; // Open Channel
+      const identity = "1+" + storagePointer; // IPFS Storage Type and HASH
+      const identityBytes = ethers.utils.toUtf8Bytes(identity);
+
+      setProgress(50);
+    
+      const tx = await contract.createChannelWithFees(
+        channelType,
+        identityBytes,
+        fees,
+        {
+          gasLimit: 1000000,
+        }
+      );
 
       console.log(tx);
-      console.log("waiting for tx to finish");
-      setProcessingInfo("Waiting for Approval TX to finish...");
+      console.log("Check: " + account);
+      let txCheck = await library.waitForTransaction(tx.hash);
 
-      await library.waitForTransaction(tx.hash);
-    }
+      if (txCheck.status === 0) {
+        channelToast.updateToast(
+          "Error",
+          `There was an error creating the channel`,
+          "ERROR",
+          (size) => <MdError size={size} color="red" />
+        );
 
-    let contract = new ethers.Contract(
-      addresses.epnscore,
-      abis.epnscore,
-      signer
-    );
-
-    const channelType = 2; // Open Channel
-    const identity = "1+" + storagePointer; // IPFS Storage Type and HASH
-    const identityBytes = ethers.utils.toUtf8Bytes(identity);
-
-    var anotherSendTxPromise = contract.createChannelWithFees(
-      channelType,
-      identityBytes,
-      fees,
-      {
-        gasLimit: 1000000,
-      }
-    );
-
-    setProcessingInfo("Creating Channel TX in progress");
-    anotherSendTxPromise
-      .then(async function(tx) {
-        console.log(tx);
-        console.log("Check: " + account);
-        await library.waitForTransaction(tx.hash);
         setProcessing(3);
-        setProcessingInfo("Channel Created! Reloading...");
-
+        setTxStatus(0);
+        setStepFlow(2);
+        setChannelInfoDone(false);
+        setUploadDone(false);
         setTimeout(() => {
+          setProcessing(0);
+        }, 500);
+      } else {
+        setProcessing(3);
+        setProgress(60);
+        setProgressInfo("Please wait while we confirm the transaction.");
+        setProcessingInfo("Transaction Confirmed");
+        setTimeout(() => {
+          setProgress(80);
+          setProgressInfo(
+            "Creating your channel, Aligning pixels, adjusting padding... This may take some time."
+          );
+          setProcessingInfo("Redirecting... Please do not refresh");
+          setProgress(90);
+        }, 2000);
+        setTimeout(() => {
+          setProgress(100);
           window.location.reload();
         }, 2000);
-      })
-      .catch((err) => {
-        console.log("Error --> %o", err);
-        console.log({ err });
-        setProcessing(3);
-        setProcessingInfo(
-          "There was an error creating your channel, please refer to our how-to guides for more information."
-        );
-      });
-  };
-
-  const isEmpty = (field) => {
-    if (field.trim().length == 0) {
-      return true;
-    }
-
-    return false;
-  };
-
-  //mind Dai
-  const mintDai = async () => {
-    try {
-      var signer = library.getSigner(account);
-      let daiContract = new ethers.Contract(addresses.dai, abis.dai, signer);
-      console.log({
-        daiContract,
-      });
-      console.log(1);
-      let daiAmount = 1000;
-      const amount = ethers.utils.parseUnits(daiAmount.toString(), 18);
-      console.log(2);
-      var mintTransactionPromise = daiContract.mint(amount);
-      console.log(3);
-      const tx = await mintTransactionPromise;
-      console.log(tx);
-      await library.waitForTransaction(tx.hash);
-      console.log(4);
-      setProcessingInfo("1000 Dai minted successfully!");
-      console.log("Transaction Completed");
+      }
     } catch (err) {
-      console.log(err);
-    }
+      console.log("hello", err);
+        if (err.code === 4001) {
+          // EIP-1193 userRejectedRequest error
+          channelToast.updateToast(
+            "Error",
+            `User denied message signature.`,
+            "ERROR",
+            (size) => <MdError size={size} color="red" />
+          );
+          setStepFlow(3);
+          setProcessing(0);
+          setUploadDone(false);
+        } else {
+          channelToast.updateToast(
+            "Error",
+            `There was an error creating the channel`,
+            "ERROR",
+            (size) => <MdError size={size} color="red" />
+          );
+
+          console.log("Error --> %o", err);
+          console.log({ err });
+          setProcessing(3);
+          setProgress(0);
+          setProgressInfo("There was an error creating the Channel");
+          setProcessingInfo(
+            "Kindly Contact support@epns.io to resolve the issue."
+          );
+        }
+      };
   };
+
+  useEffect(() => {
+    if (croppedImage) {
+      toDataURL(croppedImage, function(dataUrl) {
+        const response = handleLogoSizeLimitation(dataUrl);
+        if (response.success) {
+          setChannelFile(croppedImage);
+        }
+      });
+    } else {
+      return "Nothing";
+    }
+  }, [croppedImage]);
+
+  function toDataURL(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function() {
+      var reader = new FileReader();
+      reader.onloadend = function() {
+        callback(reader.result);
+      };
+      reader.readAsDataURL(xhr.response);
+    };
+    xhr.open("GET", url);
+    xhr.responseType = "blob";
+    xhr.send();
+  }
 
   return (
     <ThemeProvider theme={themes}>
-      <Section>
-        <Content padding="10px 20px 20px">
-          <Item align="flex-start">
-            <H2 textTransform="uppercase" spacing="0.1em">
-              <Span bg="#674c9f" color="#fff" weight="600" padding="0px 8px">
-                Create
-              </Span>
-              <Span weight="200" color={themes.color}>
-                {" "}
-                Your Channel!
+      <Section margin="0px 0px 40px">
+        <Content padding="10px 20px 10px">
+          <Item align="center">
+            <H2 textTransform="uppercase" spacing="0.075em">
+              <Span weight="400" size="32px" color={themes.color}>
+                Create Your Channel
               </Span>
             </H2>
-            <H3 color={themes.createColor}>
-              <b color={themes.createColor}>
-                Ethereum Push Notification Service
-              </b>{" "}
-              (EPNS) makes it extremely easy to open and maintain a genuine
+            <Span
+              color="#657795"
+              weight="400"
+              size="16px"
+              textTransform="none"
+              textAlign="center"
+              spacing="0.03em"
+              margin="0px 0px"
+            >
+              EPNS makes it extremely easy to open and maintain a genuine
               channel of communication with your users.
-            </H3>
+            </Span>
           </Item>
+          {txStatus === 0 && (
+            <Body>
+              <div>Transaction failed due to one of the following reasons:</div>
+              <p>1. There is not enough DAI in your wallet.</p>
+              <p>
+                2. Gas price increased due to network congestion. Adjust gas
+                limit manually.
+              </p>
+            </Body>
+          )}
         </Content>
       </Section>
 
-      <Section>
-        <Content padding="0px 20px 20px">
-          <ItemH justify="space-between">
-            <Step
-              bg="#fff"
-              activeBG="#e20880"
-              type={stepFlow >= 1 ? "active" : "inactive"}
+      {!onCoreNetwork ? (
+        <>
+          <TabSpace>
+            <p>
+              Please select {networkName[envConfig.coreContractChain]} Network
+              in your Wallet to create a channel.
+            </p>
+          </TabSpace>
+
+          <TextLine text-align="center">
+            You will be asked to change your network to the Alias Network after{" "}
+            <br></br>
+            channel creation is complete.
+          </TextLine>
+
+          <TextLink
+            href="https://docs.epns.io/developers/developer-zone/create-your-notif-channel/alias-on-polygon-network"
+            target="_blank"
+          >
+            <p>What is an Alias Network?</p>
+            <MdCallMade />
+          </TextLink>
+        </>
+      ) : (
+        <>
+          <Section>
+            <ItemHere>
+              <Tab type={stepFlow >= 1 ? "active" : "inactive"}>
+                <div>Staking Info</div>
+                <Step type={stepFlow >= 1 ? "active" : "inactive"} />
+              </Tab>
+              <Tab type={stepFlow >= 2 ? "active" : "inactive"}>
+                <div>Channel Info</div>
+                <Step type={stepFlow >= 2 ? "active" : "inactive"} />
+              </Tab>
+              <Tab type={stepFlow >= 3 ? "active" : "inactive"}>
+                <div>Upload Logo</div>
+                <Step type={stepFlow >= 3 ? "active" : "inactive"} />
+              </Tab>
+              <Line />
+            </ItemHere>
+          </Section>
+
+          {/* Stake Fees Section */}
+          {!stakeFeesChoosen && (
+            <StakingInfo
+              channelStakeFees={channelStakeFees}
+              setStakeFeesChoosen={setStakeFeesChoosen}
+              setStepFlow={setStepFlow}
+              setProcessingInfo={setProcessingInfo}
             />
-            <Step
-              bg="#fff"
-              activeBG="#e20880"
-              type={stepFlow >= 2 ? "active" : "inactive"}
+          )}
+
+          {/* Channel Entry */}
+          {stakeFeesChoosen && !channelInfoDone && (
+            <ChannelInfo
+              setStepFlow={setStepFlow}
+              channelName={channelName}
+              channelAlias={channelAlias}
+              channelInfo={channelInfo}
+              channelURL={channelURL}
+              chainDetails={chainDetails}
+              setChannelAlias={setChannelAlias}
+              setChainDetails={setChainDetails}
+              setChannelInfo={setChannelInfo}
+              setChannelName={setChannelName}
+              setChannelURL={setChannelURL}
+              setProcessing={setProcessing}
+              setProcessingInfo={setProcessingInfo}
+              setChannelInfoDone={setChannelInfoDone}
+              setTxStatus={setTxStatus}
             />
-            <Step
-              bg="#fff"
-              activeBG="#e20880"
-              type={stepFlow >= 3 ? "active" : "inactive"}
+          )}
+
+          {/* Image Upload Section */}
+          {!uploadDone && channelInfoDone && stakeFeesChoosen && (
+            <UploadLogo
+              croppedImage={croppedImage}
+              view={view}
+              imageSrc={imageSrc}
+              processing={processing}
+              setCroppedImage={setCroppedImage}
+              setView={setView}
+              setImageSrc={setImageSrc}
+              setProcessingInfo={setProcessingInfo}
+              handleCreateChannel={handleCreateChannel}
+              logoInfo={logoInfo}
             />
-            <Line />
-          </ItemH>
-        </Content>
-      </Section>
+          )}
 
-      {/* Image Upload Section */}
-      {!uploadDone && (
-        <Section>
-          <Content padding="50px 20px 20px">
-            <Item align="flex-start">
-              <H3 color="#e20880">
-                Upload Channel Logo to start the process. Make sure image is
-                128x128px.
-              </H3>
-            </Item>
-
-            <Item margin="-10px 0px 20px 0px">
-              <Dropzone
-                onChangeStatus={handleChangeStatus}
-                onSubmit={handleLogoSubmit}
-                onDrop={onDropHandler}
-                maxFiles={1}
-                multiple={false}
-                accept="image/jpeg,image/png"
-              />
-            </Item>
-            {chainId != 1 ? (
-              <Item align="flex-end">
-                <Minter
-                  onClick={() => {
-                    mintDai();
-                  }}
-                >
-                  <Pool>
-                    <br></br>
-                    <PoolShare>Get Free DAI for Channel</PoolShare>
-                  </Pool>
-                </Minter>
-              </Item>
-            ) : (
-              <></>
-            )}
-          </Content>
-        </Section>
-      )}
-
-      {/* Stake Fees Section */}
-      {uploadDone && !stakeFeesChoosen && (
-        <Section>
-          <Content padding="50px 0px 0px 0px">
-            {/* <Item align="flex-start" margin="0px 20px">
-              <H3 color="#e20880">Set your staking fees in DAI</H3>
-            </Item> */}
-
-            <Item
-              margin="-10px 20px 20px 20px"
-              padding="20px 20px 10px 20px"
-              bg="#f1f1f1"
-            >
-              {/* <Slider
-                defaultValue={minStakeFees}
-                onChangeCommitted={(event, value) => setChannelStakeFees(value)}
-                aria-labelledby="discrete-slider"
-                valueLabelDisplay="auto"
-                step={minStakeFees}
-                marks
-                min={minStakeFees}
-                max={25000}
-              /> */}
-              <Span
-                weight="400"
-                size="1.0em"
-                textTransform="uppercase"
-                spacing="0.2em"
-              >
-                Amount Staked: {channelStakeFees} DAI
-              </Span>
-            </Item>
-
-            <Item self="stretch" align="stretch" margin="20px 0px 0px 0px">
-              <Button
-                bg="#e20880"
-                color="#fff"
-                flex="1"
-                radius="0px"
-                padding="20px 10px"
-                onClick={() => {
-                  setStakeFeesChoosen(true);
-                  setStepFlow(3);
-                }}
-              >
-                <Span
-                  color="#fff"
-                  weight="400"
-                  textTransform="uppercase"
-                  spacing="0.1em"
-                >
-                  Continue
-                </Span>
-              </Button>
-            </Item>
-          </Content>
-        </Section>
-      )}
-
-      {/* Channel Entry */}
-      {uploadDone && stakeFeesChoosen && !channelInfoDone && (
-        <Section>
-          <Content padding="50px 0px 0px 0px">
-            <Item align="flex-start" margin="0px 20px">
-              <H3 color="#e20880">Setup your Channel Info</H3>
-            </Item>
-
-            <FormSubmision
-              flex="1"
-              direction="column"
-              margin="0px"
-              justify="center"
-              size="1.1rem"
-              onSubmit={handleCreateChannel}
-            >
-              <Item
-                margin="-10px 20px 15px 20px"
-                flex="1"
-                self="stretch"
-                align="stretch"
-              >
-                <Input
-                  required
-                  placeholder="Your Channel Name"
-                  maxlength="40"
-                  padding="12px"
-                  border="1px solid #000"
-                  weight="400"
-                  size="1.2em"
-                  bg="#fff"
-                  value={channelName}
-                  onChange={(e) => {
-                    setChannelName(e.target.value);
-                  }}
-                />
-                {channelName.trim().length == 0 && (
-                  <Span
-                    padding="4px 10px"
-                    right="0px"
-                    top="0px"
-                    pos="absolute"
-                    color="#fff"
-                    bg="#000"
-                    size="0.7rem"
-                    z="1"
-                  >
-                    Name of Channel
-                  </Span>
-                )}
-              </Item>
-
-              {/* <Item
-                margin="15px 20px 15px 20px"
-                flex="1"
-                self="stretch"
-                align="stretch"
-                style={{ position: "relative" }}
-              >
-                <Select
-                  className="basic-single"
-                  classNamePrefix="select"
-                  placeholder="Alias network"
-                  name="color"
-                  options={ALIAS_CHAINS}
-                  theme={(theme) => ({
-                    ...theme,
-                    borderRadius: 0,
-                    colors: {
-                      ...theme.colors,
-                      primary25: "#e20880",
-                      primary: "#e20880",
-                    },
-                  })}
-                  onChange={(selectedOption) => {
-                    setChainDetails(selectedOption.value);
-                  }}
-                />
-                <Input
-                  placeholder="Your Channel's Alias address"
-                  maxlength="40"
-                  padding="12px"
-                  style={{ paddingLeft: "22%" }}
-                  border="1px solid #000"
-                  weight="400"
-                  size="1rem"
-                  bg="#fff"
-                  value={channelAlias}
-                  onChange={(e) => {
-                    setChannelAlias(e.target.value);
-                  }}
-                />
-              </Item> */}
-              <Item
-                margin="15px 20px 15px 20px"
-                flex="1"
-                self="stretch"
-                align="stretch"
-              >
-                <TextField
-                  required
-                  placeholder="Your Channel's Short Description (250 Characters)"
-                  rows="4"
-                  maxlength="250"
-                  radius="4px"
-                  padding="12px"
-                  weight="400"
-                  border="1px solid #000"
-                  bg="#fff"
-                  value={channelInfo}
-                  onChange={(e) => {
-                    setChannelInfo(e.target.value.slice(0,250));
-                  }}
-                  autocomplete="off"
-                />
-                
-                <SpanR>
-                  {250-channelInfo.length} characters remains
-                </SpanR>
-              </Item>
-
-              <ItemH
-                margin="15px 20px 15px 20px"
-                flex="1"
-                self="stretch"
-                align="center"
-              >
-                <Item flex="0" margin="0px 5px 0px 0px">
-                  <FiLink size={24} color={themes.color} />
-                </Item>
-                <Item flex="1" margin="0px 0px 0px 5px" align="stretch">
-                  <Input
-                    required
-                    placeholder="Call to Action Link"
-                    padding="12px"
-                    border="1px solid #000"
-                    radius="4px"
-                    weight="400"
-                    bg="#f1f1f1"
-                    value={channelURL}
-                    onChange={(e) => {
-                      setChannelURL(e.target.value);
-                    }}
-                  />
-                  {channelURL.trim().length == 0 && (
-                    <Span
-                      padding="4px 10px"
-                      right="0px"
-                      top="0px"
-                      pos="absolute"
-                      color="#fff"
-                      bg="#000"
-                      size="0.7rem"
-                      z="1"
-                    >
-                      Channel's Website URL
-                    </Span>
-                  )}
-                </Item>
-              </ItemH>
-
-              <Item
-                margin="15px 0px 0px 0px"
-                flex="1"
-                self="stretch"
-                align="stretch"
-              >
-                <Button
-                  bg="#e20880"
-                  color="#fff"
-                  flex="1"
-                  radius="0px"
-                  padding="20px 10px"
-                  disabled={processing == 1 ? true : false}
-                >
-                  {processing == 1 && (
-                    <Loader type="Oval" color="#fff" height={24} width={24} />
-                  )}
-                  {processing != 1 && (
-                    <Input
-                      cursor="hand"
-                      textTransform="uppercase"
-                      color="#fff"
-                      weight="400"
-                      size="0.8em"
-                      spacing="0.2em"
-                      type="submit"
-                      value="Setup Channel"
-                    />
-                  )}
-                </Button>
-              </Item>
-            </FormSubmision>
-          </Content>
-        </Section>
-      )}
-
-      {/* Channel Setup Progress */}
-      {(processing == 1 || processing == 3) && (
-        <Section>
-          <Content padding="0px 0px 0px 0px">
-            {processing == 1 && (
-              <Item margin="20px 0px 10px 0px">
-                <Loader type="Oval" color="#000" height={24} width={24} />
-              </Item>
-            )}
-
-            <Item
-              color="#fff"
-              bg={processing == 1 ? "#e1087f" : "#000"}
-              padding="10px 15px"
-              margin="15px 0px"
-            >
-              <Span
-                color="#fff"
-                textTransform="uppercase"
-                spacing="0.1em"
-                weight="400"
-                size="1em"
-              >
-                {processingInfo}
-              </Span>
-            </Item>
-          </Content>
-        </Section>
+          {/* Channel Setup Progress */}
+          {(processing === 1 || processing === 3) && (
+            <ProcessingInfo
+              progress={progress}
+              progressInfo={progressInfo}
+              processingInfo={processingInfo}
+            />
+          )}
+        </>
       )}
     </ThemeProvider>
   );
 }
 
 // css styles
-const SpanR = styled.div`
-color: #e20880;
-opacity: 0.7;
-position: absolute;
-bottom: 0px;
-right: 0.8rem;
-z-index: 1;
-`;
-
 const Step = styled.div`
-  height: 12px;
-  width: 12px;
-  background: ${(props) => props.bg || "#fff"};
-  border: 4px solid ${(props) => props.activeBG || "#000"};
-  border-radius: 100%;
+  height: 5px;
+  width: 100%;
+  background: #cfd7e4;
+  border-radius: 13px;
 
   ${({ type }) =>
-    type == "active" &&
+    type === "active" &&
     css`
-      background: ${(props) => props.activeBG || "#ddd"};
-      border: 4px solid #00000022;
+      background: #e20880;
     `};
 `;
 
@@ -744,107 +504,133 @@ const Line = styled.div`
   z-index: -1;
 `;
 
-const Channel = styled.div`
+const TabSpace = styled.div`
+  width: 60%;
   display: flex;
-  flex-direction: column;
-  flex: 1;
-`;
-
-const Notice = styled.div`
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-`;
-
-const Title = styled.h1`
-  color: #674c9f;
-  font-size: 30px;
-  font-weight: 300;
-  margin-top: 0px;
-  margin-bottom: 30px;
-`;
-
-const Info = styled.label`
-  padding-bottom: 20px;
-  font-size: 14px;
-  color: #000;
-`;
-
-const Info2 = styled(Info)``;
-const Name = styled(Input)`
-  border-bottom: 1px solid #e20880;
-  font-size: 24px;
-`;
-
-const ShortInfo = styled.textarea`
-  outline: 0;
-  border: 0;
-  border-bottom: 1px solid #35c5f3;
-  margin: 10px;
-  font-size: 18px;
-  min-height: 80px;
-  color: #111;
-`;
-
-const Url = styled(Input)`
-  border-bottom: 1px solid #674c9f;
-  font-size: 1=8px;
-`;
-
-const Text = styled.span``;
-
-const Continue = styled.button`
-  border: 0;
-  outline: 0;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  color: #fff;
+  height: 167px;
   border-radius: 20px;
-  font-size: 14px;
-  background: ${(props) => props.theme || "#674c9f"};
-  margin: 30px 0px 0px 0px;
-  border-radius: 8px;
-  padding: 16px;
-  font-size: 16px;
-  font-weight: 400;
-`;
-const Minter = styled.div`
-  display: flex;
-  flex-direction: row;
-  font-size: 13px;
-`;
-
-const ChannelMetaBox = styled.label`
-  margin: 0px 5px;
-  color: #fff;
-  font-weight: 600;
-  padding: 10px 20px;
-  border-radius: 10px;
-  font-size: 15px;
-  // font-size: 11px;
-`;
-const Pool = styled.div`
-  margin: 0px 10px;
-  display: flex;
-  flex-direction: row;
+  background-color: #f4f5fa;
+  margin: 0 auto;
+  text-transform: none;
+  margin-top: 60px;
+  color: #cf1c84;
   align-items: center;
+  line-height: 24px;
+  font-size: 18px;
+  font-weight: 500;
+  p {
+    padding: 0 200px;
+    text-align: center;
+    @media (max-width: 600px) {
+      padding: 0 10px;
+    }
+    @media (max-width: 1224px) {
+      padding: 0 50px;
+    }
+  }
+  @media (max-width: 600px) {
+    font-size: 12px;
+    height: auto;
+  }
+  @media (max-width: 1224px) {
+    font-size: 16px;
+  }
 `;
 
-const PoolShare = styled(ChannelMetaBox)`
-  background: #e20880;
-  // background: #674c9f;
-  transition: 300ms;
-  cursor: pointer;
+const TextLine = styled.p`
+  text-transform: none;
+  margin-top: 60px;
+  color: #657795;
+  line-height: 21px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+`;
 
+const TextLink = styled.a`
+  text-transform: none;
+  margin-top: 30px;
+  color: #cf1c84;
+  line-height: 21px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
   &:hover {
-    opacity: 0.7;
-  }
-
-  &:active {
-    opacity: 0.85;
+    text-decoration: underline;
   }
 `;
 
-// Export Default
+const Tab = styled.div`
+  position: relative;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0px 10px;
+  color: #657795;
+  div {
+    margin: 5px 0px;
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+  }
+
+  @media (max-width: 600px) {
+    width: 100%;
+  }
+
+  ${({ type }) =>
+    type === "active" &&
+    css`
+      color: #e20880;
+    `};
+`;
+
+const ItemHere = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  @media (max-width: 600px) {
+    display: flex;
+    flex-direction: column;
+  }
+  @media (max-width: 1224px) {
+    display: flex;
+    flex-direction: row;
+  }
+`;
+
+const Body = styled.div`
+  margin: 10px auto 0px auto;
+  width: 55%;
+  padding: 30px;
+  background-color: #f5f5fa;
+  border-radius: 20px;
+  div {
+    text-align: center;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 21px;
+    text-align: center;
+    color: #657795;
+  }
+  p {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 22px;
+    color: #cf1c84;
+  }
+  @media (max-width: 600px) {
+    width: 95%;
+  }
+  @media (max-width: 1224px) {
+    width: 75%;
+  }
+`;
 export default CreateChannel;

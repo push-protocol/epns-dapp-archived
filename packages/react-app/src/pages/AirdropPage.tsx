@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import ReactGA from "react-ga";
 
-import styled, { css, useTheme } from 'styled-components';
-import {Section, Content, Item, ItemH, ItemBreak, Para, A, B, H1, H2, H3, Image, P, Span, Anchor, Button, Showoff, FormSubmision, Input, TextField} from 'components/SharedStyling';
+import styled, { useTheme } from 'styled-components';
+import { Section, Content, Item, Para, A, B, H2, H3, Span, Button } from '../primaries/SharedStyling';
 
-import { AiFillHeart } from 'react-icons/ai';
 import { BsChevronExpand } from 'react-icons/bs';
 
-import Loader from 'react-loader-spinner'
-import { ToastContainer, toast } from 'react-toastify';
+import { Oval } from 'react-loader-spinner'
+import { toast } from 'react-toastify';
 
 import { useWeb3React } from '@web3-react/core'
 import { addresses, abis } from "@project/contracts";
@@ -16,15 +15,11 @@ import { ethers } from "ethers";
 
 import AirdropHelper from 'helpers/AirdropHelper';
 
-import ViewInfoItem from "components/ViewInfoItem";
-
-import {ThemeProvider} from "styled-components";
-
-import { themeLight, themeDark } from "config/Themization";
+import { ThemeProvider } from "styled-components";
+import { envConfig } from "@project/contracts";
 
 
 import * as dotenv from "dotenv";
-import UsersDataStore from "singletons/UsersDataStore";
 dotenv.config();
 
 // Other Information section
@@ -34,11 +29,12 @@ function AirdropPage() {
 
   const themes = useTheme();
 
-  const { account, library } = useWeb3React();
+  const { account, library, chainId } = useWeb3React();
+  const onCoreNetwork = chainId === envConfig.coreContractChain;
 
   const [controlAt, setControlAt] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
-  const [ txInProgress, setTxInProgress ] = React.useState(false);
+  const [txInProgress, setTxInProgress] = React.useState(false);
   const [distributorContract, setDistributorContract] = React.useState(null);
   const [user, setUser] = React.useState(null);
 
@@ -52,18 +48,23 @@ function AirdropPage() {
   }
 
   React.useEffect(() => {
+    if (!onCoreNetwork) {
+      const url = window.location.origin;
+      window.location.replace(`${url}/#/notavailable`);
+    }
+  })
+
+  React.useEffect(() => {
     if (!!(library && account)) {
       let signer = library.getSigner(account);
       console.log(abis.distributor)
       const signerInstance = new ethers.Contract(addresses.distributor, abis.distributor, signer);
       setDistributorContract(signerInstance);
-      // const NFTRewardsInstance = new ethers.Contract(addresses.NFTRewards, abis.NFTRewards, signer);
-      // setNFTRewardsContract(NFTRewardsInstance);
     }
-  }, [account,library]);
+  }, [account, library]);
 
   React.useEffect(() => {
-    if(distributorContract){
+    if (distributorContract) {
       checkClaim();
     }
   }, [account, distributorContract]);
@@ -72,20 +73,20 @@ function AirdropPage() {
   const checkClaim = async () => {
     let user = await AirdropHelper.verifyAddress(account, distributorContract);
     setUser(user)
-    if(user)
-    setLoading(false)
+    if (user)
+      setLoading(false)
   }
 
   // to claim
   const handleClaim = async (user) => {
-    if(distributorContract){
+    if (distributorContract) {
       setTxInProgress(true)
       let sendWithTxPromise
       sendWithTxPromise = await distributorContract.claim(user.index, user.account, user.amount, user.proof)
       const tx = await sendWithTxPromise;
       console.log(tx);
       console.log("waiting for tx to finish");
-      let txToast = toast.dark(<LoaderToast msg="Waiting for Confirmation..." color="#35c5f3"/>, {
+      let txToast = toast.dark(<LoaderToast msg="Waiting for Confirmation..." color="#35c5f3" />, {
         position: "bottom-right",
         autoClose: false,
         hideProgressBar: true,
@@ -105,7 +106,7 @@ function AirdropPage() {
 
         setTxInProgress(false);
       }
-      catch(e) {
+      catch (e) {
         toast.update(txToast, {
           render: "Transaction Failed! (" + e.name + ")",
           type: toast.TYPE.ERROR,
@@ -121,18 +122,14 @@ function AirdropPage() {
   // toast customize
   const LoaderToast = ({ msg, color }) => (
     <Toaster>
-      <Loader
-       type="Oval"
-       color={color}
-       height={30}
-       width={30}
+      <Oval
+        color={color}
+        height={30}
+        width={30}
       />
       <ToasterMsg>{msg}</ToasterMsg>
     </Toaster>
   )
-
-  const [darkMode, setDarkMode] = useState(false);
-
 
   return (
     <ThemeProvider theme={themes}>
@@ -156,40 +153,39 @@ function AirdropPage() {
 
           <Item padding="40px 0px 20px 0px">
             {loading &&
-              <Loader
-               type="Oval"
-               color="#35c5f3"
-               height={40}
-               width={40}
+              <Oval
+                color="#35c5f3"
+                height={40}
+                width={40}
               />
             }
 
             {!loading && controlAt == 0 &&
               <>
-              {user.verified && user.claimable &&
-                <EpicButton
-                  onClick={() => {handleClaim(user)}}
-                >
-                  Claim $PUSH Tokens
-                </EpicButton>
-              }
-              {user.verified && !user.claimable &&
+                {user.verified && user.claimable &&
+                  <EpicButton
+                    onClick={() => { handleClaim(user) }}
+                  >
+                    Claim $PUSH Tokens
+                  </EpicButton>
+                }
+                {user.verified && !user.claimable &&
 
-                <EpicButton
-                  theme="claimed"
-                  disabled={true}
-                >
-                  $PUSH Tokens Claimed
-                </EpicButton>
-              }
-              {!user.verified &&
+                  <EpicButton
+                    theme="claimed"
+                    disabled={true}
+                  >
+                    $PUSH Tokens Claimed
+                  </EpicButton>
+                }
+                {!user.verified &&
                   <EpicButton
                     theme="noteligible"
                     disabled={true}
                   >
                     Not eligible for Gratitude Drop
                   </EpicButton>
-              }
+                }
               </>
             }
           </Item>
@@ -206,13 +202,13 @@ function AirdropPage() {
             <Item align="stretch" margin="0px 0px 0px 0px">
               <QnAItem>
                 <Question
-                  onClick={() => {toggleShowAnswer(1)}}
+                  onClick={() => { toggleShowAnswer(1) }}
                   hover="#e20880"
                 >
                   <Span color={themes.color}>
                     What is $PUSH contract address?
                   </Span>
-                  <BsChevronExpand size={20} color={"#ddd"}/>
+                  <BsChevronExpand size={20} color={"#ddd"} />
                 </Question>
 
                 {showAnswers[1] &&
@@ -224,13 +220,13 @@ function AirdropPage() {
 
               <QnAItem>
                 <Question
-                  onClick={() => {toggleShowAnswer(2)}}
+                  onClick={() => { toggleShowAnswer(2) }}
                   hover="#e20880"
                 >
                   <Span color={themes.color}>
                     What is EPNS?
                   </Span>
-                  <BsChevronExpand size={20} color={"#ddd"}/>
+                  <BsChevronExpand size={20} color={"#ddd"} />
                 </Question>
 
                 {showAnswers[2] &&
@@ -244,13 +240,13 @@ function AirdropPage() {
 
               <QnAItem>
                 <Question
-                  onClick={() => {toggleShowAnswer(3)}}
+                  onClick={() => { toggleShowAnswer(3) }}
                   hover="#e20880"
                 >
                   <Span color={themes.color}>
                     Why are push notifications important for Web3?
                   </Span>
-                  <BsChevronExpand size={20} color={"#ddd"}/>
+                  <BsChevronExpand size={20} color={"#ddd"} />
                 </Question>
 
                 {showAnswers[3] &&
@@ -268,13 +264,13 @@ function AirdropPage() {
 
               <QnAItem>
                 <Question
-                  onClick={() => {toggleShowAnswer(4)}}
+                  onClick={() => { toggleShowAnswer(4) }}
                   hover="#e20880"
                 >
                   <Span color={themes.color}>
                     How can I keep up with EPNS?
                   </Span>
-                  <BsChevronExpand size={20} color={"#ddd"}/>
+                  <BsChevronExpand size={20} color={"#ddd"} />
                 </Question>
 
                 {showAnswers[4] &&
@@ -292,88 +288,6 @@ function AirdropPage() {
     </ThemeProvider>
   );
 }
-
-// css styles
-const Container = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-
-  font-weight: 200;
-  align-content: center;
-  align-items: center;
-  justify-content: center;
-
-  max-height: 80vh;
-  background: ${props => props.theme.mainBg};
-`
-
-const ContainerInfo = styled.div`
-  padding: 20px;
-`
-const InfoBox = styled.div`
-  padding: 10px 20px;
-  display: block;
-  align-self: stretch;
-  background: #fafafa;
-`
-const Continue = styled.button`
-  border: 0;
-  outline: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  border-radius: 20px;
-  font-size: 14px;
-  background: ${props => props.theme || '#674c9f'};
-  margin: 30px 0px 0px 0px;
-  border-radius: 8px;
-  padding: 16px;
-  font-size: 16px;
-  font-weight: 400;
-`
-
-const ChannelTitleLink = styled.a`
-  text-decoration: none;
-  font-weight: 600;
-  color: #e20880;
-  font-size: 20px;
-  &:hover {
-    text-decoration: underline;
-    cursor: pointer;
-    pointer: hand;
-  }
-`
-const AppLink = styled.a`
-  text-decoration: none;
-  font-weight: 600;
-  color: #e20880;
-  font-size: 20px;
-  &:hover {
-    text-decoration: underline;
-    cursor: pointer;
-    pointer: hand;
-  }
-`
-const AppLinkText = styled.div`
-  text-decoration: none;
-  font-weight: 600;
-  color: #e20880;
-  font-size: 20px;
-`
-const ChannelInfo = styled.div`
-  flex: 1;
-  margin: 5px 10px;
-  min-width: 120px;
-  flex-grow: 4;
-  flex-direction: column;
-  display: flex;
-`
-
-const ChannelTitle = styled.div`
-  margin-bottom: 5px;
-`
 
 const Toaster = styled.div`
   display: flex;
@@ -453,7 +367,7 @@ const EpicButton = styled(A)`
   color: #fff;
   font-weight: 600;
   border-radius: 8px;
-  background: ${prop => prop.theme===('claimed' || 'noteligible') ? '#000' : 'linear-gradient(273deg, #674c9f 0%, rgba(226,8,128,1) 100%)'};
+  background: ${prop => prop.theme === ('claimed' || 'noteligible') ? '#000' : 'linear-gradient(273deg, #674c9f 0%, rgba(226,8,128,1) 100%)'};
 `
 
 // Export Default
