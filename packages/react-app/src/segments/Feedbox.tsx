@@ -398,8 +398,8 @@ function Feedbox(props) {
                       <Waypoint onEnter={() => handlePagination()} />
                     )}
                     <NotificationItem
-                      notificationTitle={notification.title}
-                      notificationBody={notification.body}
+                      notificationTitle={title}
+                      notificationBody={message}
                       cta={cta}
                       app={app}
                       icon={icon}
