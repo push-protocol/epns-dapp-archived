@@ -329,7 +329,7 @@ export default class ChannelsDataStore {
       pageSize: pageCount,
       address: account,
       chainId: chainId,
-      query: " ",
+      query: "0x",
       op: "read",
     }).then((response) => {
       let output;
