@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { toast } from "react-toastify";
 
-export function useBrowserNotification(account){
+export function useBrowserNotification(account, chainId){
     const [triggerNotification, setTriggerNotification] = useState(false);
      
     useEffect(() => {
@@ -9,7 +9,7 @@ export function useBrowserNotification(account){
       if (!account) return;
       (async function () {
         const {browserFunction} = require('firebase')
-        await browserFunction(account);
+        await browserFunction(account, chainId);
       })();
     }, [account]);
   
