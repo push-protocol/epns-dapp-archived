@@ -4,7 +4,7 @@ import ReactGA from "react-ga";
 import { Web3Provider } from "ethers/providers";
 import { useWeb3React } from "@web3-react/core";
 import { AbstractConnector } from "@web3-react/abstract-connector";
-import { useEagerConnect, useInactiveListener, useBrowserNotification } from "hooks";
+import { useEagerConnect, useInactiveListener } from "hooks";
 import { injected, walletconnect, portis, ledger } from "connectors";
 import { envConfig } from "@project/contracts";
 import Joyride, { CallBackProps } from "react-joyride";
@@ -53,7 +53,7 @@ export default function App() {
 
   const dispatch = useDispatch();
 
-  const { connector, activate, active, error, account } = useWeb3React<Web3Provider>();
+  const { connector, activate, active, error } = useWeb3React<Web3Provider>();
   const [activatingConnector, setActivatingConnector] = React.useState<
     AbstractConnector
   >();
@@ -91,7 +91,7 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(false);
 
   // Enable browser notification
-  useBrowserNotification(account)
+  // useBrowserNotification(account, chainId);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
