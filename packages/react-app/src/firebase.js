@@ -2,6 +2,7 @@ import { initializeApp } from "@firebase/app";
 import { envConfig } from "@project/contracts";
 import { getMessaging, getToken, onMessage } from "@firebase/messaging";
 import { postReq } from "api";
+import { convertAddressToAddrCaip } from "helpers/CaipHelper";
 
 // Initialize the Firebase app in the service worker by passing the generated config
 var firebaseConfig = { ...envConfig.firebaseConfig };
@@ -28,6 +29,7 @@ export const getPushToken = async () => {
     console.log('\n\n\n\n')
     console.log("An error occurred while retrieving token. ", err);
     console.log('\n\n\n\n')
+    throw Error(err);
   }
 };
 
@@ -38,19 +40,19 @@ export const onMessageListener = () =>
     });
 });
 
-export const browserFunction = async(account)=>{
+export const browserFunction = async(account, chainId)=>{
   try{
     const tokenKey = `${CACHEPREFIX}${account}`;
     const tokenExists = localStorage.getItem(tokenKey) || localStorage.getItem(CACHEPREFIX); //temp to prevent more than 1 account to register
     if (!tokenExists) {
       const response = await getPushToken();
+      const walletAddr = convertAddressToAddrCaip(account.toLowerCase(), chainId)
       const object = {
-        op: 'register',
-        wallet: account.toLowerCase(),
+        wallet: walletAddr,
         device_token: response,
         platform: 'dapp',
       };
-      await postReq('/pushtokens/register', object);
+      await postReq('/v1/pushtokens/register', object);
       localStorage.setItem(tokenKey, response);
       localStorage.setItem(CACHEPREFIX, 'response'); //temp to prevent more than 1 account to register
     }
